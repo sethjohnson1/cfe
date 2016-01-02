@@ -18,13 +18,27 @@ class FirearmsController extends AppController {
 		$this->CFE_StaffIDs=array(100000263,
 		//	100000264,100000265,100000266,100000267,100000268
 			);
+		
+		//available packages, I think I will make this do a one-time pull from MINDBODY and insert into database, then they can visit URL to update it. Need to see how that will work though first.
+		$this->CFEpackages=array(
+			'id1'=>array('name'=>'Cowboy','price'=>60),
+			'id2'=>array('name'=>'Western','price'=>65),
+			'id3'=>array('name'=>'Gatling','price'=>80)
+		);
 	}
 	
 	public function pickpkg(){
+		$pickpkg=array('Cowboy'=>array('action'=>'pickdate',1),'Western'=>array('action'=>'pickdate',2),'Gatling'=>array('action'=>'pickdate',3));
+		
+		$this->set('pickpkg',$this->CFEpackages);
 		$this->render('pickpkg','frontend');
 	}
 	
-	public function pickdate(){
+	public function pickdate($package_id=null){
+	if (!isset($package_id)){
+		$this->Session->setFlash('Please select a package first', 'flash_danger');
+		return $this->redirect(array('action' => 'pickpkg'));	
+	}
 		$dates=array();
 		//just fill some in for now, maybe have a calendar someday
 		for ($i=0;$i<$this->maxDays;$i++){
@@ -90,7 +104,7 @@ class FirearmsController extends AppController {
 		}
 		//API response not successful
 		else{
-			echo 'Sorry there was an error with the request <br/>';
+			$this->Session->setFlash('Sorry, something went wrong with the request.', 'flash_danger');
 			debug($data);
 		}
 

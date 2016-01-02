@@ -1,4 +1,7 @@
-
+.session-flash{
+	font-size:1.5em;
+	margin: 8px;
+}
 .date-btns{
 	width:90%;
 	font-size:2em;
