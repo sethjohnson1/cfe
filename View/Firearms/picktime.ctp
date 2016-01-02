@@ -1,10 +1,14 @@
 <div class="row">
 <div class="col-xs-12">
+<?=$this->element('selected_package')?>
+</div>
+<div class="col-xs-12">
 <h1>Pick a Time for <?=date('D M d, Y',strtotime($pickdate))?></h1>
 </div>
 <?
-echo $this->Form->create('Firearm',array('url'=>array('action'=>'addcart')));
+echo $this->Form->create('Firearm',array('url'=>array('action'=>'cart')));
 echo $this->Form->input('pickdate',array('type'=>'hidden','value'=>$pickdate,'name'=>'data[Picktime][picktime]'));
+echo $this->Form->input('package_id',array('type'=>'hidden','value'=>$package_id,'name'=>'data[Picktime][package_id]'));
 ?>
 
 <?foreach ($available_times as $key=>$slot):

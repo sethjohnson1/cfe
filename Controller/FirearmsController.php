@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
 
 class FirearmsController extends AppController {
 
-	public $components = array('Paginator');
+	public $components = array('Paginator','Cookie');
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
@@ -25,11 +25,25 @@ class FirearmsController extends AppController {
 			'id2'=>array('name'=>'Western','price'=>65),
 			'id3'=>array('name'=>'Gatling','price'=>80)
 		);
+		$this->CFEextras=array(
+			'eid1'=>array('name'=>'Double Your Fun','retailprice'=>40,'price'=>30),
+			'eid2'=>array('name'=>'Target','retailprice'=>4,'price'=>3),
+			'eid3'=>array('name'=>'Gatling','price'=>80)
+		);
+		
+		//now the Cookie setup, maybe this should be AppController
+		$this->Cookie->name = 'CodyFirearmsExperience';
+		$this->Cookie->time = '1 day';
+//enable these in production!
+	//	$this->Cookie->domain = Configure::read('siteDomain');
+	//	$this->Cookie->secure = true;  // i.e. only sent if using secure HTTPS
+		$this->Cookie->key = Configure::read('cookieKey');
+		$this->Cookie->httpOnly = true;
+		$this->Cookie->type('aes');
+		
 	}
 	
 	public function pickpkg(){
-		$pickpkg=array('Cowboy'=>array('action'=>'pickdate',1),'Western'=>array('action'=>'pickdate',2),'Gatling'=>array('action'=>'pickdate',3));
-		
 		$this->set('pickpkg',$this->CFEpackages);
 		$this->render('pickpkg','frontend');
 	}
@@ -44,12 +58,18 @@ class FirearmsController extends AppController {
 		for ($i=0;$i<$this->maxDays;$i++){
 			$dates[$i]=date('Y-m-d', strtotime('today + '.$i.' days'));
 		}	
-		$this->set(compact('dates'));
+		$selected_package=$this->CFEpackages[$package_id];
+		
+		$this->set(compact('dates','selected_package','package_id'));
 		$this->render('pickdate','frontend');
 	}
 
 
-	public function picktime(){
+	public function picktime($package_id=null){
+	if (!isset($package_id)){
+		$this->Session->setFlash('Please select a package first', 'flash_danger');
+		return $this->redirect(array('action' => 'pickpkg'));	
+	}
 		if (isset($this->request->query['t'])){
 			$pickdate=date('Y-m-d',strtotime($this->request->query['t']));
 			//make sure the date is valid and within range
@@ -79,13 +99,7 @@ class FirearmsController extends AppController {
 			if (count($data['GetBookableItemsResult']['ScheduleItems'])>1){
 				foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
 					$interval=$schitem['StartDateTime'];
-				//	debug($schitem['StartDateTime']);
-				//	debug(date('c',strtotime($schitem['StartDateTime'])+1800));
-					//debug($schitem['EndDateTime']);
-					
 					do {
-					
-						//debug($interval);
 						array_push($available_times,$interval);
 						$interval=date('c',strtotime($interval)+1800);
 					}
@@ -107,20 +121,42 @@ class FirearmsController extends AppController {
 			$this->Session->setFlash('Sorry, something went wrong with the request.', 'flash_danger');
 			debug($data);
 		}
-
+		$selected_package=$this->CFEpackages[$package_id];
 		$this->set('request',$mb->getXMLRequest());
-		$this->set(compact('available_times','pickdate'));
+		$this->set(compact('available_times','pickdate','package_id','selected_package'));
 		$this->render('picktime','frontend');
 		
 	}
 	
-	public function addcart(){
+	public function cart(){
+		$packages=$this->CFEpackages;
+		$cart_items=$this->Cookie->read('CartItems');
+		if (!$cart_items) $this->Session->setFlash('Your cart is empty!', 'flash_danger');
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
 			$picktime=$this->request->data['Picktime'];
 			$mbdate=$picktime['picktime'].'T'.$picktime['slot'];
-			debug($mbdate);
+			//use the date as the key to prevent the same slot added to cart twice
+			$cart_items['Packages'][$mbdate]=$picktime['package_id'];
+			$this->Cookie->write('CartItems',$cart_items);
+			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
 		}
+		$this->set(compact('cart_items','packages'));
+		$this->render('cart','frontend');
+	}
+	
+	public function cart_remove_package($mbdate=null){
+		$cart_items=$this->Cookie->read('CartItems');
+		$this->Cookie->delete('CartItems');
+		unset($cart_items['Packages'][urldecode($mbdate)]);
+		if (count($cart_items['Packages'])<1) unset($cart_items['Packages']);
+		$this->Cookie->write('CartItems',$cart_items);
+		$flash='Item removed from cart';
+		$this->Session->setFlash($flash, 'flash_custom');
+		return $this->redirect(array('action' => 'cart'));
+		
+		//cookies never write if you don't render to valid view!
+		$this->render('cart','frontend');
 	}
 	
 	//everything below is useful test stuff
