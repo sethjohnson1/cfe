@@ -39,27 +39,30 @@ class ProductsController extends AppController {
 		foreach ($this->CFE_Categories as $cat_id=>$cat_name){
 			
 			$data=$mb->GetProducts(array('SellOnline'=>true,'CategoryIDs'=>array($cat_id)));
-			
-			//if only one result it needs to be fixed up
-			if (isset($data['GetProductsResult']['Products']['Product']['ID'])){
-				$temp_data=array();
-				$temp_data=$data['GetProductsResult']['Products']['Product'];
-				unset($data['GetProductsResult']['Products']['Product']);
-				$data['GetProductsResult']['Products']['Product'][0]=$temp_data;
-			}
-			
-			
-			foreach ($data['GetProductsResult']['Products']['Product'] as $key=>$product){
-				$product['barcodeID']=$product['ID'];
-				unset($product['ID']);
-				//assuming we only have one category
-				$product['CategoryID']=$cat_id;
-				$product['CategoryName']=$cat_name;
-				$product['prodtype']='Product';
-				$this->Product->create();
-				if ($this->Product->save($product)) {
-					$this->Session->setFlash('Products have been updated','flash_success');
+			if ($data['GetProductsResult']['ErrorCode']==200){
+				//if only one result it needs to be fixed up
+				if (isset($data['GetProductsResult']['Products']['Product']['ID'])){
+					$temp_data=array();
+					$temp_data=$data['GetProductsResult']['Products']['Product'];
+					unset($data['GetProductsResult']['Products']['Product']);
+					$data['GetProductsResult']['Products']['Product'][0]=$temp_data;
 				}
+				
+				//debug($data);
+				foreach ($data['GetProductsResult']['Products']['Product'] as $key=>$product){
+					$product['CategoryID']=$cat_id;
+					$product['CategoryName']=$cat_name;
+					$product['prodtype']='Product';
+					$product['barcodeID']=$product['ID'];
+					$this->Product->create();
+					if ($this->Product->save($product)) {
+						$this->Session->setFlash('Products have been updated','flash_success');
+					}
+				}
+			}
+			else{
+				$this->Session->setFlash('Something has gone wrong, try again then seek help.','flash_danger');
+				debug($data);
 			}
 		}
 		//I don't think we need this part, might as well just use products and categories
@@ -90,6 +93,7 @@ class ProductsController extends AppController {
 			}
 		}
 		*/
+		
 		
 		
 	//	$this->set('request',$mb->getXMLRequest());

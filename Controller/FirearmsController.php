@@ -25,14 +25,14 @@ class FirearmsController extends AppController {
 		$packages=$this->Product->find('all',array('conditions'=>array('Product.CategoryName'=>'Food')));
 		$new_pack=array();
 		foreach ($packages as $package){
-			$new_pack[$package['Product']['id']]=$package['Product'];
+			$new_pack[$package['Product']['barcodeID']]=$package['Product'];
 		}
 		$this->CFE_packages=$new_pack;
 		
 		$extras=$this->Product->find('all',array('conditions'=>array('Product.CategoryName'=>'Retail')));
 		$new_ex=array();
 		foreach ($extras as $extra){
-			$new_ex[$extra['Product']['id']]=$extra['Product'];
+			$new_ex[$extra['Product']['barcodeID']]=$extra['Product'];
 		}
 		
 		$this->CFE_extras=$new_ex;
@@ -138,22 +138,9 @@ class FirearmsController extends AppController {
 	public function cart(){
 		$packages=$this->CFE_packages;
 		$extras=$this->CFE_extras;
-		//debug($this->CFEProducts);
 		$cart_items=$this->Cookie->read('CartItems');
 		if (!$cart_items) $this->Session->setFlash('Your cart is empty!', 'flash_danger');
 		
-		//make a total
-		$cart_total=0;
-		if (isset($cart_items['Packages'])){
-			foreach ($cart_items['Packages'] as $mbdate=>$pid){
-				$cart_total=$cart_total+$packages[$pid]['Price'];	
-			}
-		}
-		if (isset($cart_items['Extras'])){
-			foreach ($cart_items['Extras'] as $name=>$pid){
-				$cart_total=$cart_total+$extras[$pid]['Price'];	
-			}
-		}
 		
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
@@ -164,19 +151,39 @@ class FirearmsController extends AppController {
 			$this->Cookie->write('CartItems',$cart_items);
 			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
 		}
-		//came from cart itself, so update or checkout
-		if (isset($this->request->data['Cart'])){
-		/********** This is where I left off, adding these items ********/
+		//came from cart itself, this is update
+		if (isset($this->request->data['Cart']['update_button'])){
 			$update=$this->request->data['Cart'];
-			debug($update);
-			//$mbdate=$picktime['picktime'].'T'.$picktime['slot'];
-			//use the date as the key to prevent the same slot added to cart twice
-			//$cart_items['Packages'][$mbdate]=$picktime['package_id'];
-			//$this->Cookie->write('CartItems',$cart_items);
-			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
+			//debug($update);
+			//remake the cookie
+			$this->Cookie->delete('CartItems');
+			unset($cart_items['Extras']);
+			foreach ($update['Extras'] as $id=>$qty){
+				//use the id as the key to prevent the same slot added to cart twice
+				$cart_items['Extras'][$id]=$qty;
+				//
+			}
+			
+			$this->Cookie->write('CartItems',$cart_items);
+			$this->Session->setFlash('Updated quantities', 'flash_success');
 		}
-
-		$this->set(compact('cart_items','packages','extras'));
+		
+		//make a total
+		$cart_total=0;
+		if (isset($cart_items['Packages'])){
+			foreach ($cart_items['Packages'] as $mbdate=>$pid){
+				$cart_total=$cart_total+$packages[$pid]['Price'];	
+			}
+		}
+		if (isset($cart_items['Extras'])){
+			foreach ($cart_items['Extras'] as $pid=>$qty){
+				$cart_total=$cart_total+($extras[$pid]['Price']*$qty);	
+			}
+		}
+		
+		//this just doesn't seem to work
+		//$this->request->data['Cart']['Extras'][189]=3;
+		$this->set(compact('cart_items','packages','extras','cart_total'));
 		$this->render('cart','frontend');
 	}
 	
