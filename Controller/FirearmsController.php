@@ -19,17 +19,23 @@ class FirearmsController extends AppController {
 		//	100000264,100000265,100000266,100000267,100000268
 			);
 		
-		//available packages, I think I will make this do a one-time pull from MINDBODY and insert into database, then they can visit URL to update it. Need to see how that will work though first.
-		$this->CFEpackages=array(
-			'id1'=>array('name'=>'Cowboy','price'=>60),
-			'id2'=>array('name'=>'Western','price'=>65),
-			'id3'=>array('name'=>'Gatling','price'=>80)
-		);
-		$this->CFEextras=array(
-			'eid1'=>array('name'=>'Double Your Fun','retailprice'=>40,'price'=>30),
-			'eid2'=>array('name'=>'Target','retailprice'=>4,'price'=>3),
-			'eid3'=>array('name'=>'Photo e-mailed to you','price'=>5)
-		);
+		//available packages, just using 'Food' category for now
+
+		$this->loadModel('Product');
+		$packages=$this->Product->find('all',array('conditions'=>array('Product.CategoryName'=>'Food')));
+		$new_pack=array();
+		foreach ($packages as $package){
+			$new_pack[$package['Product']['id']]=$package['Product'];
+		}
+		$this->CFE_packages=$new_pack;
+		
+		$extras=$this->Product->find('all',array('conditions'=>array('Product.CategoryName'=>'Retail')));
+		$new_ex=array();
+		foreach ($extras as $extra){
+			$new_ex[$extra['Product']['id']]=$extra['Product'];
+		}
+		
+		$this->CFE_extras=$new_ex;
 		
 		//now the Cookie setup, maybe this should be AppController
 		$this->Cookie->name = 'CodyFirearmsExperience';
@@ -44,7 +50,7 @@ class FirearmsController extends AppController {
 	}
 	
 	public function pickpkg(){
-		$this->set('pickpkg',$this->CFEpackages);
+		$this->set('pickpkg',$this->CFE_packages);
 		$this->render('pickpkg','frontend');
 	}
 	
@@ -58,7 +64,7 @@ class FirearmsController extends AppController {
 		for ($i=0;$i<$this->maxDays;$i++){
 			$dates[$i]=date('Y-m-d', strtotime('today + '.$i.' days'));
 		}	
-		$selected_package=$this->CFEpackages[$package_id];
+		$selected_package=$this->CFE_packages[$package_id];
 		
 		$this->set(compact('dates','selected_package','package_id'));
 		$this->render('pickdate','frontend');
@@ -96,6 +102,7 @@ class FirearmsController extends AppController {
 			//make an array of intervals (1800 is 30 min.)
 			//AN IDEA! Could use separate staff and just make an associative array of available times with the court as the value
 			$available_times=array();
+			//THIS DOESN'T WORK RIGHT, FLAWED LOGIC
 			if (count($data['GetBookableItemsResult']['ScheduleItems'])>1){
 				foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
 					$interval=$schitem['StartDateTime'];
@@ -121,7 +128,7 @@ class FirearmsController extends AppController {
 			$this->Session->setFlash('Sorry, something went wrong with the request.', 'flash_danger');
 			debug($data);
 		}
-		$selected_package=$this->CFEpackages[$package_id];
+		$selected_package=$this->CFE_packages[$package_id];
 		$this->set('request',$mb->getXMLRequest());
 		$this->set(compact('available_times','pickdate','package_id','selected_package'));
 		$this->render('picktime','frontend');
@@ -129,9 +136,25 @@ class FirearmsController extends AppController {
 	}
 	
 	public function cart(){
-		$packages=$this->CFEpackages;
+		$packages=$this->CFE_packages;
+		$extras=$this->CFE_extras;
+		//debug($this->CFEProducts);
 		$cart_items=$this->Cookie->read('CartItems');
 		if (!$cart_items) $this->Session->setFlash('Your cart is empty!', 'flash_danger');
+		
+		//make a total
+		$cart_total=0;
+		if (isset($cart_items['Packages'])){
+			foreach ($cart_items['Packages'] as $mbdate=>$pid){
+				$cart_total=$cart_total+$packages[$pid]['Price'];	
+			}
+		}
+		if (isset($cart_items['Extras'])){
+			foreach ($cart_items['Extras'] as $name=>$pid){
+				$cart_total=$cart_total+$extras[$pid]['Price'];	
+			}
+		}
+		
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
 			$picktime=$this->request->data['Picktime'];
@@ -141,7 +164,19 @@ class FirearmsController extends AppController {
 			$this->Cookie->write('CartItems',$cart_items);
 			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
 		}
-		$this->set(compact('cart_items','packages'));
+		//came from cart itself, so update or checkout
+		if (isset($this->request->data['Cart'])){
+		/********** This is where I left off, adding these items ********/
+			$update=$this->request->data['Cart'];
+			debug($update);
+			//$mbdate=$picktime['picktime'].'T'.$picktime['slot'];
+			//use the date as the key to prevent the same slot added to cart twice
+			//$cart_items['Packages'][$mbdate]=$picktime['package_id'];
+			//$this->Cookie->write('CartItems',$cart_items);
+			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
+		}
+
+		$this->set(compact('cart_items','packages','extras'));
 		$this->render('cart','frontend');
 	}
 	
@@ -170,11 +205,21 @@ class FirearmsController extends AppController {
 		*/
 		//26 is Retail from Sandbox, get this by inspecting dropdown element on GUI
 		$data=$mb->GetProducts(array('SellOnline'=>true,'CategoryIDs'=>array(26)));
+		//$data=$mb->GetServices(array('SellOnline'=>true,'SessionTypeIDs'=>$this->CFESessionTypeIDs));
 		//this only gets Session times and only shows dates starting in 1899 in Sandbox?
 		//$data = $mb->GetActiveSessionTimes(array('XMLDetail'=>'Full','PageSize'=>3,'CurrentPageIndex'=>0,'StartTime'=>'2015-12-30T00:00:00','EndTime'=>'2016-01-06T20:00:00','SessionTypeIDs'=>array(214)));
 		
 		//this works great for getting services
-		//$data = $mb->GetServices(array('XMLDetail'=>'Full','PageSize'=>50,'LocationID'=>1,'HideRelatedPrograms'=>true,'SessionTypeIDs'=>array(214)));
+		//$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>$this->CFESessionTypeIDs,'PageSize'=>1));
+		
+		//if only one returned then fix it up
+		if (isset($data['GetServicesResult']['Services']['Service']['ID'])){
+			$temp_data=array();
+			$temp_data=$data['GetServicesResult']['Services']['Service'];
+			unset($data['GetServicesResult']['Services']['Service']);
+			$data['GetServicesResult']['Services']['Service'][0]=$temp_data;
+		}
+		echo count($data['GetServicesResult']['Services']);
 		
 		//get staff, doesn't do much for us 
 		//$data=$mb->GetStaff(array('SessionTypeID'=>214,'StartDateTime'=>'2015-12-31T10:30:00'));

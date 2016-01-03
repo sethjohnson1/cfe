@@ -19,6 +19,7 @@ create table products(
 	primary key(id),
 	created datetime,
 	modified datetime,
+	prodtype varchar(255), -- either Product or Service depending on API call
 	-- no good way to get this yet...
 	img varchar(40),
 	
