@@ -19,7 +19,8 @@ $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun!</td></tr>
+<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun!</td>
+<td></td><td></td><td><input type="checkbox" name="data[][]" class="" checked="checked" value="1"></input></td></tr>
 <?
 
 endforeach?>
@@ -43,6 +44,7 @@ You must have at least one package to complete checkout<br />
 
 <div class="col-xs-12">
 <h2>Targets and Extra Ammo</h2>
+<h2><small>Shirts, hats, drinks/snacks and other merchandise are available at our full retail store.</small></h2>
 <?if (isset($cart_items['Extras'])){?>
 <table class="table table-hover"> 
 <thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 

@@ -28,7 +28,7 @@ class FirearmsController extends AppController {
 		$this->CFEextras=array(
 			'eid1'=>array('name'=>'Double Your Fun','retailprice'=>40,'price'=>30),
 			'eid2'=>array('name'=>'Target','retailprice'=>4,'price'=>3),
-			'eid3'=>array('name'=>'Gatling','price'=>80)
+			'eid3'=>array('name'=>'Photo e-mailed to you','price'=>5)
 		);
 		
 		//now the Cookie setup, maybe this should be AppController
@@ -159,6 +159,7 @@ class FirearmsController extends AppController {
 		$this->render('cart','frontend');
 	}
 	
+	
 	//everything below is useful test stuff
 	public function index() {
 		require_once('MB_API.php');
@@ -167,15 +168,8 @@ class FirearmsController extends AppController {
 		/*
 			SessionTypeID 214 is the 90 min reservation from the sandbox, get this by hovering over it in MINDBODY GUI
 		*/
-		
-		//this returns a single time slot or chunks of time slots - basically exactly what you need!
-		$data = $mb->GetBookableItems(array('SessionTypeIDs'=>array(214),'StaffIDs'=>array(100000263),'StartDate'=>date('Y-m-d'),'EndDate'=>date('Y-m-d')));
-		
-		foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$val){
-			debug($val['StartDateTime']);
-			debug($val['EndDateTime']);
-		}
-		
+		//26 is Retail from Sandbox, get this by inspecting dropdown element on GUI
+		$data=$mb->GetProducts(array('SellOnline'=>true,'CategoryIDs'=>array(26)));
 		//this only gets Session times and only shows dates starting in 1899 in Sandbox?
 		//$data = $mb->GetActiveSessionTimes(array('XMLDetail'=>'Full','PageSize'=>3,'CurrentPageIndex'=>0,'StartTime'=>'2015-12-30T00:00:00','EndTime'=>'2016-01-06T20:00:00','SessionTypeIDs'=>array(214)));
 		
