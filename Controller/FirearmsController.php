@@ -168,16 +168,16 @@ class FirearmsController extends AppController {
 			$this->Session->setFlash('Updated quantities', 'flash_success');
 		}
 		
-		//make a total
+		//make a total AFTER everything is updated
 		$cart_total=0;
 		if (isset($cart_items['Packages'])){
 			foreach ($cart_items['Packages'] as $mbdate=>$pid){
-				$cart_total=$cart_total+$packages[$pid]['Price'];	
+				$cart_total=$cart_total+$packages[$pid]['OnlinePrice'];	
 			}
 		}
 		if (isset($cart_items['Extras'])){
 			foreach ($cart_items['Extras'] as $pid=>$qty){
-				$cart_total=$cart_total+($extras[$pid]['Price']*$qty);	
+				$cart_total=$cart_total+($extras[$pid]['OnlinePrice']*$qty);	
 			}
 		}
 		

@@ -16,14 +16,16 @@ $disabled=false;
 foreach ($cart_items['Packages'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
-<tr> <th scope="row"><?=$packages[$id]['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$packages[$id]['Price']?></td>
+<tr> <th scope="row"><?=$packages[$id]['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$packages[$id]['Price']?></strike></span></td>
 <td><?
 $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun!</td>
-<td></td><td></td><td><input type="checkbox" name="data[][]" class="" checked="checked" value="1"></input></td></tr>
+<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount!</span></td>
+<td></td>
+<td><span style="color:red"><strike>40</strike></span>&nbsp;&nbsp;30</td>
+<td><input type="checkbox" name="data[][]" class="" checked="checked" value="1"></input></td></tr>
 <?
 
 endforeach?>
@@ -54,10 +56,13 @@ You must have at least one package to complete checkout<br />
 ?>
 <?if (isset($extras)){?>
 <table class="table table-hover"> 
-<thead> <tr> <th>Item</th> <th>Description</th> <th></th> <th>Price</th><th>Qty</th> </tr> </thead><tbody> 
+<thead> <tr> <th>Item</th> <th>Description</th> <th>Retail</th> <th>Online Price</th><th>Qty</th> </tr> </thead><tbody> 
 <?
-
+//using counter for mockup
+$i=0;
 foreach ($extras as $id=>$extra):
+$i++;
+if ($i>3) break;
 $qty_val=0;
 //debug($cart_items['Extras']);
 if (isset($cart_items['Extras'][$extra['barcodeID']])){
@@ -65,7 +70,7 @@ if (isset($cart_items['Extras'][$extra['barcodeID']])){
 }
 
 ?>
-<tr> <th scope="row"><?=$extra['Name']?></th> <td><?=$extra['ShortDesc']?></td> <td></td> <td><?=$extras[$id]['Price']?></td>
+<tr> <th scope="row"><?=$extra['Name']?></th> <td><?=$extra['ShortDesc']?></td> <td><span style="color:red"><strike><?=$extras[$id]['Price']?></strike></span></td> <td><span style="color:green"><strong> <?=$extras[$id]['OnlinePrice']?></strong></span></td>
 <td>
 <?=$this->Form->input($extra['barcodeID'],array('type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>99,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'))?>
 </td> </tr>
