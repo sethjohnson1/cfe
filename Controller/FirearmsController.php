@@ -136,7 +136,7 @@ class FirearmsController extends AppController {
 	public function cart(){
 		$packages=$this->CFE_packages;
 		$extras=$this->CFE_extras;
-		
+		$this->Cookie->delete('CheckoutTotal');
 		$cart_items=$this->Cookie->read('CartItems');
 		//remove expired items
 		if (isset($cart_items['Packages'])){
@@ -178,8 +178,7 @@ class FirearmsController extends AppController {
 			//begin checkout
 			if(isset($this->request->data['Cart']['checkout_button'])){
 				//write Session variable to match cookie, checkout page will match them
-				$this->Session->write('CheckoutItems',$cart_items);
-				$checkout=$this->Session->read('CheckoutItems');
+				$this->Cookie->write('CheckoutItems',$cart_items);
 				return $this->redirect(array('action' => 'checkout'));
 			}
 		}
@@ -218,33 +217,14 @@ class FirearmsController extends AppController {
 	public function checkout(){
 		$packages=$this->CFE_packages;
 		$extras=$this->CFE_extras;
-		//just using first value, once gatling is added we will do something else
-		$session_id=$this->CFE_SessionTypeIDs[0];
-		$staff_id=$this->CFE_StaffIDs[0];
-		$checkout_items=$this->Session->read('CheckoutItems');
+
+		$checkout_items=$this->Cookie->read('CheckoutItems');
 		if (!isset($checkout_items['Packages'])){
 			$this->Session->setFlash('No current package selected. Selected package may have expired.', 'flash_custom');
 			return $this->redirect(array('action' => 'cart'));
 		}
-		//make array ready for MINDBODY API
-		$CartItems=array();
-		$itemkey=0;
-		foreach ($checkout_items['Packages'] as $mbdate=>$product_id){
-			$CartItems[$itemkey]['Quantity']=1;
-			$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
-			$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$staff_id),'SessionType'=>array('ID'=>$session_id));
-			$itemkey++;
-		}
-		foreach ($checkout_items['Extras'] as $product_id=>$qty){
-			if ($qty>0){
-				$CartItems[$itemkey]['Quantity']=$qty;
-				$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
-				$itemkey++;
-			}
-		}
-		//this is the proper thing, set to Session
-		$this->Session->write('CheckoutItems',$CartItems);
 		
+		//write the total to Cookie so we can compare it.
 		$checkout_total=0;
 		if (isset($checkout_items['Packages'])){
 			foreach ($checkout_items['Packages'] as $mbdate=>$pid){
@@ -256,14 +236,105 @@ class FirearmsController extends AppController {
 				$checkout_total=$checkout_total+($extras[$pid]['OnlinePrice']*$qty);	
 			}
 		}
-		
-		$this->set(compact('checkout_items','CartItems','packages','extras','checkout_total'));
+
+		$this->Cookie->write('CheckoutTotal',$checkout_total);
+		$this->set(compact('checkout_items','packages','extras','checkout_total'));
 		$this->render('checkout','frontend');
 	}
 	
 	public function transact(){
-		$checkout=$this->Session->read('CheckoutItems');
-		debug($checkout);
+		if (isset($this->request->data['Firearm'])){
+			$packages=$this->CFE_packages;
+			$extras=$this->CFE_extras;
+			//just using first value, once gatling is added we will do something else
+			$session_id=$this->CFE_SessionTypeIDs[0];
+			$staff_id=$this->CFE_StaffIDs[0];
+			$checkout_items=$this->Cookie->read('CheckoutItems');
+			//debug($checkout_items);
+			$CartItems=$this->Cookie->read('CheckoutItems');
+			$client=$this->request->data['Firearm'];
+			//debug($client);
+			
+			$client['Username']='web'.time();
+			$client['BirthDate']=date('Y-m-d',strtotime($client['BirthDate']));
+			$client['Password']=time().Configure::read('userPasswords');
+			$client['Notes']=$_SERVER['REMOTE_ADDR'].'-'.time();
+			//$client['Gender']='Male';
+			//$client['LiabilityRelease']=0;
+			$client['ID']=CakeText::uuid();
+			$client['EmailOptIn']=0;
+			$client['ReferredBy']='website';
+			
+			require_once('MB_API.php');
+			$mb = new MB_API();
+			$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
+				'Test'=>false,
+				'Clients'=>array('Client'=>$client)));
+			if ($add['AddOrUpdateClientsResult']['ErrorCode']==200){
+				//client added, now checkout the cart
+				
+				//use this amount to ensure there was no discrepency (i.e. open in another window)
+				$Amount=$this->Cookie->read('CheckoutTotal');
+				
+				//make array ready for MINDBODY API
+				$CartItems=array();
+				$itemkey=0;
+				foreach ($checkout_items['Packages'] as $mbdate=>$product_id){
+					$CartItems[$itemkey]['Quantity']=1;
+					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
+					//$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$staff_id,'isMale'=>false),'SessionType'=>array('ID'=>$session_id));
+					$CartItems[$itemkey]['DiscountAmount']=0;
+					$itemkey++;
+				}
+				foreach ($checkout_items['Extras'] as $product_id=>$qty){
+					if ($qty>0){
+						$CartItems[$itemkey]['Quantity']=$qty;
+						$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
+						$CartItems[$itemkey]['DiscountAmount']=0;
+						$itemkey++;
+					}
+				}
+
+				//build payment info
+				$PaymentInfo['CreditCardNumber']=$this->request->data['Firearm']['CreditCardNumber'];
+				$PaymentInfo['Amount']=$Amount;
+				if (strlen($this->request->data['Firearm']['ExpYear'])==2) $PaymentInfo['ExpYear']='20'.$this->request->data['Firearm']['ExpYear'];
+				else $PaymentInfo['ExpYear']=$this->request->data['Firearm']['ExpYear'];
+				$PaymentInfo['ExpMonth']=$this->request->data['Firearm']['ExpMonth'];
+				$PaymentInfo['BillingName']=$this->request->data['Firearm']['BillingName'];
+				
+				if ($this->request->data['Firearm']['SameBilling'] !=true){
+					$PaymentInfo['BillingAddress']=$this->request->data['Firearm']['BillingAddress'];
+					$PaymentInfo['BillingCity']=$this->request->data['Firearm']['BillingCity'];
+					$PaymentInfo['BillingState']=$this->request->data['Firearm']['BillingState'];
+					$PaymentInfo['BillingPostalCode']=$this->request->data['Firearm']['BillingPostalCode'];
+				}
+				else{
+					$PaymentInfo['BillingAddress']=$this->request->data['Firearm']['AddressLine1']."\n".$this->request->data['Firearm']['AddressLine2'];
+					$PaymentInfo['BillingCity']=$this->request->data['Firearm']['City'];
+					$PaymentInfo['BillingState']=$this->request->data['Firearm']['State'];
+					$PaymentInfo['BillingPostalCode']=$this->request->data['Firearm']['PostalCode'];
+				}
+				$Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
+
+				$checkout=$mb->CheckoutShoppingCart(array('Test'=>true,
+					'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
+					'CartItems'=>$CartItems,
+					'Payments'=>$Payments,
+					//products WILL NOT SELL unless you say InStore...
+					'InStore'=>true
+				));
+				//debug($CartItems);
+				debug($checkout);
+				$this->set('request',$mb->getXMLRequest());
+			}
+			else {
+				$this->Session->setFlash('Unable to save client, please ensure all fields are filled out properly.', 'flash_danger');
+				debug($add);
+			}
+		}
+		
+		//debug($checkout);
 		$this->render('transact','frontend');
 	}
 	//everything below is useful test stuff
@@ -284,24 +355,14 @@ class FirearmsController extends AppController {
 		//$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>$this->CFESessionTypeIDs,'PageSize'=>1));
 		
 		//if only one returned then fix it up
-		if (isset($data['GetServicesResult']['Services']['Service']['ID'])){
-			$temp_data=array();
-			$temp_data=$data['GetServicesResult']['Services']['Service'];
-			unset($data['GetServicesResult']['Services']['Service']);
-			$data['GetServicesResult']['Services']['Service'][0]=$temp_data;
-		}
-		echo count($data['GetServicesResult']['Services']);
-		
+
 		//get staff, doesn't do much for us 
 		//$data=$mb->GetStaff(array('SessionTypeID'=>214,'StartDateTime'=>'2015-12-31T10:30:00'));
 		//not sure what these are, found them in "Arrivals"
 		//$data=$mb->GetPackages(array('SellOnline'=>false));
 		
 		//beginning demo of how o add asi values to the request
-	/*	$data = $mb->CheckoutShoppingCart(array(
-			'Test'=>true,
-			'ClientID'=>1234,
-			'CartItems'=>array(
+	/*	$CartItems=array(
 			//numbering the array here seems to work fine. Yay!
 			0=>array(
 				'Quantity'=>1,
@@ -311,16 +372,18 @@ class FirearmsController extends AppController {
 				'Quantity'=>1,
 				'Item' => new SoapVar(array('ID'=>"1234"), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5'),
 				'DiscountAmount' => 1234)
-			),
+			);
+			debug($CartItems);
+		$data = $mb->CheckoutShoppingCart(array(
+			'Test'=>true,
+			'ClientID'=>1234,
+			'CartItems'=>$CartItems,
 			'Payments' => array(
 			'PaymentInfo' => new SoapVar(array('Amount'=>"1234"), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5'))
 		));
 		*/
 		debug($data);
-		$this->Prg->commonProcess();
-		$this->Firearm->recursive = 0;
-		$this->paginate = array('conditions' => $this->Firearm->parseCriteria($this->Prg->parsedParams()));
-		$this->set('firearms', $this->paginate());
+
 		$this->set('request',$mb->getXMLRequest());
 	}
 	
@@ -339,39 +402,17 @@ class FirearmsController extends AppController {
 			'Test'=>false,
 			'Clients'=>array(
 			'Client'=>array(
-				//obviously these need to be randomized or dealt with somehow
-				'Username'=>'random'.time(),
-				'Password'=>'random1test',
-				'Notes'=>'some notes like timestamp and IP',
-				'Gender'=>'Male',
-				'LiabilityRelease'=>0,
-				'EmergencyContactInfoName'=>'...',
-				'ID'=>$userid,
-				'FirstName'=>'SethTest',
-				'MiddleName'=>'Junir',
-				'LastName'=>time(),
-				'Email'=>'seth@example.com',
-				'EmailOptIn'=>0,
-				'AddressLine1'=>'2117 Test Road',
-				'AddressLine2'=>'Address Line 2 test',
-				'City'=>'Cody',
-				'State'=>'CO',
-				'PostalCode'=>'12345',
-				'Country'=>'USA',
-				'MobilePhone'=>'307-999-9999',
-				'HomePhone'=>'307-999-9999',
-				'WorkPhone'=>'307-999-9999',
-				'BirthDate'=>date("c"),
-				'ReferredBy'=>'website'
-				
-				)),
+	'FirstName' => 's',
+	'LastName' => 'troll',
+	'BirthDate' => '1989-01-26'
+)),
 		
 		));
 		
 		debug($add);
 		
 		//this works!
-		$book=$mb->AddOrUpdateAppointments(array(
+	/*	$book=$mb->AddOrUpdateAppointments(array(
 			'Test'=>false,
 			//'SendEmail'=>true,
 			'Appointments'=>array(
@@ -386,11 +427,12 @@ class FirearmsController extends AppController {
 					//'StaffRequested'=>true
 				))
 		));
+		*/
 		
 
 		
 		//if this returns Success then it worked
-		debug($book);
+		//debug($book);
 
 		$this->set('request',$mb->getXMLRequest());
 	}

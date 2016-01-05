@@ -25,7 +25,7 @@ create table products(
 	
 	-- direct copy of MINDBODY GetProducts response
 	-- this is returned just as 'ID' but uniqueness isn't supported
-	barcodeID int,
+	barcodeID varchar(255),
 	Price float,
 	TaxRate float,
 	GroupID int,
