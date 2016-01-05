@@ -22,7 +22,7 @@ $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount!</span></td>
+<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount! (these do nothing. Subcategories?)</span></td>
 <td></td>
 <td><span style="color:red"><strike>40</strike></span>&nbsp;&nbsp;30</td>
 <td><input type="checkbox" name="data[][]" class="" checked="checked" value="1"></input></td></tr>

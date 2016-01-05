@@ -65,8 +65,8 @@ class ProductsController extends AppController {
 				debug($data);
 			}
 		}
-		//I don't think we need this part, might as well just use products and categories
-		/*
+		//now get services for each specified SessionID, this makes the checkout much easier
+		
 		foreach ($this->CFE_SessionTypeIDs as $ses_id=>$ses_name){
 			
 			$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>array($ses_id)));
@@ -82,7 +82,6 @@ class ProductsController extends AppController {
 			foreach ($data['GetServicesResult']['Services']['Service'] as $key=>$product){
 				$product['barcodeID']=$product['ID'];
 				unset($product['ID']);
-				//assuming we only have one category
 				$product['CategoryID']=$ses_id;
 				$product['CategoryName']=$ses_name;
 				$product['prodtype']='Service';
@@ -92,7 +91,7 @@ class ProductsController extends AppController {
 				}
 			}
 		}
-		*/
+		
 		
 		
 		

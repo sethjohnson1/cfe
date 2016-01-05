@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
 
 class FirearmsController extends AppController {
 
-	public $components = array('Paginator','Cookie');
+	public $components = array('Paginator','Cookie','Session');
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
@@ -19,17 +19,17 @@ class FirearmsController extends AppController {
 		//	100000264,100000265,100000266,100000267,100000268
 			);
 		
-		//available packages, just using 'Food' category for now
+		//available packages and products
 
 		$this->loadModel('Product');
-		$packages=$this->Product->find('all',array('conditions'=>array('Product.CategoryName'=>'Food')));
+		$packages=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Service')));
 		$new_pack=array();
 		foreach ($packages as $package){
 			$new_pack[$package['Product']['barcodeID']]=$package['Product'];
 		}
 		$this->CFE_packages=$new_pack;
 		
-		$extras=$this->Product->find('all',array('conditions'=>array('Product.CategoryName'=>'Retail')));
+		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
 		foreach ($extras as $extra){
 			$new_ex[$extra['Product']['barcodeID']]=$extra['Product'];
@@ -102,25 +102,23 @@ class FirearmsController extends AppController {
 			//make an array of intervals (1800 is 30 min.)
 			//AN IDEA! Could use separate staff and just make an associative array of available times with the court as the value
 			$available_times=array();
-			//THIS DOESN'T WORK RIGHT, FLAWED LOGIC
-			if (count($data['GetBookableItemsResult']['ScheduleItems'])>1){
-				foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
-					$interval=$schitem['StartDateTime'];
-					do {
-						array_push($available_times,$interval);
-						$interval=date('c',strtotime($interval)+1800);
-					}
-					while ($interval <= $schitem['EndDateTime']);
+			//debug($data);
+			//if a single item make into array
+			if (isset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']['ID'])){
+					$temp_data=array();
+					$temp_data=$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'];
+					unset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']);
+					$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'][0]=$temp_data;
 				}
-			}
-			//there is only one. What if there are zero? Need to check that!!
-			else{
-				$interval=$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']['StartDateTime'];
+			
+			foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
+				$interval=$schitem['StartDateTime'];
 				do {
-						array_push($available_times,$interval);
-						$interval=date('c',strtotime($interval)+1800);
-					}
-					while ($interval <= $data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']['EndDateTime']);
+					//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file
+					if (strtotime($interval) > (time())) array_push($available_times,$interval);
+					$interval=date('c',strtotime($interval)+1800);
+				}
+				while ($interval <= $schitem['EndDateTime']);
 			}
 		}
 		//API response not successful
@@ -138,7 +136,18 @@ class FirearmsController extends AppController {
 	public function cart(){
 		$packages=$this->CFE_packages;
 		$extras=$this->CFE_extras;
+		
 		$cart_items=$this->Cookie->read('CartItems');
+		//remove expired items
+		if (isset($cart_items['Packages'])){
+			foreach ($cart_items['Packages'] as $date=>$item){
+				if (strtotime($date)<time()){ 
+				unset($cart_items['Packages'][$date]);
+				}
+			}
+			if (count($cart_items['Packages'])<1) unset($cart_items['Packages']);
+			$this->Cookie->write('CartItems',$cart_items);
+		}
 		if (!$cart_items) $this->Session->setFlash('Your cart is empty!', 'flash_danger');
 		
 		
@@ -151,11 +160,10 @@ class FirearmsController extends AppController {
 			$this->Cookie->write('CartItems',$cart_items);
 			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
 		}
-		//came from cart itself, this is update
-		if (isset($this->request->data['Cart']['update_button'])){
+		//came from cart itself, this is update and checkout
+		if (isset($this->request->data['Cart']['update_button']) || isset($this->request->data['Cart']['checkout_button'])){
+		//first update cart
 			$update=$this->request->data['Cart'];
-			//debug($update);
-			//remake the cookie
 			$this->Cookie->delete('CartItems');
 			unset($cart_items['Extras']);
 			foreach ($update['Extras'] as $id=>$qty){
@@ -166,6 +174,14 @@ class FirearmsController extends AppController {
 			
 			$this->Cookie->write('CartItems',$cart_items);
 			$this->Session->setFlash('Updated quantities', 'flash_success');
+			
+			//begin checkout
+			if(isset($this->request->data['Cart']['checkout_button'])){
+				//write Session variable to match cookie, checkout page will match them
+				$this->Session->write('CheckoutItems',$cart_items);
+				$checkout=$this->Session->read('CheckoutItems');
+				return $this->redirect(array('action' => 'checkout'));
+			}
 		}
 		
 		//make a total AFTER everything is updated
@@ -181,8 +197,6 @@ class FirearmsController extends AppController {
 			}
 		}
 		
-		//this just doesn't seem to work
-		//$this->request->data['Cart']['Extras'][189]=3;
 		$this->set(compact('cart_items','packages','extras','cart_total'));
 		$this->render('cart','frontend');
 	}
@@ -201,7 +215,57 @@ class FirearmsController extends AppController {
 		$this->render('cart','frontend');
 	}
 	
+	public function checkout(){
+		$packages=$this->CFE_packages;
+		$extras=$this->CFE_extras;
+		//just using first value, once gatling is added we will do something else
+		$session_id=$this->CFE_SessionTypeIDs[0];
+		$staff_id=$this->CFE_StaffIDs[0];
+		$checkout_items=$this->Session->read('CheckoutItems');
+		if (!isset($checkout_items['Packages'])){
+			$this->Session->setFlash('No current package selected. Selected package may have expired.', 'flash_custom');
+			return $this->redirect(array('action' => 'cart'));
+		}
+		//make array ready for MINDBODY API
+		$CartItems=array();
+		$itemkey=0;
+		foreach ($checkout_items['Packages'] as $mbdate=>$product_id){
+			$CartItems[$itemkey]['Quantity']=1;
+			$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
+			$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$staff_id),'SessionType'=>array('ID'=>$session_id));
+			$itemkey++;
+		}
+		foreach ($checkout_items['Extras'] as $product_id=>$qty){
+			if ($qty>0){
+				$CartItems[$itemkey]['Quantity']=$qty;
+				$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
+				$itemkey++;
+			}
+		}
+		//this is the proper thing, set to Session
+		$this->Session->write('CheckoutItems',$CartItems);
+		
+		$checkout_total=0;
+		if (isset($checkout_items['Packages'])){
+			foreach ($checkout_items['Packages'] as $mbdate=>$pid){
+				$checkout_total=$checkout_total+$packages[$pid]['OnlinePrice'];	
+			}
+		}
+		if (isset($checkout_items['Extras'])){
+			foreach ($checkout_items['Extras'] as $pid=>$qty){
+				$checkout_total=$checkout_total+($extras[$pid]['OnlinePrice']*$qty);	
+			}
+		}
+		
+		$this->set(compact('checkout_items','CartItems','packages','extras','checkout_total'));
+		$this->render('checkout','frontend');
+	}
 	
+	public function transact(){
+		$checkout=$this->Session->read('CheckoutItems');
+		debug($checkout);
+		$this->render('transact','frontend');
+	}
 	//everything below is useful test stuff
 	public function index() {
 		require_once('MB_API.php');
@@ -270,22 +334,22 @@ class FirearmsController extends AppController {
 		//I THINK we might write this to a DB of our own
 		$userid=CakeText::uuid();
 		
-		/*
-		$done=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
+		
+		$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
 			'Test'=>false,
 			'Clients'=>array(
 			'Client'=>array(
 				//obviously these need to be randomized or dealt with somehow
-				'Username'=>'random15',
+				'Username'=>'random'.time(),
 				'Password'=>'random1test',
-				'Notes'=>'some notes like timestamp',
+				'Notes'=>'some notes like timestamp and IP',
 				'Gender'=>'Male',
 				'LiabilityRelease'=>0,
 				'EmergencyContactInfoName'=>'...',
 				'ID'=>$userid,
-				'FirstName'=>'4SethTest',
+				'FirstName'=>'SethTest',
 				'MiddleName'=>'Junir',
-				'LastName'=>'4JTest',
+				'LastName'=>time(),
 				'Email'=>'seth@example.com',
 				'EmailOptIn'=>0,
 				'AddressLine1'=>'2117 Test Road',
@@ -303,25 +367,21 @@ class FirearmsController extends AppController {
 				)),
 		
 		));
-		*/
 		
-		//5685487c-ea6c-4364-b584-0bf5c0a80177
-		//56854b59-eb0c-46ec-a600-0bf5c0a80177
-		//56854b83-fe08-486b-9ffd-0bf5c0a80177
-		//56854c5c-4a9c-43d5-b8a5-0bf5c0a80177
+		debug($add);
 		
 		//this works!
-		$done=$mb->AddOrUpdateAppointments(array(
+		$book=$mb->AddOrUpdateAppointments(array(
 			'Test'=>false,
 			//'SendEmail'=>true,
 			'Appointments'=>array(
 				'Appointment'=>array(
-					'StartDateTime'=>"2015-12-31T10:30:00",
+					'StartDateTime'=>"2016-01-05T06:30:00",
 					//1 is 'Clubville' use GetLocations to find yours
 					'Location'=>array('ID'=>1),
 					'Staff'=>array('ID'=>100000263,'isMale'=>false),
 					//'Duration'=>60,
-					'Client'=>array('ID'=>'56854c5c-4a9c-43d5-b8a5-0bf5c0a80177'),
+					'Client'=>array('ID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID']),
 					'SessionType'=>array('ID'=>214),
 					//'StaffRequested'=>true
 				))
@@ -329,13 +389,9 @@ class FirearmsController extends AppController {
 		
 
 		
-		//if this returns Success then it worked, now we would write to our DB
-		debug($done);
-		
-		$this->Prg->commonProcess();
-		$this->Firearm->recursive = 0;
-		$this->paginate = array('conditions' => $this->Firearm->parseCriteria($this->Prg->parsedParams()));
-		$this->set('firearms', $this->paginate());
+		//if this returns Success then it worked
+		debug($book);
+
 		$this->set('request',$mb->getXMLRequest());
 	}
 	
