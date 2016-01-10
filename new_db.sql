@@ -39,7 +39,8 @@ create table products(
 	
 	-- for convenience, added via Controller
 	CategoryID int,
-	CategoryName varchar(255)
+	CategoryName varchar(255),
+	ExtendedPrice float
 );
 
 

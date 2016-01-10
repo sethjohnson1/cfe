@@ -15,9 +15,6 @@ endforeach?>
 </tbody>
 </table>
 <h3>Extras (online discount applied)</h3>
-<table class="table table-hover"> 
-<thead> <tr> <th>Item</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 
-
 
 <?if (isset($checkout_items['Extras'])){?>
 <table class="table table-hover"> 
@@ -44,7 +41,11 @@ endforeach;
 </tbody>
 </table>
 <h3><?=$this->Html->link('<< Back to Cart',array('action'=>'cart'))?></h3>
-<h2 align="center">Total Checkout: <small><em>only</em></small> <?='$'.$checkout_total?></h2>
+<h3 align="center">Sub-Total: <small><em>only</em></small> <?='$'.$checkout_total?><br />
+Tax: <?=$tax_total?><br />
+Total: <?=$final_total?>
+
+</h3>
 <?=$this->Html->link('Proceed to Payment >>',array('action'=>'transact'),array('class'=>'btn btn-lg btn-success date-btns'))?>
 </div>
 </div><!--  /checkout row -->

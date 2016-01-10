@@ -114,8 +114,9 @@ class FirearmsController extends AppController {
 			foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
 				$interval=$schitem['StartDateTime'];
 				do {
-					//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file
-					if (strtotime($interval) > (time())) array_push($available_times,$interval);
+					//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file. 900 is a 15 minute
+					//debug(time()-900);
+					if (strtotime($interval) > (time()+900)) array_push($available_times,$interval);
 					$interval=date('c',strtotime($interval)+1800);
 				}
 				while ($interval <= $schitem['EndDateTime']);
@@ -141,8 +142,9 @@ class FirearmsController extends AppController {
 		//remove expired items
 		if (isset($cart_items['Packages'])){
 			foreach ($cart_items['Packages'] as $date=>$item){
-				if (strtotime($date)<time()){ 
+				if (strtotime($date)<time()+900){ 
 				unset($cart_items['Packages'][$date]);
+				$this->Session->setFlash('Some items may have expired and were removed.', 'flash_danger');
 				}
 			}
 			if (count($cart_items['Packages'])<1) unset($cart_items['Packages']);
@@ -167,9 +169,8 @@ class FirearmsController extends AppController {
 			$this->Cookie->delete('CartItems');
 			unset($cart_items['Extras']);
 			foreach ($update['Extras'] as $id=>$qty){
-				//use the id as the key to prevent the same slot added to cart twice
+				//use the id as the key to prevent the same item show in cart twice
 				$cart_items['Extras'][$id]=$qty;
-				//
 			}
 			
 			$this->Cookie->write('CartItems',$cart_items);
@@ -183,7 +184,7 @@ class FirearmsController extends AppController {
 			}
 		}
 		
-		//make a total AFTER everything is updated
+		//make a total AFTER everything is updated. This total does not include tax!
 		$cart_total=0;
 		if (isset($cart_items['Packages'])){
 			foreach ($cart_items['Packages'] as $mbdate=>$pid){
@@ -226,19 +227,27 @@ class FirearmsController extends AppController {
 		
 		//write the total to Cookie so we can compare it.
 		$checkout_total=0;
+		$tax_total=0;
+		$final_total=0;
 		if (isset($checkout_items['Packages'])){
 			foreach ($checkout_items['Packages'] as $mbdate=>$pid){
 				$checkout_total=$checkout_total+$packages[$pid]['OnlinePrice'];	
+				$tax_total=$tax_total+($packages[$pid]['OnlinePrice']*$packages[$pid]['TaxRate']);	
+				$final_total=$final_total+$packages[$pid]['ExtendedPrice'];
 			}
 		}
 		if (isset($checkout_items['Extras'])){
 			foreach ($checkout_items['Extras'] as $pid=>$qty){
-				$checkout_total=$checkout_total+($extras[$pid]['OnlinePrice']*$qty);	
+				if ($qty>0){
+				$checkout_total=$checkout_total+($extras[$pid]['OnlinePrice']*$qty);
+				$tax_total=$tax_total+($extras[$pid]['OnlinePrice']*$extras[$pid]['TaxRate']);	
+				$final_total=$final_total+$extras[$pid]['ExtendedPrice'];	
+				}		
 			}
 		}
-
-		$this->Cookie->write('CheckoutTotal',$checkout_total);
-		$this->set(compact('checkout_items','packages','extras','checkout_total'));
+		$final_total=round($final_total,2);
+		$this->Cookie->write('CheckoutTotal',$final_total);
+		$this->set(compact('checkout_items','packages','extras','final_total','checkout_total','tax_total'));
 		$this->render('checkout','frontend');
 	}
 	
@@ -250,11 +259,9 @@ class FirearmsController extends AppController {
 			$session_id=$this->CFE_SessionTypeIDs[0];
 			$staff_id=$this->CFE_StaffIDs[0];
 			$checkout_items=$this->Cookie->read('CheckoutItems');
-			//debug($checkout_items);
-			$CartItems=$this->Cookie->read('CheckoutItems');
+			debug($checkout_items);
 			$client=$this->request->data['Firearm'];
-			//debug($client);
-			
+
 			$client['Username']='web'.time();
 			$client['BirthDate']=date('Y-m-d',strtotime($client['BirthDate']));
 			$client['Password']=time().Configure::read('userPasswords');

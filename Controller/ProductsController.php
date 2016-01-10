@@ -54,6 +54,7 @@ class ProductsController extends AppController {
 					$product['CategoryName']=$cat_name;
 					$product['prodtype']='Product';
 					$product['barcodeID']=$product['ID'];
+					$product['ExtendedPrice']=$product['OnlinePrice']+($product['OnlinePrice']*$product['TaxRate']);
 					$this->Product->create();
 					if ($this->Product->save($product)) {
 						$this->Session->setFlash('Products have been updated','flash_success');
@@ -85,6 +86,7 @@ class ProductsController extends AppController {
 				$product['CategoryID']=$ses_id;
 				$product['CategoryName']=$ses_name;
 				$product['prodtype']='Service';
+				$product['ExtendedPrice']=$product['OnlinePrice']+($product['OnlinePrice']*$product['TaxRate']);
 				$this->Product->create();
 				if ($this->Product->save($product)) {
 					$this->Session->setFlash('Products have been updated','flash_success');

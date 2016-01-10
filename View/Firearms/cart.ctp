@@ -62,7 +62,7 @@ You must have at least one package to complete checkout<br />
 $i=0;
 foreach ($extras as $id=>$extra):
 $i++;
-if ($i>3) break;
+//if ($i>3) break;
 $qty_val=0;
 //debug($cart_items['Extras']);
 if (isset($cart_items['Extras'][$extra['barcodeID']])){
@@ -99,7 +99,7 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 <h2><small>Shirts, hats, drinks/snacks and other merchandise are available at our full retail store.</small></h2>
 </div><!-- /add-ons column -->
 <div class="col-xs-12 col-pad">
-<h2 align="">Cart Total: <?=$cart_total?></h2>
+<h2 align="">Cart Total: <?='$'.$cart_total?><br /><small> Tax will be added at checkout</small></h2>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">
 <?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]'))?>
