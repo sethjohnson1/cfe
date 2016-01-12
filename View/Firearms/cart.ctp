@@ -15,7 +15,7 @@ $disabled=false;
 
 foreach ($cart_items['Packages'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
-
+debug($id);
 ?>
 <tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$id['OnlinePrice']?></strike></span></td>
 <td><?

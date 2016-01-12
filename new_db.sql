@@ -39,7 +39,10 @@ create table products(
 	
 	-- for convenience, added via Controller
 	CategoryID int,
+	
+	-- this is also used for the Lane as a CSV value of MINDBODY Session IDs, which would be the packages themselves
 	CategoryName varchar(255),
+	
 	ExtendedPrice float,
 	-- these are not returned by the Product call but added as a big time saver
 	SessionTypeID int,

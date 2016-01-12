@@ -10,16 +10,26 @@ class ProductsController extends AppController {
 		//set some variables
 		//26 is the Retail from Sandbox, get this by inspecting dropdown element in product add/edit
 		//the only way to do this is to set manually here (this data cannot be found via API call)
-		//$this->CFE_Categories=array(26=>'Retail',32=>'Food');
+		$this->CFE_Categories=array(26=>'Retail',32=>'Food');
 		
 		//these are from live CFE environment
-		$this->CFE_Categories=array(100001=>'Firearm Reservations',100002=>'Retail');
+		//$this->CFE_Categories=array(100001=>'Firearm Reservations',100002=>'Retail');
 		
 		//214 is the 90 min. reservation IN SANDBOX - this is the best way to build database is loop through rather than get all at once
-		$this->CFE_SessionTypeIDs=array(214=>'90 min');
+		//265 is the 60 min, I assigned it to Staff Court 2
+		//270 is the Add-on
+		//271 as well is the Add-on
+		//these are actually ALL SessionTypeIDs but we do separate calls for purpose of creating our on DB
+		$this->CFE_LaneTypeIDs=array(214=>'Lane',265=>'Gatling');
+		
+		//these are just for the Lane
+		$this->CFE_ComboTypeIDs=array(270=>'Cowboy',271=>'Rifle');
+		
+		//for "Double the Fun" connect a package ID from above JUST literally doubling now
+		$this->CFE_DoubleTypeIDs=array(270=>270,265=>265);
 		
 		//these are production need to make setting for it
-		$this->CFE_SessionTypeIDs=array(5=>'Regular Package',6=>'Gatling');
+		//$this->CFE_SessionTypeIDs=array(5=>'Regular Package',6=>'Gatling');
 
 		
 		/* shouldn't need these now 
@@ -80,18 +90,17 @@ class ProductsController extends AppController {
 				}
 			}
 			else{
-				$this->Session->setFlash('Something has gone wrong, try again then seek help.','flash_danger');
+				$this->Session->setFlash('Could not get products. Try again then Seek help!','flash_danger');
 				debug($data);
 			}
 		}
+		
+		
 		//now get services for each specified SessionID, this makes the checkout much easier
 		
-		foreach ($this->CFE_SessionTypeIDs as $ses_id=>$ses_name){
-			//old way, but no need to be restrictive with Session IDs, just anything available online, unfortunately this call DOES NOT return SessionTypeIDs which would be helpful
+		foreach ($this->CFE_LaneTypeIDs as $ses_id=>$ses_name){
 			$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>array($ses_id)));
-			
-			//$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true));
-			//debug($data);
+
 			//if only one result it needs to be fixed up
 			if (isset($data['GetServicesResult']['Services']['Service']['ID'])){
 				$temp_data=array();
@@ -99,15 +108,14 @@ class ProductsController extends AppController {
 				unset($data['GetServicesResult']['Services']['Service']);
 				$data['GetServicesResult']['Services']['Service'][0]=$temp_data;
 			}
-			
 			foreach ($data['GetServicesResult']['Services']['Service'] as $key=>$product){
 				$product['barcodeID']=$product['ID'];
 				unset($product['ID']);
 				$product['CategoryID']=$product['ProductID'];
-				$product['CategoryName']='Reservation';
+				$product['CategoryName']=$ses_name;
 				$product['prodtype']='Service';	
 				$product['SessionTypeID']=$ses_id;	
-				$product['SessionTypeName']=$ses_name;	
+				$product['SessionTypeName']='RangeLane';	
 				$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
 				if ( $tax & 1 )$tax++;
 				$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
@@ -115,15 +123,84 @@ class ProductsController extends AppController {
 				if ($this->Product->save($product)) {
 					$this->Session->setFlash('Products have been updated','flash_success');
 				}
+				else{
+					debug('broke');
+					break 2;
+				}
+			}
+		}
+
+		foreach ($this->CFE_ComboTypeIDs as $ses_id=>$ses_name){
+			$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>array($ses_id)));
+
+			//if only one result it needs to be fixed up
+			if (isset($data['GetServicesResult']['Services']['Service']['ID'])){
+				$temp_data=array();
+				$temp_data=$data['GetServicesResult']['Services']['Service'];
+				unset($data['GetServicesResult']['Services']['Service']);
+				$data['GetServicesResult']['Services']['Service'][0]=$temp_data;
+			}
+			foreach ($data['GetServicesResult']['Services']['Service'] as $key=>$product){
+				$product['barcodeID']=$product['ID'];
+				unset($product['ID']);
+				$product['CategoryID']=$product['ProductID'];
+				$product['CategoryName']=$ses_name;
+				$product['prodtype']='Service';	
+				$product['SessionTypeID']=$ses_id;	
+				$product['SessionTypeName']='Combo';	
+				$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
+				if ( $tax & 1 )$tax++;
+				$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
+				$this->Product->create();
+				if ($this->Product->save($product)) {
+					$this->Session->setFlash('Products have been updated','flash_success');
+				}
+				else{
+					debug('broke');
+					break 2;
+				}
+			}
+		}
+		foreach ($this->CFE_DoubleTypeIDs as $ses_id=>$ses_name){
+			$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>array($ses_id)));
+
+			//if only one result it needs to be fixed up
+			if (isset($data['GetServicesResult']['Services']['Service']['ID'])){
+				$temp_data=array();
+				$temp_data=$data['GetServicesResult']['Services']['Service'];
+				unset($data['GetServicesResult']['Services']['Service']);
+				$data['GetServicesResult']['Services']['Service'][0]=$temp_data;
+			}
+			foreach ($data['GetServicesResult']['Services']['Service'] as $key=>$product){
+				$product['barcodeID']=$product['ID'];
+				unset($product['ID']);
+				$product['CategoryID']=$product['ProductID'];
+				$product['CategoryName']=$ses_name;
+				$product['prodtype']='Service';	
+				$product['SessionTypeID']=$ses_id;	
+				$product['SessionTypeName']='Double';	
+				$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
+				if ( $tax & 1 )$tax++;
+				$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
+				$this->Product->create();
+				if ($this->Product->save($product)) {
+					$this->Session->setFlash('Products have been updated','flash_success');
+				}
+				else{
+					debug('broke');
+					break 2;
+				}
 			}
 		}
 		
+		
+		
 		//finally get all packages and compare to available products
-		//ONLY USING SINGLE ID for testing, normally we want all
+		//ONLY USING SINGLE ID for testing, normally we want all SellOnline
 		$data = $mb->GetPackages(array('SellOnline'=>true
 		//,'PackageIDs'=>array(353)
 		));
-	//	debug($data);
+		//debug($data);
 		
 		//fix single return. ARG!
 		if (isset($data['GetPackagesResult']['Packages']['Package']['ID'])){
@@ -157,7 +234,7 @@ class ProductsController extends AppController {
 			}
 			
 			//now loop through and write, ensuring product is in product table
-			//debug($pack);
+			debug($pack);
 			foreach ($pack['Services']['Service'] as $service){
 				$pack['service_id']=$service['ProductID'];
 				$product=$this->Product->find('first',array('conditions'=>array('barcodeID'=>$service['ProductID'])));
@@ -176,6 +253,8 @@ class ProductsController extends AppController {
 					break 2;
 				}
 			}
+			/** DISABLED BECAUSE you can't sell products via package online. Dang it! **/
+			/*
 			foreach ($pack['Products']['Product'] as $service){
 				//debug($service);
 				unset($pack['service_id']);
@@ -195,6 +274,7 @@ class ProductsController extends AppController {
 					break 2;
 				}
 			}
+			*/
 			//save the totals to all records
 			$saved=$this->Package->find('all',array('conditions'=>array('barcodeID'=>$pack['barcodeID'])));
 			foreach ($saved as $save){

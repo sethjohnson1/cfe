@@ -16,22 +16,26 @@ class FirearmsController extends AppController {
 		//need to stash these in a config file somewhere, keys 5 and 6 are Regular and Gatling, eventually write double to this array
 		$this->loadModel('Product');
 		//this might be a bad way to do it
-		$session_types=$this->Product->find('all',array('fields'=>'DISTINCT SessionTypeID, SessionTypeName','conditions'=>array("SessionTypeID <> ''")));
+		$session_types=$this->Product->find('all',array('fields'=>'DISTINCT SessionTypeID, SessionTypeName','conditions'=>array("SessionTypeID <> ''",'SessionTypeName'=>'RangeLane')));
 		$session_array=array();
 		foreach ($session_types as $skey=>$sess_val){
 			if (isset($sess_val['Product'])) $session_array[$skey]=$sess_val['Product'];
 		}
 		//debug($session_array);
-		$this->CFE_SessionTypeIDs=$session_array;
+		//TURN THIS ONE OFF FOR TESTING BUT IT WORKS
+		//$this->CFE_SessionTypeIDs=$session_array;
 		
-		//MINDBODY StaffIDs, these are the Courts from the sandbox
-		//$this->CFE_StaffIDs=array(100000263,
+		//MINDBODY StaffIDs, these are the Courts from the sandbox, just using one I think
+		$this->CFE_StaffIDs=array('Lanes'=>100000263,'Gatling'=>100000264,'AddOn'=>100000265);
 		//	100000264,100000265,100000266,100000267,100000268
-			//);
 			
-		//PRODUCTION IDs 02 is Lane 1-6, we might not even need this
-		$this->CFE_StaffIDs=array(100000002);
+			
+		//PRODUCTION IDs 02 is Lane 1-6
+		//$this->CFE_StaffIDs=array(100000002);
 		
+		//the key is the ID of the package and the value is the SessionID of the Double Add-on
+		//I will put this on the DB later...
+		$this->CFE_DoubleIDs(354=>270, 353=>265);
 		
 		//available packages and products
 
@@ -43,14 +47,28 @@ class FirearmsController extends AppController {
 			$new_pack[$package['Package']['barcodeID']]=$package['Package'];
 			//also find service_ids and add to array
 			}
-		foreach ($new_pack as $key=>$new){
+		//debug($new_pack);
+		foreach ($packages as $key=>$new){
 			//debug($new);
-			$svc=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['service_id'],'Product.CategoryName'=>'Reservation')));
-			//debug($svc);
-			if (isset($svc['Product']['SessionTypeID'])){
-				$new_pack[$key]['SessionTypeID']=$svc['Product']['SessionTypeID'];
+			$svc=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['Package']['service_id'],'Product.SessionTypeName'=>'RangeLane')));
+			
+			if (isset($svc['Product']['SessionTypeName'])){
+				//debug($new['Package']['service_id']);
+				$new_pack[$new['Package']['barcodeID']]['SessionTypeID']=$svc['Product']['SessionTypeID'];
 			}
+			
+			
+			$dbl=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['Package']['service_id'],'Product.SessionTypeName'=>'Double')));
+			if (isset($svc['Product']['SessionTypeName'])){
+				$new_pack[$new['Package']['barcodeID']]['DoubleTypeID']=$svc['Product']['SessionTypeID'];
+			}
+			$cmb=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['Package']['service_id'],'Product.SessionTypeName'=>'Combo')));
+			if (isset($cmb['Product']['SessionTypeName'])){
+				$new_pack[$new['Package']['barcodeID']]['ComboTypeID']=$cmb['Product']['SessionTypeID'];
+			}
+			
 		}
+		//debug($new_pack);
 		$this->CFE_packages=$new_pack;
 		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
@@ -165,6 +183,10 @@ class FirearmsController extends AppController {
 		$extras=$this->CFE_extras;
 		$this->Cookie->delete('CheckoutTotal');
 		$cart_items=$this->Cookie->read('CartItems');
+		debug($cart_items);
+		foreach ($packages as $ky=>$pk){
+			//if ($ky=='
+		}
 		//remove expired items
 		if (isset($cart_items['Packages'])){
 			foreach ($cart_items['Packages'] as $date=>$item){
@@ -182,7 +204,8 @@ class FirearmsController extends AppController {
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
 			$picktime=$this->request->data['Picktime'];
-			$mbdate=$picktime['picktime'].'T'.$picktime['slot'];
+			//make sure you always have trailing zeros or bookings do not work!!
+			$mbdate=$picktime['picktime'].'T'.$picktime['slot'].':00';
 			//the first one is just fine, don't need all of them
 			$pkg_data=$this->Package->find('first',array('conditions'=>array('barcodeID'=>$picktime['package_id'])));
 			//use the date as the key to prevent the same slot added to cart twice
@@ -286,6 +309,7 @@ class FirearmsController extends AppController {
 			//just using first value, once gatling is added we will do something else
 			//NEEDS FIXING !!!
 			$session_id=$this->CFE_SessionTypeIDs[0]['SessionTypeID'];
+			$session_id=214;
 			//debug($session_id);
 			$staff_id=$this->CFE_StaffIDs[0];
 			$checkout_items=$this->Cookie->read('CheckoutItems');
@@ -304,36 +328,33 @@ class FirearmsController extends AppController {
 			
 			require_once('MB_API.php');
 			$mb = new MB_API();
+			debug($mb->GetClients(array('SearchText'=>'TESTING')));
 			$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
 				'Test'=>true,
 				'Clients'=>array('Client'=>$client)));
+			//debug($add);
 			if ($add['AddOrUpdateClientsResult']['ErrorCode']==200){
 				//client added, now checkout the cart
-				
 				//use this amount to ensure there was no discrepency (i.e. open in another window)
 				$Amount=$this->Cookie->read('CheckoutTotal');
-				
 				//make array ready for MINDBODY API
 				$CartItems=array();
 				$itemkey=0;
-				foreach ($checkout_items['Packages'] as $mbdate=>$product_id){
-					//debug($product_id);
+				foreach ($checkout_items['Packages'] as $mbdate=>$product_id){	
+					debug($mbdate);
 					//first add the package
+					/*** This is tested working with multiple packages HOWEVER I still need to apply the discount percentage to the package**/
 					$CartItems[$itemkey]['Quantity']=1;
-					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id['barcodeID'],'DiscountPercentage'=>$product_id['DiscountPercentage'],'SellOnline'=>true,'InStore'=>true), SOAP_ENC_ARRAY, 'Package', 'http://clients.mindbodyonline.com/api/0_5');
-
+					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id['barcodeID'],'DiscountPercentage'=>$product_id['DiscountPercentage'],'SellOnline'=>true), SOAP_ENC_ARRAY, 'Package', 'http://clients.mindbodyonline.com/api/0_5');
 					$CartItems[$itemkey]['DiscountAmount']=0;
-
 					$itemkey++;
+					
+					//must sell service for booking
 					$CartItems[$itemkey]['Quantity']=1;
+					$CartItems[$itemkey]['DiscountAmount']=0;
 					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id['service_id']), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
-				
-				//this part makes it return null now with no error...	/*$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$staff_id,'isMale'=>false),'SessionType'=>array('ID'=>$session_id));
-					
-					$CartItems[$itemkey]['DiscountAmount']=0;
-					$itemkey++;
-					
-					
+					//this part will often return NULL at the slightest error, make sure the ABOVE call is working as it relies on it (and goes to the same key)
+					$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$staff_id,'isMale'=>false),'SessionType'=>array('ID'=>$session_id));
 				}
 				foreach ($checkout_items['Extras'] as $product_id=>$qty){
 					if ($qty>0){
@@ -348,6 +369,9 @@ class FirearmsController extends AppController {
 				//build payment info
 				$PaymentInfo['CreditCardNumber']=$this->request->data['Firearm']['CreditCardNumber'];
 				$PaymentInfo['Amount']=$Amount;
+				$PaymentInfo['Amount']=51.30;
+
+				
 				if (strlen($this->request->data['Firearm']['ExpYear'])==2) $PaymentInfo['ExpYear']='20'.$this->request->data['Firearm']['ExpYear'];
 				else $PaymentInfo['ExpYear']=$this->request->data['Firearm']['ExpYear'];
 				$PaymentInfo['ExpMonth']=$this->request->data['Firearm']['ExpMonth'];
@@ -366,18 +390,31 @@ class FirearmsController extends AppController {
 					$PaymentInfo['BillingPostalCode']=$this->request->data['Firearm']['PostalCode'];
 				}
 				$Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
+				
+				//for testing with comp
+				//$Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
 
-				$checkout=$mb->CheckoutShoppingCart(array('Test'=>true,
-				//'InStore'=>true,	//'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
-					'ClientID'=>'20160111185337924',
+				$checkout=$mb->CheckoutShoppingCart(array('Test'=>true,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
+					//just for testing!
+					//'ClientID'=>'56951471-87c0-422b-bb2d-b050c0a80194',
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
 					'InStore'=>true
 				));
-				debug($CartItems);
+				//debug($CartItems);
 				debug($checkout);
-				$this->set('request',$mb->getXMLRequest());
+				
+				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
+					//wow it's a miracle
+				
+				}
+				else {
+					$this->Session->setFlash('The request to checkout failed please try again or contact us.', 'flash_danger');
+					debug($checkout);
+				}
+				
+				//$this->set('request',$mb->getXMLRequest());
 			}
 			else {
 				$this->Session->setFlash('Unable to save client, please ensure all fields are filled out properly.', 'flash_danger');
@@ -444,46 +481,28 @@ class FirearmsController extends AppController {
 		require_once('MB_API.php');
 		$mb = new MB_API();
 
-		//testing adding client, this works - most of the below fields are required see API docs for what else you can get.
-		//I THINK we might write this to a DB of our own
-		$userid=CakeText::uuid();
-		
-		
-		$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
-			'Test'=>false,
-			'Clients'=>array(
-			'Client'=>array(
-	'FirstName' => 's',
-	'LastName' => 'troll',
-	'BirthDate' => '1989-01-26'
-)),
-		
-		));
-		
-		debug($add);
-		
 		//this works!
-	/*	$book=$mb->AddOrUpdateAppointments(array(
+		$book=$mb->AddOrUpdateAppointments(array(
 			'Test'=>false,
 			//'SendEmail'=>true,
 			'Appointments'=>array(
 				'Appointment'=>array(
-					'StartDateTime'=>"2016-01-05T06:30:00",
+					'StartDateTime'=>'2016-01-14T06:30:00',
 					//1 is 'Clubville' use GetLocations to find yours
 					'Location'=>array('ID'=>1),
 					'Staff'=>array('ID'=>100000263,'isMale'=>false),
-					//'Duration'=>60,
-					'Client'=>array('ID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID']),
-					'SessionType'=>array('ID'=>214),
+					'Duration'=>90,
+					'Client'=>array('ID'=>'56951471-87c0-422b-bb2d-b050c0a80194'),
+					'SessionType'=>array('ID'=>270),
 					//'StaffRequested'=>true
-				))
+				)
+				
+				)
 		));
-		*/
-		
-
 		
 		//if this returns Success then it worked
-		//debug($book);
+		debug($book);
+		
 
 		$this->set('request',$mb->getXMLRequest());
 	}
