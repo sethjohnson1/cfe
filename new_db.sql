@@ -40,9 +40,29 @@ create table products(
 	-- for convenience, added via Controller
 	CategoryID int,
 	CategoryName varchar(255),
-	ExtendedPrice float
+	ExtendedPrice float,
+	-- these are not returned by the Product call but added as a big time saver
+	SessionTypeID int,
+	SessionTypeName varchar(300)
 );
 
+drop table packages;
+create table packages(
+	id int not null auto_increment,
+	primary key(id),
+	created datetime,
+	modified datetime,
+	-- this is returned by API as just 'ID'
+	barcodeID int,
+	Name varchar(500),
+	DiscountPercentage float,
+	service_id int,
+	product_id int,
+	-- to make checkout easier, this is done on Controller
+	Price float,
+	OnlinePrice float,
+	ExtendedPrice float
+);
 
 -- the site settings are here
 drop table firearms;

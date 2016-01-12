@@ -8,7 +8,7 @@
 foreach ($checkout_items['Packages'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
-<tr> <th scope="row"><?=$packages[$id]['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$packages[$id]['Price']?></strike></span></td>
+<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$id['Price']?></strike></span></td>
 <td>Doubled</td> </tr>
 <?
 endforeach?>

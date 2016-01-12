@@ -44,7 +44,8 @@ $cc_inputs=array(
 	'ExpMonth'=>'Expiration Month',
 	'ExpYear'=>'Exp Year'
 );
-?>
+//set this to FALSE and it's disabled
+$testdata='TESTING_TRUE'?>
 <div class="row">
 <div class="col-xs-12">
 <h3>Shooter Registration</h3>
@@ -53,7 +54,7 @@ foreach ($client_inputs as $name=>$label):
 ?>
 <div class="form-group">
 <?
-	echo $this->Form->input($name,array('label'=>$label[0],'div'=>false,'required'=>$label[1],'placeholder'=>$label[0],'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+	echo $this->Form->input($name,array('value'=>$testdata,'label'=>$label[0],'div'=>false,'required'=>$label[1],'placeholder'=>$label[0],'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
 </div>
 	<?
 endforeach;
@@ -64,7 +65,7 @@ endforeach;
 <h3>Payment Info</h3>
 <div class="form-group">
 <div class="col-sm-offset-2 col-sm-10 col-xs-12">
-<?=$this->Form->input('SameBilling',array('label'=>'Billing address is the same as above','onclick'=>'toggleBilling()','checked'=>'checked','id'=>'showBillInfo','class'=>'','div'=>array('class'=>'checkbox')))?>
+<?=$this->Form->input('SameBilling',array('value'=>$testdata,'label'=>'Billing address is the same as above','onclick'=>'toggleBilling()','checked'=>'checked','id'=>'showBillInfo','class'=>'','div'=>array('class'=>'checkbox')))?>
 
 </div>
 </div>
@@ -75,12 +76,12 @@ endforeach;
 </style>
 <?foreach ($billing_inputs as $name=>$label):?>
 <div class="form-group billing-info">
-<?=$this->Form->input($name,array('label'=>$label,'div'=>false,'placeholder'=>$label,'class'=>'form-control billing-input','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+<?=$this->Form->input($name,array('value'=>$testdata,'label'=>$label,'div'=>false,'placeholder'=>$label,'class'=>'form-control billing-input','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
 </div>
 <?endforeach?>
 <?foreach ($cc_inputs as $name=>$label):?>
 <div class="form-group cc-info">
-<?=$this->Form->input($name,array('required'=>true,'label'=>$label,'div'=>false,'placeholder'=>$label,'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+<?=$this->Form->input($name,array('value'=>$testdata,'required'=>true,'label'=>$label,'div'=>false,'placeholder'=>$label,'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
 </div>
 <?endforeach?>
 <?=$this->Form->submit('Submit Payment', array('div' => false,'class'=>'btn btn-success btn-lg date-btns'))?>
