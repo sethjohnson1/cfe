@@ -4,7 +4,7 @@ echo $this->Form->create('Firearm',array('url'=>array('action'=>'cart')));
 $disabled=false;
 ?>
 <div class="col-xs-12">
-<h1>Shopping Cart</h1>
+<h1>Shopping Cart <small>The arsenal awaits</small></h1>
 </div>
 <div class="col-xs-12">
 <h2>Lane Reservations</h2>
@@ -15,7 +15,7 @@ $disabled=false;
 
 foreach ($cart_items['Packages'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
-debug($id);
+//debug($id);
 ?>
 <tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$id['OnlinePrice']?></strike></span></td>
 <td><?
@@ -23,10 +23,14 @@ $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;Double your Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount! (these do nothing. Subcategories?)</span></td>
+<tr><th class="row"><em>&nbsp;&nbsp;YES! Double My Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount!</span></td>
 <td></td>
-<td><span style="color:red"><strike>40</strike></span>&nbsp;&nbsp;30</td>
-<td><input type="checkbox" name="data[][]" class="" checked="checked" value="1"></input></td></tr>
+<td><span style="color:red"><strike><?=$id['DoubleTypeID']['Price']?></strike></span>&nbsp;&nbsp;<?=$id['DoubleTypeID']['OnlinePrice']?></td>
+<td>
+<? //using default naming makes this checkbox behave much nicer!!?>
+<?=$this->Form->input($mbdate,array('type'=>'checkbox','label'=>false,'div'=>false,'onclick'=>'$("#update_button").click()'));?>
+
+</td></tr>
 <?
 
 endforeach?>
@@ -51,7 +55,7 @@ You must have at least one package to complete checkout<br />
 </div><!-- /package column -->
 
 <div class="col-xs-12">
-<h2>Targets and Extra Ammo <small style="color:red">Buy Online and Save!</small></h2>
+<h2>Targets and Extra Guns<small style="color:red"> Buy Online and Save!</small></h2>
 <?
 //still need to fill in this info somehow
 ?>
@@ -103,7 +107,7 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 <h2 align="">Cart Total: <?='$'.$cart_total?><br /><small> Tax will be added at checkout</small></h2>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">
-<?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]'))?>
+<?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button'))?>
 </div>
 
 <div class="col-xs-12 col-md-6 col-pad">

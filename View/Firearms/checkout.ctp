@@ -9,7 +9,7 @@ foreach ($checkout_items['Packages'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
 <tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$id['Price']?></strike></span></td>
-<td>Doubled</td> </tr>
+<td><?if (isset($id['Double'])) echo '<strong>2x ammo!</strong> (+$'.$id['DoubleTypeID']['OnlinePrice'].')'?></td> </tr>
 <?
 endforeach?>
 </tbody>

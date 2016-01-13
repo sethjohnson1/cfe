@@ -44,9 +44,10 @@ create table products(
 	CategoryName varchar(255),
 	
 	ExtendedPrice float,
-	-- these are not returned by the Product call but added as a big time saver
+	-- these are not returned by the Product call but added as a big time saver (or even pure necessity
 	SessionTypeID int,
-	SessionTypeName varchar(300)
+	SessionTypeName varchar(300),
+	StaffID int
 );
 
 drop table packages;

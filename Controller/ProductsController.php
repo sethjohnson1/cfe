@@ -19,13 +19,18 @@ class ProductsController extends AppController {
 		//265 is the 60 min, I assigned it to Staff Court 2
 		//270 is the Add-on
 		//271 as well is the Add-on
-		//these are actually ALL SessionTypeIDs but we do separate calls for purpose of creating our on DB
-		$this->CFE_LaneTypeIDs=array(214=>'Lane',265=>'Gatling');
 		
-		//these are just for the Lane
-		$this->CFE_ComboTypeIDs=array(270=>'Cowboy',271=>'Rifle');
+		//these are ALL SessionTypeIDs but we do separate calls for purpose of creating our on DB, I have looked High and Low for ways to link SessionIDs from MINDBODY but I am missing it
+		
+		//this is Court 1 and 2 for Staff
+		$this->CFE_LaneTypeIDs=array(214=>array('name'=>'Lane','staff'=>100000263),265=>array('name'=>'Gatling','staff'=>100000264));
+		
+		//these are what show - I'll need to do something special for the Gatling
+		//these should all be the same staff but they can tweak as neeeded this way
+		$this->CFE_ComboTypeIDs=array(270=>'Cowboy',271=>'Rifle',265=>'Gatling');
 		
 		//for "Double the Fun" connect a package ID from above JUST literally doubling now
+		//the KEY should be the DoubleFun and VALUE the package it belongs to (then it can be assigned multiple times
 		$this->CFE_DoubleTypeIDs=array(270=>270,265=>265);
 		
 		//these are production need to make setting for it
@@ -41,9 +46,9 @@ class ProductsController extends AppController {
 		//this should be a dashboard to update stuff, just a tester now
 		require_once('MB_API.php');
 		$mb = new MB_API();
-		//$data = $mb->GetPackages(array('SellOnline'=>true));
-		$this->loadModel('Package');
-		$data=$this->Package->find('all');
+		$data = $mb->GetServices(array('SellOnline'=>true));
+		//$this->loadModel('Package');
+		//$data=$this->Package->find('all');
 		debug($data);
 		
 	}
@@ -112,7 +117,8 @@ class ProductsController extends AppController {
 				$product['barcodeID']=$product['ID'];
 				unset($product['ID']);
 				$product['CategoryID']=$product['ProductID'];
-				$product['CategoryName']=$ses_name;
+				$product['CategoryName']=$ses_name['name'];
+				$product['StaffID']=$ses_name['staff'];
 				$product['prodtype']='Service';	
 				$product['SessionTypeID']=$ses_id;	
 				$product['SessionTypeName']='RangeLane';	
@@ -234,7 +240,7 @@ class ProductsController extends AppController {
 			}
 			
 			//now loop through and write, ensuring product is in product table
-			debug($pack);
+			//debug($pack);
 			foreach ($pack['Services']['Service'] as $service){
 				$pack['service_id']=$service['ProductID'];
 				$product=$this->Product->find('first',array('conditions'=>array('barcodeID'=>$service['ProductID'])));
