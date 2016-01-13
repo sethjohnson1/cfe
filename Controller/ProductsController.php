@@ -10,22 +10,12 @@ class ProductsController extends AppController {
 		//set some variables
 		//26 is the Retail from Sandbox, get this by inspecting dropdown element in product add/edit
 		//the only way to do this is to set manually here (this data cannot be found via API call)
-		//32 is Food
-		$this->CFE_Categories=array(26=>'Retail',32=>'Double');
+		//32 is Food which is the "Double"
+		$this->CFE_Categories=array(26=>array('name'=>'Retail','prodtype'=>'Product'),32=>array('name'=>'Double','prodtype'=>'Double'));
 		
 		//these are from live CFE environment
 		//$this->CFE_Categories=array(100001=>'Firearm Reservations',100002=>'Retail');
-		
-		//214 is the 90 min. reservation IN SANDBOX - this is the best way to build database is loop through rather than get all at once
-		//265 is the 60 min, I assigned it to Staff Court 2
-		//270 is the Add-on
-		//271 as well is the Add-on
-		
-		//these are ALL SessionTypeIDs but we do separate calls for purpose of creating our on DB, I have looked High and Low for ways to link SessionIDs from MINDBODY but I am missing it
-		
-		//this is Court 1 and 2 for Staff
-		$this->CFE_LaneTypeIDs=array(214=>array('name'=>'Lane','staff'=>100000263),265=>array('name'=>'Gatling','staff'=>100000264));
-		
+
 		//these are what show - I'll need to do something special for the Gatling
 		//these should all be the same staff but they can tweak as neeeded this way
 		$this->CFE_ComboTypeIDs=array(214=>'Cowboy',265=>'Rifle',266=>'Gatling');
@@ -34,21 +24,18 @@ class ProductsController extends AppController {
 		//BOOKING ADD-ONS DIDN'T WORK! EVEN AFTER THE TESTNG
 		//now simply link a product id, currently Food category
 		$this->CFE_DoubleTypeIDs=array(265=>1237,214=>1237,266=>1238);
+		require_once('MB_API.php');
 		
-		//these are production need to make setting for it
-		//$this->CFE_SessionTypeIDs=array(5=>'Regular Package',6=>'Gatling');
-
 	}
 	public function index() {
 		//this should be a dashboard to update stuff, just a tester now
-		require_once('MB_API.php');
-		$mb = new MB_API();
 		$data = $mb->GetServices(array('SellOnline'=>true));
 		//$this->loadModel('Package');
 		//$data=$this->Package->find('all');
 		debug($data);
 		
 	}
+	
 	
 	//need to password this at some point before live
 	
@@ -77,8 +64,8 @@ class ProductsController extends AppController {
 				//debug($data);
 				foreach ($data['GetProductsResult']['Products']['Product'] as $key=>$product){
 					$product['CategoryID']=$cat_id;
-					$product['CategoryName']=$cat_name;
-					$product['prodtype']='Product';
+					$product['CategoryName']=$cat_name['name'];
+					$product['prodtype']=$cat_name['prodtype'];
 					$product['barcodeID']=$product['ID'];
 					//must deal with MINDBODY strange way of rounding tax, if hundreds is even then it rounds down but if odd rounds up			
 					$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
@@ -140,10 +127,14 @@ class ProductsController extends AppController {
 	
 	public function settings(){
 		$this->loadModel('Firearm');
+		$days=array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
 		$firearm=$this->Firearm->find('all');
 		if ($this->request->is('post')) {
-			debug($this->request->data);
-			foreach ($this->request->data['Product'] as $setting=>$value){
+			$settings=$this->request->data['Product'];
+			debug($settings);
+			//just for testing, may not want to do this - the loop does it individually
+			$this->Firearm->deleteAll(array(1=>1));
+			foreach ($settings as $setting=>$value){
 				$this->Firearm->deleteAll(array('Firearm.name'=>$setting));
 				$setting_val['name']=$setting;
 				$setting_val['setting_value']=$value;
@@ -152,7 +143,27 @@ class ProductsController extends AppController {
 				if ($this->Firearm->save($setting_val)) {
 					$this->Session->setFlash('Settings have been updated','flash_success');
 				}
+			}				
+			//update bookdates table
+			$this->loadModel('Bookdate');
+			$dates=array();
+			$closed=explode(',',$settings['closedDays']);
+			for ($i=0;$i<$settings['maxBookableDays'];$i++){
+				$bookdate=date('Y-m-d', strtotime('today + '.$i.' days'));
+				foreach ($closed as $c){
+					if ($bookdate==$c) continue 2;
+				}
+				foreach ($days as $day){
+					if (!$settings[$day] && date('l',strtotime($bookdate)==$day){
+					//must be doing something wrong here, check for days
+						debug($day);
+					}
+				}
+				
+				//save
+				//debug($bookdate);
 			}
+			
 		}
 		else {
 			foreach ($firearm as $key=>$val){
@@ -163,30 +174,9 @@ class ProductsController extends AppController {
 		}
 
 		
-		$this->set(compact('firearm'));
+		$this->set(compact('firearm','days'));
 		
 		$this->render('settings','frontend');
 		
 	}
 }
-
-/*
-ALL web settings documented here:
-
-datetime for operating hours
-sun_start
-sun_end
-mon_start
-mon_end
-tue_start
-tue_end
-wed_start
-wed_end
-thur_start
-thur_end
-fri_start
-fri_end
-sat_start
-sat_end
-
-*/

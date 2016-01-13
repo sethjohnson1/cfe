@@ -13,6 +13,19 @@ create table webpages(
 	content text
 );
 
+-- the site settings are here
+drop table firearms;
+create table firearms(
+	id int not null auto_increment,
+	primary key(id),
+	created datetime,
+	modified datetime,
+	name varchar(255),
+	setting_value varchar(255),
+	setting_date_value datetime
+	
+);
+
 drop table products;
 create table products(
 	id int not null auto_increment,
@@ -50,6 +63,18 @@ create table products(
 	DoubleTypeID int
 );
 
+-- filled in by GetBookableItems, but only when needed very long call
+drop table bookdates;
+create table bookdates(
+	id int not null auto_increment,
+	primary key(id),
+	created datetime,
+	modified datetime,
+	bookdate varchar(255)
+);
+
+
+/** OLD
 drop table packages;
 create table packages(
 	id int not null auto_increment,
@@ -68,15 +93,5 @@ create table packages(
 	ExtendedPrice float
 );
 
--- the site settings are here
-drop table firearms;
-create table firearms(
-	id int not null auto_increment,
-	primary key(id),
-	created datetime,
-	modified datetime,
-	name varchar(255),
-	setting_value varchar(255),
-	setting_date_value datetime
-	
-);
+
+**/

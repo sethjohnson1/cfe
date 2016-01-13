@@ -10,68 +10,8 @@ class FirearmsController extends AppController {
 		parent::beforeFilter();
 		//set some variables
 		//max days that can be scheduled
-		$this->maxDays=30;
+		$this->maxDays=Configure::read('maxCalendarDays');
 		$this->loadModel('Product');
-		
-		//MINDBODY session type IDs, 214 is the 90 min. reservation in sandbox, this is REQUIRED by GetBookableItems
-		//$this->CFE_SessionTypeIDs=array(214);
-		//need to stash these in a config file somewhere, keys 5 and 6 are Regular and Gatling, eventually write double to this array
-		
-		//this might be a bad way to do it
-		//$session_types=$this->Product->find('all',array('fields'=>'DISTINCT SessionTypeID, SessionTypeName','conditions'=>array("SessionTypeID <> ''",'SessionTypeName'=>'RangeLane')));
-		//$session_array=array();
-		//foreach ($session_types as $skey=>$sess_val){
-		//	if (isset($sess_val['Product'])) $session_array[$skey]=$sess_val['Product'];
-	//	}
-		//debug($session_array);
-		//TURN THIS ONE OFF FOR TESTING BUT IT WORKS
-		//$this->CFE_SessionTypeIDs=$session_array;
-		
-		//MINDBODY StaffIDs, these are the Courts from the sandbox, just using one I think, these should be on a DB or have an array
-		//$this->CFE_StaffIDs=array('Lanes'=>100000263,'Gatling'=>100000264,'AddOn'=>100000265);
-		//	100000264,100000265,100000266,100000267,100000268
-			
-			
-		//PRODUCTION IDs 02 is Lane 1-6
-		//$this->CFE_StaffIDs=array(100000002);
-		
-		//the key is the ID of the package and the value is the SessionID of the Double Add-on
-		//I will put this on the DB later...
-		//$this->CFE_DoubleIDs=array(354=>270, 353=>271);
-		
-		//available packages and products
-/*
-		$this->loadModel('Package');
-		$packages=$this->Package->find('all',array('conditions'=>array("service_id <> ''"),'fields'=>array('barcodeID','Name','DiscountPercentage','Price','OnlinePrice','ExtendedPrice','service_id')));
-		//debug($packages);
-		$new_pack=array();
-		foreach ($packages as $package){
-			$new_pack[$package['Package']['barcodeID']]=$package['Package'];
-			}
-		//also find service IDs (same as SessionTypeIDs) and link them to array
-		foreach ($packages as $key=>$new){
-			//debug($new);
-			$svc=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['Package']['service_id'],'Product.SessionTypeName'=>'RangeLane')));
-			
-			if (isset($svc['Product']['SessionTypeName'])){
-				//debug($new['Package']['service_id']);
-				$new_pack[$new['Package']['barcodeID']]['SessionTypeID']=$svc['Product']['SessionTypeID'];
-			}
-			
-			
-			$dbl=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['Package']['service_id'],'Product.SessionTypeName'=>'Double')));
-			if (isset($svc['Product']['SessionTypeName'])){
-				$new_pack[$new['Package']['barcodeID']]['DoubleTypeID']=$svc['Product']['SessionTypeID'];
-			}
-			$cmb=$this->Product->find('first',array('conditions'=>array('Product.barcodeID'=>$new['Package']['service_id'],'Product.SessionTypeName'=>'Combo')));
-			if (isset($cmb['Product']['SessionTypeName'])){
-				$new_pack[$new['Package']['barcodeID']]['ComboTypeID']=$cmb['Product']['SessionTypeID'];
-			}
-			
-		}
-		//debug($new_pack);
-		$this->CFE_packages=$new_pack;
-	*/	
 		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
 		foreach ($extras as $extra){
@@ -79,16 +19,17 @@ class FirearmsController extends AppController {
 		}
 		$this->CFE_extras=$new_ex;
 		//first find doubles, we will add them to product for ease of checkout
-		$dbl=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Double'),'fields'=>array('barcodeID','SessionTypeID','Price','OnlinePrice','TaxRate','ExtendedPrice')));
+		//TESTING TO SEE IF GROUP ID CHECKS OUT
+		$dbl=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Double'),'fields'=>array('barcodeID','GroupID','Price','OnlinePrice','TaxRate','ExtendedPrice')));
 		$new_dbl=array();
 		foreach ($dbl as $d){
-			$new_dbl[$d['Product']['SessionTypeID']]=$d['Product'];
+			$new_dbl[$d['Product']['GroupID']]=$d['Product'];
 		}
 		$svcs=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Service')));
 		$new_svc=array();
 		foreach ($svcs as $svc){
 			$new_svc[$svc['Product']['barcodeID']]=$svc['Product'];
-			$new_svc[$svc['Product']['barcodeID']]['DoubleInfo']=$new_dbl[$svc['Product']['SessionTypeID']];
+			$new_svc[$svc['Product']['barcodeID']]['DoubleInfo']=$new_dbl[$svc['Product']['DoubleTypeID']];
 		}
 		//debug($new_svc);
 		$this->CFE_services=$new_svc;
