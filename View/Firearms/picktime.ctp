@@ -41,20 +41,19 @@ setInterval("displaytime()", 1000)
 echo $this->Form->create('Firearm',array('url'=>array('action'=>'cart')));
 echo $this->Form->input('pickdate',array('type'=>'hidden','value'=>$pickdate,'name'=>'data[Picktime][picktime]'));
 echo $this->Form->input('package_id',array('type'=>'hidden','value'=>$package_id,'name'=>'data[Picktime][package_id]'));
-?>
 
-<?foreach ($available_times as $key=>$slot):
-	$slot_view=date('H:i',strtotime($slot));
+foreach ($available_times as $key=>$slot):
+	$slot_view=date('H:i',$key);
+	//slot is the staff_id now
 	
 ?>
 <div class="col-xs-12 col-md-6 col-lg-2" style="padding:10px;">
-<!-- this should add to cart, does nothing at the moment -->
 <?
-
-
-//echo $this->Html->link($slot_view,array('action'=>'addcart'),array('class'=>'btn btn-lg btn-primary date-btns','style'=>''));
-
+echo $slot;
+echo $this->Form->input($slot,array('type'=>'hidden','value'=>$slot,'name'=>'data[Picktime]['.$slot_view.']'));
 echo $this->Form->submit($slot_view, array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Picktime][slot]','value'=>'value'.$key));
+
+
 
 ?>
 </div>

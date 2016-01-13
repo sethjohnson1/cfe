@@ -47,7 +47,7 @@ create table products(
 	-- these are not returned by the Product call but added as a big time saver (or even pure necessity
 	SessionTypeID int,
 	SessionTypeName varchar(300),
-	StaffID int
+	DoubleTypeID int
 );
 
 drop table packages;

@@ -8,12 +8,12 @@ $disabled=false;
 </div>
 <div class="col-xs-12">
 <h2>Lane Reservations</h2>
-<?if (isset($cart_items['Packages'])){?>
+<?if (isset($cart_items['Services'])){?>
 <table class="table table-hover"> 
 <thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 
 <?
 
-foreach ($cart_items['Packages'] as $mbdate=>$id):
+foreach ($cart_items['Services'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 //debug($id);
 ?>
@@ -25,7 +25,7 @@ echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($m
 </td> </tr>
 <tr><th class="row"><em>&nbsp;&nbsp;YES! Double My Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount!</span></td>
 <td></td>
-<td><span style="color:red"><strike><?=$id['DoubleTypeID']['Price']?></strike></span>&nbsp;&nbsp;<?=$id['DoubleTypeID']['OnlinePrice']?></td>
+<td><span style="color:red"><strike><?=$id['DoubleInfo']['Price']?></strike></span>&nbsp;&nbsp;<?=$id['DoubleInfo']['OnlinePrice']?></td>
 <td>
 <? //using default naming makes this checkbox behave much nicer!!?>
 <?=$this->Form->input($mbdate,array('type'=>'checkbox','label'=>false,'div'=>false,'onclick'=>'$("#update_button").click()'));?>
@@ -36,7 +36,7 @@ echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($m
 endforeach?>
 </tbody>
 </table>
-
+<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?><small> Max 1 per slot (should we do 2? I think I can figure that out)</small></h4>
 <?} 
 //no valid packages
 else{

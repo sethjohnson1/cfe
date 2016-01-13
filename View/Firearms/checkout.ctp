@@ -5,11 +5,11 @@
 <thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 
 <?
 
-foreach ($checkout_items['Packages'] as $mbdate=>$id):
+foreach ($checkout_items['Services'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
 <tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$id['Price']?></strike></span></td>
-<td><?if (isset($id['Double'])) echo '<strong>2x ammo!</strong> (+$'.$id['DoubleTypeID']['OnlinePrice'].')'?></td> </tr>
+<td><?if (isset($id['Double'])) echo '<strong>2x ammo!</strong> (+$'.$id['DoubleInfo']['OnlinePrice'].')'?></td> </tr>
 <?
 endforeach?>
 </tbody>

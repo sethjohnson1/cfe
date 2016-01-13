@@ -40,7 +40,7 @@ class FirearmsController extends AppController {
 		//$this->CFE_DoubleIDs=array(354=>270, 353=>271);
 		
 		//available packages and products
-
+/*
 		$this->loadModel('Package');
 		$packages=$this->Package->find('all',array('conditions'=>array("service_id <> ''"),'fields'=>array('barcodeID','Name','DiscountPercentage','Price','OnlinePrice','ExtendedPrice','service_id')));
 		//debug($packages);
@@ -71,13 +71,28 @@ class FirearmsController extends AppController {
 		}
 		//debug($new_pack);
 		$this->CFE_packages=$new_pack;
+	*/	
 		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
 		foreach ($extras as $extra){
 			$new_ex[$extra['Product']['barcodeID']]=$extra['Product'];
 		}
-		
 		$this->CFE_extras=$new_ex;
+		//first find doubles, we will add them to product for ease of checkout
+		$dbl=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Double'),'fields'=>array('barcodeID','SessionTypeID','Price','OnlinePrice','TaxRate','ExtendedPrice')));
+		$new_dbl=array();
+		foreach ($dbl as $d){
+			$new_dbl[$d['Product']['SessionTypeID']]=$d['Product'];
+		}
+		$svcs=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Service')));
+		$new_svc=array();
+		foreach ($svcs as $svc){
+			$new_svc[$svc['Product']['barcodeID']]=$svc['Product'];
+			$new_svc[$svc['Product']['barcodeID']]['DoubleInfo']=$new_dbl[$svc['Product']['SessionTypeID']];
+		}
+		//debug($new_svc);
+		$this->CFE_services=$new_svc;
+
 		
 		//now the Cookie setup, maybe this should be AppController
 		$this->Cookie->name = 'CodyFirearmsExperience';
@@ -92,7 +107,7 @@ class FirearmsController extends AppController {
 	}
 	
 	public function pickpkg(){
-		$pickpkg=$this->CFE_packages;
+		$pickpkg=$this->CFE_services;
 		$this->set(compact('pickpkg'));
 		$this->render('pickpkg','frontend');
 	}
@@ -103,11 +118,11 @@ class FirearmsController extends AppController {
 		return $this->redirect(array('action' => 'pickpkg'));	
 	}
 		$dates=array();
-		//just fill some in for now, maybe have a calendar someday
+		//just fill some in for now, will use GetBookableItems one day and then store on DB (so can be updated manually like products but not every time this page is called)
 		for ($i=0;$i<$this->maxDays;$i++){
 			$dates[$i]=date('Y-m-d', strtotime('today + '.$i.' days'));
 		}	
-		$selected_package=$this->CFE_packages[$package_id];
+		$selected_package=$this->CFE_services[$package_id];
 		
 		$this->set(compact('dates','selected_package','package_id','session_id'));
 		$this->render('pickdate','frontend');
@@ -130,23 +145,15 @@ class FirearmsController extends AppController {
 		}
 		require_once('MB_API.php');
 		$mb = new MB_API();
-	
 		//begin making the options array
 		$options['StartDate']=$pickdate;
 		$options['EndDate']=$pickdate;
-		
 		//this is REQUIRED for the call
 		$options['SessionTypeIDs']=array($session_id);
-
-		//just getting top one now, it can be booked 4 times
-		//$options['StaffIDs']=$this->CFE_StaffIDs[0];
-		
 		$data = $mb->GetBookableItems($options);
 		//debug($data);
-		//check for successful response
 		if ($data['GetBookableItemsResult']['ErrorCode']==200){
-			//make an array of intervals (1800 is 30 min.)
-			//AN IDEA! Could use separate staff and just make an associative array of available times with the court as the value - not doing that now, using max appointment values in MINDBODY POS
+			//successful
 			$available_times=array();
 			//if a single item make into array
 			if (isset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']['ID'])){
@@ -155,32 +162,36 @@ class FirearmsController extends AppController {
 					unset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']);
 					$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'][0]=$temp_data;
 				}
-			
+			$staff_times=array();
 			foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
 				$interval=$schitem['StartDateTime'];
 				do {
 					//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file. 900 is a 15 minute
-					//debug(time()-900);
-					if (strtotime($interval) > (time()+900)) array_push($available_times,$interval);
+					//the key is the interval and then topmost available staff_id. If we get too busy then we'll need to do something else to make sure *all* staff 
+					if (strtotime($interval) > (time()+900)){
+						$available_times[strtotime($interval)]=$schitem['Staff']['ID'];
+					}
 					$interval=date('c',strtotime($interval)+1800);
+					//debug($schitem['Staff']['ID']);
 				}
 				while ($interval <= $schitem['EndDateTime']);
 			}
 		}
 		//API response not successful
 		else{
-			$this->Session->setFlash('Sorry, something went wrong findind Bookable Items.', 'flash_danger');
+			$this->Session->setFlash('Sorry, something went wrong finding Bookable Items.', 'flash_danger');
 			debug($data);
 		}
-		$selected_package=$this->CFE_packages[$package_id];
-		$this->set('request',$mb->getXMLRequest());
+		ksort($available_times);
+		$selected_package=$this->CFE_services[$package_id];
+	//	$this->set('request',$mb->getXMLRequest());
 		$this->set(compact('available_times','pickdate','package_id','selected_package'));
 		$this->render('picktime','frontend');
 		
 	}
 	
 	public function cart(){
-		$packages=$this->CFE_packages;
+		$services=$this->CFE_services;
 		$extras=$this->CFE_extras;
 		$this->Cookie->delete('CheckoutTotal');
 		$cart_items=$this->Cookie->read('CartItems');
@@ -188,14 +199,14 @@ class FirearmsController extends AppController {
 
 		
 		//remove expired items
-		if (isset($cart_items['Packages'])){
-			foreach ($cart_items['Packages'] as $date=>$item){
+		if (isset($cart_items['Services'])){
+			foreach ($cart_items['Services'] as $date=>$item){
 				if (strtotime($date)<time()+900){ 
-				unset($cart_items['Packages'][$date]);
+				unset($cart_items['Services'][$date]);
 				$this->Session->setFlash('Some items may have expired and were removed.', 'flash_danger');
 				}
 			}
-			if (count($cart_items['Packages'])<1) unset($cart_items['Packages']);
+			if (count($cart_items['Services'])<1) unset($cart_items['Services']);
 			$this->Cookie->write('CartItems',$cart_items);
 		}
 		if (!$cart_items) $this->Session->setFlash('Your cart is empty!', 'flash_danger');
@@ -203,39 +214,22 @@ class FirearmsController extends AppController {
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
 			$picktime=$this->request->data['Picktime'];
+			//debug($picktime[$picktime['slot']]);
 			//make sure you always have trailing zeros or bookings do not work!!
 			$mbdate=$picktime['picktime'].'T'.$picktime['slot'].':00';
-			//we just have to add SessionIDs to the array manually as the MINDBODY API doesn't make it simple, so we find all and loop through
-			$pkg_data=$this->Package->find('all',array('conditions'=>array('barcodeID'=>$picktime['package_id'])));
-
-			//use the date as the key to prevent duplicates
-			$cart_items['Packages'][$mbdate]=$pkg_data[0]['Package'];
-			foreach ($pkg_data as $pd=>$va){
-				//debug($va['Package']['service_id']);
-				$pkg=$this->Product->find('all',array('conditions'=>array('Product.barcodeID'=>$va['Package']['service_id'])));
-
-				//this make the Cookie write fail if you fill it too full? Seems ok now but when I passed full product info to all of them it didn't work and took forever to figure out why
-				foreach ($pkg as $test){
-					//debug($test);
-					if ($test['Product']['SessionTypeName']=='RangeLane') $cart_items['Packages'][$mbdate]['SessionTypeID']=$test['Product']['SessionTypeID'];
-					if ($test['Product']['SessionTypeName']=='Combo') $cart_items['Packages'][$mbdate]['ComboTypeID']=$test['Product']['SessionTypeID'];
-					if ($test['Product']['SessionTypeName']=='Double') $cart_items['Packages'][$mbdate]['DoubleTypeID']=$test['Product'];
-				}
-			
-			}
-			
+			$cart_items['Services'][$mbdate]=$services[$picktime['package_id']];
+			$cart_items['Services'][$mbdate]['StaffID']=$picktime[$picktime['slot']];
 			$this->Cookie->delete('CartItems');
 			$this->Cookie->write('CartItems',$cart_items);
 			//debug($cart_items);
 			$this->Session->setFlash('Complete checkout to confirm reservation', 'flash_danger');
-			//return $this->redirect(array('action' => 'pickdate'));
 		}
 		//came from cart itself, this is update and checkout
 		if (isset($this->request->data['Cart']['update_button']) || isset($this->request->data['Cart']['checkout_button'])){
 		//first update cart
 			$update=$this->request->data['Cart'];
-//			$cart_items=$this->Cookie->read('CartItems');
-//			$this->Cookie->delete('CartItems');
+			$cart_items=$this->Cookie->read('CartItems');
+			$this->Cookie->delete('CartItems');
 			unset($cart_items['Extras']);
 			foreach ($update['Extras'] as $id=>$qty){
 				//use the id as the key to prevent the same item show in cart twice
@@ -243,20 +237,17 @@ class FirearmsController extends AppController {
 			}
 			
 			if (isset($this->request->data['Firearm'])){
-				//debug($this->request->data['Firearm']);
-			foreach ($this->request->data['Firearm'] as $dbl=>$on){
-				if ($on==1) $cart_items['Packages'][$dbl]['Double']='Double';
-				else unset($cart_items['Packages'][$dbl]['Double']);
-			}
+				foreach ($this->request->data['Firearm'] as $dbl=>$on){
+					if ($on==1) $cart_items['Services'][$dbl]['Double']='Double';
+					else unset($cart_items['Services'][$dbl]['Double']);
+				}
 			}
 			
 			
 			$this->Cookie->write('CartItems',$cart_items);
 			$this->Session->setFlash('Updated quantities', 'flash_success');
-			//debug($cart_items);
-			//begin checkout
 			if(isset($this->request->data['Cart']['checkout_button'])){
-				//write Session variable to match cookie, checkout page will match them
+				//write Checkout cookie to match cookie, checkout page will match them
 				$this->Cookie->write('CheckoutItems',$cart_items);
 				return $this->redirect(array('action' => 'checkout'));
 			}
@@ -265,12 +256,12 @@ class FirearmsController extends AppController {
 		
 		//make a total AFTER everything is updated. This total does not include tax!
 		$cart_total=0;
-		if (isset($cart_items['Packages'])){
-			foreach ($cart_items['Packages'] as $mbdate=>$pid){
+		if (isset($cart_items['Services'])){
+			foreach ($cart_items['Services'] as $mbdate=>$pid){
 				$cart_total=$cart_total+$pid['OnlinePrice'];
 					if (isset($pid['Double'])){
 						//debug($pid['DoubleTypeID']['OnlinePrice']);
-						$cart_total=$cart_total+$pid['DoubleTypeID']['OnlinePrice'];
+						$cart_total=$cart_total+$pid['DoubleInfo']['OnlinePrice'];
 					}					
 			}
 		}
@@ -286,8 +277,8 @@ class FirearmsController extends AppController {
 	public function cart_remove_package($mbdate=null){
 		$cart_items=$this->Cookie->read('CartItems');
 		$this->Cookie->delete('CartItems');
-		unset($cart_items['Packages'][urldecode($mbdate)]);
-		if (count($cart_items['Packages'])<1) unset($cart_items['Packages']);
+		unset($cart_items['Services'][urldecode($mbdate)]);
+		if (count($cart_items['Services'])<1) unset($cart_items['Services']);
 		$this->Cookie->write('CartItems',$cart_items);
 		$flash='Item removed from cart';
 		$this->Session->setFlash($flash, 'flash_custom');
@@ -298,11 +289,11 @@ class FirearmsController extends AppController {
 	}
 	
 	public function checkout(){
-		$packages=$this->CFE_packages;
+		$services=$this->CFE_packages;
 		$extras=$this->CFE_extras;
 
 		$checkout_items=$this->Cookie->read('CheckoutItems');
-		if (!isset($checkout_items['Packages'])){
+		if (!isset($checkout_items['Services'])){
 			$this->Session->setFlash('No current package selected. Selected package may have expired.', 'flash_custom');
 			return $this->redirect(array('action' => 'cart'));
 		}
@@ -311,14 +302,13 @@ class FirearmsController extends AppController {
 		$checkout_total=0;
 		$tax_total=0;
 		$final_total=0;
-		if (isset($checkout_items['Packages'])){
-		//debug($checkout_items['Packages']);
-			foreach ($checkout_items['Packages'] as $mbdate=>$pid){
+		if (isset($checkout_items['Services'])){
+			foreach ($checkout_items['Services'] as $mbdate=>$pid){
 				$checkout_total=$checkout_total+$pid['OnlinePrice'];	
 				$final_total=$final_total+$pid['ExtendedPrice'];
 				if (isset($pid['Double'])){
-					$checkout_total=$checkout_total+$pid['OnlinePrice'];
-					$final_total=$final_total+$pid['ExtendedPrice'];
+					$checkout_total=$checkout_total+$pid['DoubleInfo']['OnlinePrice'];
+					$final_total=$final_total+$pid['DoubleInfo']['ExtendedPrice'];
 				}
 			}
 		}
@@ -326,31 +316,22 @@ class FirearmsController extends AppController {
 			foreach ($checkout_items['Extras'] as $pid=>$qty){
 				if ($qty>0){
 				$checkout_total=$checkout_total+($extras[$pid]['OnlinePrice']*$qty);	
-				$final_total=$final_total+$extras[$pid]['ExtendedPrice'];	
+				$final_total=$final_total+($extras[$pid]['ExtendedPrice']*$qty);	
 				}		
 			}
 		}
 		$tax_total=$final_total-$checkout_total;
 		$final_total=round($final_total,2);
 		$this->Cookie->write('CheckoutTotal',$final_total);
-		$this->set(compact('checkout_items','packages','extras','final_total','checkout_total','tax_total'));
+		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
 		$this->render('checkout','frontend');
 	}
 	
 	public function transact(){
 		if (isset($this->request->data['Firearm'])){
-			$packages=$this->CFE_packages;
-			$extras=$this->CFE_extras;
-			//just using first value, once gatling is added we will do something else
-			//NEEDS FIXING !!!
-			//$session_id=$this->CFE_SessionTypeIDs[0]['SessionTypeID'];
-		//	$session_id=214;
-			//debug($session_id);
-		//	$staff_id=$this->CFE_StaffIDs[0];
 			$checkout_items=$this->Cookie->read('CheckoutItems');
 			//debug($checkout_items);
 			$client=$this->request->data['Firearm'];
-
 			$client['Username']='web'.time();
 			$client['BirthDate']=date('Y-m-d',strtotime($client['BirthDate']));
 			$client['Password']=time().Configure::read('userPasswords');
@@ -374,28 +355,22 @@ class FirearmsController extends AppController {
 				//make array ready for MINDBODY API
 				$CartItems=array();
 				$itemkey=0;
-				foreach ($checkout_items['Packages'] as $mbdate=>$product_id){	
-					//debug($mbdate);
-					//first add the package
-					/*** This is tested working with multiple packages HOWEVER I still need to apply the discount percentage to the package**/
-				//	$CartItems[$itemkey]['Quantity']=1;
-				//	$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id['barcodeID'],'DiscountPercentage'=>$product_id['DiscountPercentage'],'SellOnline'=>true), SOAP_ENC_ARRAY, 'Package', 'http://clients.mindbodyonline.com/api/0_5');
-				//	$CartItems[$itemkey]['DiscountAmount']=0;
-					//note: if you get one key off it fails!
-					//$itemkey++;
+				foreach ($checkout_items['Services'] as $mbdate=>$service){	
+					//you can set very high discount amounts for testing (so the comp works)
 					
-					//first let's just book the main service - this is the slot itself and should be the "less visible" staff person - THIS SEEMS TO HAVE CEASED TO WORK WITH SELLING THE PACKAGE, maybe because same items.. No, it just doesn't seem to work at all anymore, returns success with Appointments empty, something is wrong... I think the session IDs are wrong! No it's just not working, probably down or something.. So the idea here is to keep on keepin' on and just book them and discount the amount that it is
-					debug($product_id);
 					$CartItems[$itemkey]['Quantity']=1;
-					$CartItems[$itemkey]['DiscountAmount']=40;
-					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>1414), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
+					$CartItems[$itemkey]['DiscountAmount']=1000;
+					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$service['barcodeID']), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
 					//this part will often return NULL at the slightest error, make sure the ABOVE call is working as it relies on it (and goes to the same key)
-					$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>'2016-01-14T09:30:00','Location'=>array('ID'=>1),'Staff'=>array('ID'=>100000263,'isMale'=>false),'SessionType'=>array('ID'=>265));
+					$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$service['StaffID'],'isMale'=>false),'SessionType'=>array('ID'=>$service['SessionTypeID']),'Notes'=>'TESTING'); // the notes don't work, leaving them here to remind me
 					$itemkey++;
-					//then the Double, if applicable - this should be the main person or they can watch the screen during checkout  - their choice
-					//break;
-					//then finally the "add-on" which is really what they will want to see for scheduling
-					
+					//then the Double
+					if (isset($service['Double'])){
+						if ($service['Double']=='Double'){
+							//
+							$itemkey++;
+						}
+					}	
 				}
 				foreach ($checkout_items['Extras'] as $product_id=>$qty){
 					if ($qty>0){
@@ -410,7 +385,7 @@ class FirearmsController extends AppController {
 				//build payment info
 				$PaymentInfo['CreditCardNumber']=$this->request->data['Firearm']['CreditCardNumber'];
 				$PaymentInfo['Amount']=$Amount;
-				$PaymentInfo['Amount']=0;
+				//$PaymentInfo['Amount']=0;
 
 				
 				if (strlen($this->request->data['Firearm']['ExpYear'])==2) $PaymentInfo['ExpYear']='20'.$this->request->data['Firearm']['ExpYear'];
@@ -435,7 +410,7 @@ class FirearmsController extends AppController {
 				//for testing with comp
 				$Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
 
-				$checkout=$mb->CheckoutShoppingCart(array('Test'=>true,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
+				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
 					//just for testing!
 					'ClientID'=>'5695ecef-b2c8-406a-b4ec-ca35c0a80194',
 					'CartItems'=>$CartItems,
@@ -446,8 +421,11 @@ class FirearmsController extends AppController {
 				//debug($CartItems);
 				debug($checkout);
 				
+				//NOTICE: It only returns the last appointment booked, but I confirmed it DOES book them all in MINDBODY
 				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
 					//wow it's a miracle
+					//REMEMBER TO KILL THE COOKIE HERE!!
+					
 				
 				}
 				else {
@@ -513,7 +491,7 @@ class FirearmsController extends AppController {
 		*/
 		debug($data);
 
-		$this->set('request',$mb->getXMLRequest());
+		//$this->set('request',$mb->getXMLRequest());
 	}
 	
 
@@ -545,7 +523,7 @@ class FirearmsController extends AppController {
 		debug($book);
 		
 
-		$this->set('request',$mb->getXMLRequest());
+		//$this->set('request',$mb->getXMLRequest());
 	}
 	
 	public function mobile() {
