@@ -8,9 +8,6 @@ class FirearmsController extends AppController {
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
-		//set some variables
-		//max days that can be scheduled
-		$this->maxDays=Configure::read('maxCalendarDays');
 		$this->loadModel('Product');
 		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
@@ -33,7 +30,7 @@ class FirearmsController extends AppController {
 		}
 		//debug($new_svc);
 		$this->CFE_services=$new_svc;
-
+		
 		
 		//now the Cookie setup, maybe this should be AppController
 		$this->Cookie->name = 'CodyFirearmsExperience';
@@ -45,6 +42,18 @@ class FirearmsController extends AppController {
 		$this->Cookie->httpOnly = true;
 		$this->Cookie->type('aes');
 		
+		//load settings, which are on the firearms table
+		$configs=$this->Firearm->find('all');
+		//debug($configs);
+		$opts=array();
+		foreach ($configs as $opt) $opts[$opt['Firearm']['name']]=$opt['Firearm']['setting_value'];
+		$closed=explode(',',$opts['closedDays']);
+		$opts['closedDays']=$closed;
+		$days_off=array();
+		$days=array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+		foreach ($days as $day) if (!$opts[$day]) $days_off[$day]=$day;
+		$opts['weekdaysOff']=$days_off;
+		$this->CFE_settings=$opts;
 	}
 	
 	public function pickpkg(){
@@ -54,15 +63,25 @@ class FirearmsController extends AppController {
 	}
 	
 	public function pickdate($package_id=null,$session_id=null){
-	if (!isset($package_id) || !isset($session_id)){
-		$this->Session->setFlash('Please select a package first', 'flash_danger');
-		return $this->redirect(array('action' => 'pickpkg'));	
-	}
+		if (!isset($package_id) || !isset($session_id)){
+			$this->Session->setFlash('Please select a package first', 'flash_danger');
+			return $this->redirect(array('action' => 'pickpkg'));	
+		}
 		$dates=array();
-		//just fill some in for now, will use GetBookableItems one day and then store on DB (so can be updated manually like products but not every time this page is called)
-		for ($i=0;$i<$this->maxDays;$i++){
+		//NEED TO PAGINATE THIS! Oh and days of the week need to be here too
+		debug($this->CFE_settings);
+		for ($i=0;$i<$this->CFE_settings['maxBookableDays'];$i++){
 			$dates[$i]=date('Y-m-d', strtotime('today + '.$i.' days'));
-		}	
+			foreach ($this->CFE_settings['closedDays'] as $c){
+				if ($dates[$i]==$c) unset($dates[$i]);
+			}
+			//foreach ($this->CFE_settings['weekdaysOff'] as $day) if (date('l',strtotime($dates[$i]))==$day) unset($dates[$i]);
+		}
+
+
+
+				
+					
 		$selected_package=$this->CFE_services[$package_id];
 		
 		$this->set(compact('dates','selected_package','package_id','session_id'));
@@ -308,7 +327,9 @@ class FirearmsController extends AppController {
 					//then the Double
 					if (isset($service['Double'])){
 						if ($service['Double']=='Double'){
-							//
+							$CartItems[$itemkey]['Quantity']=1;
+							$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$service['DoubleTypeID']), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
+							$CartItems[$itemkey]['DiscountAmount']=0;
 							$itemkey++;
 						}
 					}	
