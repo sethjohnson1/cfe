@@ -38,12 +38,18 @@ $billing_inputs=array(
 	'BillingState'=>'State',
 	'BillingPostalCode'=>'Zip'
 );
+/*
 $cc_inputs=array(
 	'BillingName'=>'Name on Card',
 	'CreditCardNumber'=>'Card number',
 	'ExpMonth'=>'Expiration Month',
 	'ExpYear'=>'Exp Year'
 );
+*/
+$years=array();
+for ($x=0; $x<=10;$x++){
+	$years[date('Y',strtotime('today + '.$x.' years'))]= date('Y',strtotime('today + '.$x.' years'));
+}
 //set this to FALSE and it's disabled
 $testdata='TESTING_TRUE'?>
 <div class="row">
@@ -54,7 +60,7 @@ foreach ($client_inputs as $name=>$label):
 ?>
 <div class="form-group">
 <?
-	echo $this->Form->input($name,array('value'=>$testdata,'label'=>$label[0],'div'=>false,'required'=>$label[1],'placeholder'=>$label[0],'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+	echo $this->Form->input($name,array('value'=>$testdata,'div'=>false,'required'=>$label[1],'placeholder'=>$label[0],'class'=>'form-control','label'=>array('text'=>$label[0],'class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
 </div>
 	<?
 endforeach;
@@ -76,14 +82,25 @@ endforeach;
 </style>
 <?foreach ($billing_inputs as $name=>$label):?>
 <div class="form-group billing-info">
-<?=$this->Form->input($name,array('value'=>$testdata,'label'=>$label,'div'=>false,'placeholder'=>$label,'class'=>'form-control billing-input','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+<?=$this->Form->input($name,array('value'=>$testdata,'div'=>false,'placeholder'=>$label,'class'=>'form-control billing-input','label'=>array('text'=>$label,'class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
 </div>
 <?endforeach?>
-<?foreach ($cc_inputs as $name=>$label):?>
+
+
 <div class="form-group cc-info">
-<?=$this->Form->input($name,array('value'=>$testdata,'required'=>true,'label'=>$label,'div'=>false,'placeholder'=>$label,'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+<?=$this->Form->input('BillingName',array('value'=>'','required'=>true,'label'=>'Name on Card','div'=>false,'placeholder'=>'Name on Card','class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
 </div>
-<?endforeach?>
+<div class="form-group cc-info">
+<?=$this->Form->input('CreditCardNumber',array('value'=>'','required'=>true,'label'=>'Card number','div'=>false,'placeholder'=>'Card Number','class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+</div>
+<div class="form-group cc-info">
+<?=$this->Form->input('ExpMonth',array('options'=>array('01'=>'01','02'=>'02','03'=>'03','04'=>'04','05'=>'05','06'=>'06','07'=>'07','08'=>'08','09'=>'09','10'=>'10','11'=>'11','12'=>'12'),'label'=>'Exp Month','div'=>false,'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+</div>
+<div class="form-group cc-info">
+<?=$this->Form->input('ExpYear',array('options'=>$years,'label'=>'Exp Year','div'=>false,'class'=>'form-control','label'=>array('class'=>'col-sm-2 col-xs-12 control-label'),'between'=>'<div class="col-xs-12 col-sm-10">','after'=>'</div>'));?>
+</div>
+
+
 <?=$this->Form->submit('Submit Payment', array('div' => false,'class'=>'btn btn-success btn-lg date-btns'))?>
 <?=$this->Form->end();?>
 </div>
