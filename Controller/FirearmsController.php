@@ -97,11 +97,11 @@ class FirearmsController extends AppController {
 		if (isset($this->request->query['t'])){
 			$pickdate=date('Y-m-d',strtotime($this->request->query['t']));
 			//make sure the date is valid and within range
-			$max=$this->maxDays-1;
+			$max=Configure::read('maxCalendarDays')-1;
 			if ($pickdate<date('Y-m-d')||$pickdate>date('Y-m-d', strtotime('today + '.$max.' days'))) $pickdate=date('Y-m-d');
-		}
-		else {
-			$pickdate=date('Y-m-d');
+			else {
+			
+			}
 		}
 		require_once('MB_API.php');
 		$mb = new MB_API();
