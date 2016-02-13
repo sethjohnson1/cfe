@@ -16,6 +16,7 @@
 	
 
 	echo $this->Html->script('jquery.min');
+	echo $this->Html->script('jquery.blockUI');
 	echo $this->Html->script('bootstrap.min');
 	echo $this->Html->css('bootstrap.min');
 	
@@ -86,6 +87,7 @@ s.parentNode.insertBefore(ga, s);
 			<?php echo $this->Session->flash(); ?>
 
 			<?php echo $this->fetch('content'); ?>
+			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC. Credit card processing and online booking are Powered by <a href="http://www.mindbody.com">MINDBODY</a>.'?></p>
 </div><!-- /container -->
 </body>
 </html>

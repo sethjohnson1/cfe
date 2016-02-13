@@ -16,8 +16,7 @@ class ProductsController extends AppController {
 		//these are from live CFE environment
 		//$this->CFE_Categories=array(100001=>'Firearm Reservations',100002=>'Retail');
 
-		//these are what show - I'll need to do something special for the Gatling
-		//these should all be the same staff but they can tweak as neeeded this way
+		//these are the sandbox Appointment IDs, make sure they are sellable online (90 and 120 are not by default_)
 		$this->CFE_ComboTypeIDs=array(214=>'Cowboy',265=>'Rifle',266=>'Gatling');
 		
 		//for "Double the Fun" connect a package ID(key) to a "double-fun" product
@@ -86,7 +85,7 @@ class ProductsController extends AppController {
 		
 		foreach ($this->CFE_ComboTypeIDs as $ses_id=>$ses_name){
 			$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>array($ses_id)));
-			//there is no description of services sent by the API
+			//there is no description of services sent by the API - DOH!
 			//debug($data);
 			//if only one result it needs to be fixed up
 			if (isset($data['GetServicesResult']['Services']['Service']['ID'])){
@@ -95,6 +94,7 @@ class ProductsController extends AppController {
 				unset($data['GetServicesResult']['Services']['Service']);
 				$data['GetServicesResult']['Services']['Service'][0]=$temp_data;
 			}
+			//debug($data);
 			foreach ($data['GetServicesResult']['Services']['Service'] as $key=>$product){
 				$product['barcodeID']=$product['ID'];
 				unset($product['ID']);
@@ -131,7 +131,7 @@ class ProductsController extends AppController {
 		$firearm=$this->Firearm->find('all');
 		if ($this->request->is('post')) {
 			$settings=$this->request->data['Product'];
-			debug($settings);
+			//debug($settings);
 			//just for testing, may not want to do this - the loop does it individually
 			$this->Firearm->deleteAll(array(1=>1));
 			foreach ($settings as $setting=>$value){
@@ -144,7 +144,8 @@ class ProductsController extends AppController {
 					$this->Session->setFlash('Settings have been updated','flash_success');
 				}
 			}				
-			//update bookdates table
+			//update bookdates table - no need right now, just do the math on the other controller
+			/*
 			$this->loadModel('Bookdate');
 			$dates=array();
 			$closed=explode(',',$settings['closedDays']);
@@ -154,7 +155,7 @@ class ProductsController extends AppController {
 					if ($bookdate==$c) continue 2;
 				}
 				foreach ($days as $day){
-					if (!$settings[$day] && date('l',strtotime($bookdate)==$day){
+					if (!$settings[$day] && date('l',strtotime($bookdate)==$day)){
 					//must be doing something wrong here, check for days
 						debug($day);
 					}
@@ -163,6 +164,7 @@ class ProductsController extends AppController {
 				//save
 				//debug($bookdate);
 			}
+			*/
 			
 		}
 		else {

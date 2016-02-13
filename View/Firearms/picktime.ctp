@@ -51,7 +51,7 @@ foreach ($available_times as $key=>$slot):
 <?
 echo $slot;
 echo $this->Form->input($slot,array('type'=>'hidden','value'=>$slot,'name'=>'data[Picktime]['.$slot_view.']'));
-echo $this->Form->submit($slot_view, array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Picktime][slot]','value'=>'value'.$key));
+echo $this->Form->submit($slot_view, array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Picktime][slot]','value'=>'value'.$key,'onclick'=>$this->element('blockui',array('msg'=>'Loading cart...'))));
 
 
 

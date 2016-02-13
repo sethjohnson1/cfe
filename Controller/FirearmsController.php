@@ -68,16 +68,13 @@ class FirearmsController extends AppController {
 			return $this->redirect(array('action' => 'pickpkg'));	
 		}
 		$dates=array();
-		//NEED TO PAGINATE THIS! Oh and days of the week need to be here too
-		debug($this->CFE_settings);
+		//debug($this->CFE_settings);
 		for ($i=0;$i<$this->CFE_settings['maxBookableDays'];$i++){
 			$dates[$i]=date('Y-m-d', strtotime('today + '.$i.' days'));
-			foreach ($this->CFE_settings['closedDays'] as $c){
-				if ($dates[$i]==$c) unset($dates[$i]);
-			}
-			//foreach ($this->CFE_settings['weekdaysOff'] as $day) if (date('l',strtotime($dates[$i]))==$day) unset($dates[$i]);
-		}
 
+			foreach ($this->CFE_settings['weekdaysOff'] as $day) if (date('l',strtotime($dates[$i]))==$day) {unset($dates[$i-1]); break;}
+			foreach ($this->CFE_settings['closedDays'] as $day) if (date('Y-m-d',strtotime($dates[$i]))==$day){ unset($dates[$i]); break;}
+		}
 
 
 				
