@@ -107,11 +107,11 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 <h2 align="">Cart Total: <?='$'.$cart_total?><br /><small> Tax will be added at checkout</small></h2>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">
-<?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button'))?>
+<?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button','onclick'=>$this->element('blockui',array('msg'=>'Updating cart...'))))?>
 </div>
 
 <div class="col-xs-12 col-md-6 col-pad">
-<?echo $this->Form->submit('Checkout', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][checkout_button]','disabled'=>$disabled));
+<?echo $this->Form->submit('Checkout', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][checkout_button]','disabled'=>$disabled,'onclick'=>$this->element('blockui',array('msg'=>'Checking out...'))));
 echo $this->Form->end();
 ?>
 </div>
