@@ -3,14 +3,11 @@
 <?=$this->element('selected_package')?>
 </div>
 <div class="col-xs-12">
-<!-- h1>Pick a Time for <?=date('D M d, Y',strtotime($pickdate))?></h1 -->
-<h2>Time slots are in MST (UTC-7)</h2>
-
 
 <script type="text/javascript">
 
 
-var currenttime = '<? print date("F d, Y H:i:s", time())?>'
+var currenttime = '<? print date("F d, Y g:i:s a", time())?>'
 //make the time
 
 var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
@@ -22,10 +19,19 @@ return output
 }
 
 function displaytime(){
+if (serverdate.getHours() > 12) {
+	ampm='pm';
+	hours=serverdate.getHours()-12;
+}
+else{
+	ampm='am';
+	hours=serverdate.getHours();
+}
 serverdate.setSeconds(serverdate.getSeconds()+1)
 var datestring=montharray[serverdate.getMonth()]+" "+padlength(serverdate.getDate())+", "+serverdate.getFullYear()
-var timestring=padlength(serverdate.getHours())+":"+padlength(serverdate.getMinutes())+":"+padlength(serverdate.getSeconds())
-document.getElementById("servertime").innerHTML=datestring+" "+timestring
+//var timestring=padlength(hours)+":"+padlength(serverdate.getMinutes())+":"+padlength(serverdate.getSeconds())
+var timestring=padlength(hours)+":"+padlength(serverdate.getMinutes())
+document.getElementById("servertime").innerHTML=datestring+" "+timestring+" "+ampm
 }
 
 window.onload=function(){
@@ -33,8 +39,9 @@ setInterval("displaytime()", 1000)
 }
 
 </script>
+<p>Time slots are in MST<small>(UTC-7)</small></p>
+<h3><b>Current Time at the Range:</b> <span id="servertime"></span></h3>
 
-<p><b>Current Time at the Range:</b> <span id="servertime"></span></p>
 
 </div>
 <?
