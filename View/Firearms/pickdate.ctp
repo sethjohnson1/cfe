@@ -9,12 +9,6 @@ echo $this->Form->input('package_id',array('type'=>'hidden','value'=>$package_id
 echo $this->Form->input('session_id',array('type'=>'hidden','value'=>$session_id));
 ?>
 <style>
-.bootstrap-datetimepicker-widget.dropdown-menu{
-	width:100%;
-	font-size: 1.4em;
-	padding: 14px;
-	display: block;
-}
 .bootstrap-datetimepicker-widget table td.day{
 	line-height:44px;
 }
@@ -23,18 +17,22 @@ echo $this->Form->input('session_id',array('type'=>'hidden','value'=>$session_id
 	font-size:30px;
 }
 
+.wfe-cal{
+	width: 100%;
+	font-size: 1.4em;
+}
 </style>
 
 <div class="container">
     <div class="row">
         <div class='col-sm-12'>
             <div class="form-group">
-                <div class='input-group date' id='pickdate'>
+                <div class='input-group date wfe-cal' id='pickdate'>
 				<?=$this->Form->input('pickdate',array('class'=>'form-control pickdate','type'=>'hidden','div'=>false,'label'=>false))?>
                    
-                    <span class="input-group-addon" id="cal-btn">
+                    <!-- span class="input-group-addon" id="cal-btn">
                         <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+                    </span -->
                 </div>
             </div>
 			<p><a href="#" onclick="location.reload();">Reset</a></p>
