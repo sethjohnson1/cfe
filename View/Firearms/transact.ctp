@@ -1,8 +1,8 @@
-<div class="row">
+<!-- div class="row">
 <div class="col-xs-12">
 <textarea class="form-control" rows=20><?=$request?></textarea>
 </div>
-</div>
+</div -->
 <?
 //make an array for the inputs, the 1 or 0 is for required
 $client_inputs=array(
@@ -103,6 +103,9 @@ endforeach;
 <?//do not just blindly blockUI here
 //'onclick'=>$this->element('blockui',array('msg'=>'Loading cart...'))
 ?>
+<h4 align="center">Sub-Total: <small><em>only</em></small> <?='$'.$checkout_total?><br />
+Tax: <?=$tax_total?></h4>
+<h3 align="center">Total: $<?=$final_total?></h3>
 <?=$this->Form->submit('Submit Payment', array('div' => false,'class'=>'btn btn-success btn-lg date-btns'))?>
 <?=$this->Form->end();?>
 </div>

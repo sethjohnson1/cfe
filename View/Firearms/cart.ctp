@@ -14,10 +14,11 @@ $disabled=false;
 <?
 
 foreach ($cart_items['Services'] as $mbdate=>$id):
+//debug($mbdate);
 $date_time=explode('T',$mbdate);
 //debug($id);
 ?>
-<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=$id['OnlinePrice']?></strike></span></td>
+<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=date('h:i a',strtotime($date_time[1]))?></td> <td><?=$id['OnlinePrice']?></strike></span></td>
 <td><?
 $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
@@ -36,7 +37,7 @@ echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($m
 endforeach?>
 </tbody>
 </table>
-<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?><small> Max 1 per slot (should we do 2? I think I can figure that out)</small></h4>
+<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?><small> Max 1 shooter per slot </small></h4>
 <?} 
 //no valid packages
 else{
@@ -62,6 +63,12 @@ You must have at least one package to complete checkout<br />
 <?if (isset($extras)){?>
 <table class="table table-hover"> 
 <thead> <tr> <th>Item</th> <th>Description</th> <th>Retail</th> <th>Online Price</th><th>Qty</th> </tr> </thead><tbody> 
+<script>
+//this doesn't work on my iPad mini - tried some workarounds and none worked, moving on (everyone else seems to work, so heck with em)
+$( document ).ready(function() {
+$("input[type=number]").focus(function() { $(this).select(); }); 
+});
+</script>
 <?
 //using counter for mockup
 $i=0;

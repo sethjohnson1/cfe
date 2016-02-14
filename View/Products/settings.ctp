@@ -29,6 +29,8 @@ echo $this->Form->input('maxBookableDays',array('class'=>'form-control'));
 
 echo $this->Form->input('closedDays',array('class'=>'form-control','label'=>'Closed Days comma listed, see Christmas and Thanksgiving below for format')).'<br />';
 
+//echo $this->Form->input('closedDays',array('class'=>'form-control','label'=>'Closed Days comma listed, see Christmas and Thanksgiving below for format')).'<br />';
+
 echo $this->Form->submit('Save', array('div' => false,'class'=>'pad btn btn-success btn-lg date-btns'));
 echo $this->Form->end();
 ?>
