@@ -68,83 +68,88 @@ class FirearmsController extends AppController {
 			return $this->redirect(array('action' => 'pickpkg'));	
 		}
 		$dates=array();
-		//debug($this->CFE_settings);
+		$closed=array();
 		for ($i=0;$i<$this->CFE_settings['maxBookableDays'];$i++){
-			$dates[$i]=date('Y-m-d', strtotime('today + '.$i.' days'));
+			$theday=date('Y-m-d', strtotime('today + '.$i.' days'));
+			$dates[$theday]=$theday;
 
-			foreach ($this->CFE_settings['weekdaysOff'] as $day) if (date('l',strtotime($dates[$i]))==$day) {unset($dates[$i-1]); break;}
-			foreach ($this->CFE_settings['closedDays'] as $day) if (date('Y-m-d',strtotime($dates[$i]))==$day){ unset($dates[$i]); break;}
+			foreach ($this->CFE_settings['weekdaysOff'] as $day) if (date('l',strtotime($dates[$theday]))==$day) {$dates[$theday]='CLOSED'; $closed[$i]=$theday; unset($dates[$theday]); break;}
+			if (isset($dates[$theday])){
+				foreach ($this->CFE_settings['closedDays'] as $day) if (date('Y-m-d',strtotime($dates[$theday]))==$day){ $dates[$theday]='CLOSED'; $closed[$i]=$theday; unset($dates[$theday]); break;}
+			}
+			
+			//set the last day over and over
+			$lastday=$theday;
 		}
-
+		//debug($dates);
 
 				
 					
 		$selected_package=$this->CFE_services[$package_id];
 		
-		$this->set(compact('dates','selected_package','package_id','session_id'));
+		$this->set(compact('lastday','dates','closed','selected_package','package_id','session_id'));
 		$this->render('pickdate','frontend');
 	}
 
 
-	public function picktime($package_id=null,$session_id=null){
-	if (!isset($package_id) || !isset($session_id)){
-		$this->Session->setFlash('Please select a package first', 'flash_danger');
-		return $this->redirect(array('action' => 'pickpkg'));	
-	}
-		if (isset($this->request->query['t'])){
-			$pickdate=date('Y-m-d',strtotime($this->request->query['t']));
+	public function picktime(){
+		if ($this->request->is('post')) {
+			$pickdate=date('Y-m-d',strtotime($this->request->data['Firearm']['pickdate']));
 			//make sure the date is valid and within range
-			$max=Configure::read('maxCalendarDays')-1;
+			$max=$this->CFE_settings['maxBookableDays']-1;
 			if ($pickdate<date('Y-m-d')||$pickdate>date('Y-m-d', strtotime('today + '.$max.' days'))) $pickdate=date('Y-m-d');
-			else {
+			$package_id=$this->request->data['Firearm']['package_id'];
+			$session_id=$this->request->data['Firearm']['session_id'];
 			
-			}
-		}
-		require_once('MB_API.php');
-		$mb = new MB_API();
-		//begin making the options array
-		$options['StartDate']=$pickdate;
-		$options['EndDate']=$pickdate;
-		//this is REQUIRED for the call
-		$options['SessionTypeIDs']=array($session_id);
-		$data = $mb->GetBookableItems($options);
-		//debug($data);
-		if ($data['GetBookableItemsResult']['ErrorCode']==200){
-			//successful
-			$available_times=array();
-			//if a single item make into array
-			if (isset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']['ID'])){
-					$temp_data=array();
-					$temp_data=$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'];
-					unset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']);
-					$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'][0]=$temp_data;
-				}
-			$staff_times=array();
-			foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
-				$interval=$schitem['StartDateTime'];
-				do {
-					//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file. 900 is a 15 minute
-					//the key is the interval and then topmost available staff_id. If we get too busy then we'll need to do something else to make sure *all* staff 
-					if (strtotime($interval) > (time()+900)){
-						$available_times[strtotime($interval)]=$schitem['Staff']['ID'];
+			require_once('MB_API.php');
+			$mb = new MB_API();
+			//begin making the options array
+			$options['StartDate']=$pickdate;
+			$options['EndDate']=$pickdate;
+			//this is REQUIRED for the call
+			$options['SessionTypeIDs']=array($session_id);
+			$data = $mb->GetBookableItems($options);
+			//debug($data);
+			if ($data['GetBookableItemsResult']['ErrorCode']==200){
+				//successful
+				$available_times=array();
+				//if a single item make into array
+				if (isset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']['ID'])){
+						$temp_data=array();
+						$temp_data=$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'];
+						unset($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem']);
+						$data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'][0]=$temp_data;
 					}
-					$interval=date('c',strtotime($interval)+1800);
-					//debug($schitem['Staff']['ID']);
+				$staff_times=array();
+				foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
+					$interval=$schitem['StartDateTime'];
+					do {
+						//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file. 900 is a 15 minute
+						//the key is the interval and then topmost available staff_id. If we get too busy then we'll need to do something else to make sure *all* staff 
+						if (strtotime($interval) > (time()+900)){
+							$available_times[strtotime($interval)]=$schitem['Staff']['ID'];
+						}
+						$interval=date('c',strtotime($interval)+1800);
+						//debug($schitem['Staff']['ID']);
+					}
+					while ($interval <= $schitem['EndDateTime']);
 				}
-				while ($interval <= $schitem['EndDateTime']);
 			}
+			//API response not successful
+			else{
+				$this->Session->setFlash('Sorry, something went wrong finding Bookable Items.', 'flash_danger');
+				debug($data);
+			}
+			ksort($available_times);
+			$selected_package=$this->CFE_services[$package_id];
+		//	$this->set('request',$mb->getXMLRequest());
+			$this->set(compact('available_times','pickdate','package_id','selected_package'));
+			$this->render('picktime','frontend');
 		}
-		//API response not successful
 		else{
-			$this->Session->setFlash('Sorry, something went wrong finding Bookable Items.', 'flash_danger');
-			debug($data);
-		}
-		ksort($available_times);
-		$selected_package=$this->CFE_services[$package_id];
-	//	$this->set('request',$mb->getXMLRequest());
-		$this->set(compact('available_times','pickdate','package_id','selected_package'));
-		$this->render('picktime','frontend');
-		
+			$this->Session->setFlash('Please select date first', 'flash_danger');
+			return $this->redirect(array('action' => 'pickpkg'));	
+		}		
 	}
 	
 	public function cart(){
@@ -171,9 +176,9 @@ class FirearmsController extends AppController {
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
 			$picktime=$this->request->data['Picktime'];
-			//debug($picktime[$picktime['slot']]);
+			$mbtime=date('H:m',strtotime($picktime['slot']));
 			//make sure you always have trailing zeros or bookings do not work!!
-			$mbdate=$picktime['picktime'].'T'.$picktime['slot'].':00';
+			$mbdate=$picktime['picktime'].'T'.$mbtime.':00';
 			$cart_items['Services'][$mbdate]=$services[$picktime['package_id']];
 			$cart_items['Services'][$mbdate]['StaffID']=$picktime[$picktime['slot']];
 			$this->Cookie->delete('CartItems');

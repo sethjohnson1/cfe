@@ -17,8 +17,12 @@
 
 	echo $this->Html->script('jquery.min');
 	echo $this->Html->script('jquery.blockUI');
+	//used by datepicker
+	echo $this->Html->script('moment.min');
 	echo $this->Html->script('bootstrap.min');
 	echo $this->Html->css('bootstrap.min');
+	echo $this->Html->script('bootstrap-datepicker.min');
+	echo $this->Html->css('bootstrap-datepicker.min');
 	
 
 //	echo $this->Html->css('proctor_overrides.css');
