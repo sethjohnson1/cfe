@@ -323,10 +323,10 @@ class FirearmsController extends AppController {
 				$CartItems=array();
 				$itemkey=0;
 				//set higher for testing
-				$discount=0;
+				$discount=1000;
 				foreach ($checkout_items['Services'] as $mbdate=>$service){	
 					//you can set very high discount amounts for testing (so the comp works)
-					
+					//running the URLs over https fails and I don't know why, nor do I know if it will matter as long as the request is sent over https
 					$CartItems[$itemkey]['Quantity']=1;
 					$CartItems[$itemkey]['DiscountAmount']=$discount;
 					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$service['barcodeID']), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
@@ -383,22 +383,24 @@ class FirearmsController extends AppController {
 
 				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
 					//just for testing!
-					'ClientID'=>'56c0c605-0dfc-4a74-8246-204fc0a80194',
+					'ClientID'=>'56c2111d-25c8-48c0-bb25-48cdc0a80194',
 					//this is a TEST client from production
-					'ClientID'=>'20160111185337924',
+					//'ClientID'=>'20160111185337924',
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
 					'InStore'=>true
 				));
 				//debug($CartItems);
-				debug($checkout);
+				//debug($checkout);
 				
 				//NOTICE: It only returns the last appointment booked, but I confirmed it DOES book them all in MINDBODY
 				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
-					//wow it's a miracle
-					//REMEMBER TO KILL THE COOKIEs HERE!!
-					//SubTotals, CheckoutTotal, CartItems (maybe just ALL of them?)
+				//wow it's a miracle
+					//$this->Session->destroy();
+					$this->Cookie->write(array('SuccessfulCheckout'=>'miracle'));
+					$this->Session->setFlash('Booking successful. See you soon!', 'flash_success');
+					return $this->redirect(array('action' => 'thankyou'));
 					
 				
 				}
@@ -421,6 +423,20 @@ class FirearmsController extends AppController {
 		$checkout_total=$subs['sub'];
 		$this->set(compact('final_total','tax_total','checkout_total'));
 		$this->render('transact','frontend');
+	}
+	public function thankyou() {
+	//need to add tracking pixel here!!
+	$legit=$this->Cookie->read('SuccessfulCheckout');
+	if ($legit=='miracle'){
+			$cart=$this->Cookie->read('CartItems');
+			$this->set(compact('cart'));
+			$this->render('thankyou','frontend');
+			}
+	
+	else{
+		$this->Session->setFlash('Page Expired.', 'flash_danger');
+		return $this->redirect('/');
+		}
 	}
 	//everything below is useful test stuff
 	public function index() {
