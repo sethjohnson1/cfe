@@ -323,7 +323,8 @@ class FirearmsController extends AppController {
 				$CartItems=array();
 				$itemkey=0;
 				//set higher for testing
-				$discount=1000;
+				if (isset(Configure::read('discountAmount'))) $discount=Configure::read('discountAmount');
+				else $discount=0;
 				foreach ($checkout_items['Services'] as $mbdate=>$service){	
 					//you can set very high discount amounts for testing (so the comp works)
 					//running the URLs over https fails and I don't know why, nor do I know if it will matter as long as the request is sent over https
