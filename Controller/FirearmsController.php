@@ -323,7 +323,7 @@ class FirearmsController extends AppController {
 				$CartItems=array();
 				$itemkey=0;
 				//set higher for testing
-				if (isset(Configure::read('discountAmount'))) $discount=Configure::read('discountAmount');
+				if (null !== Configure::read('discountAmount')) $discount=Configure::read('discountAmount');
 				else $discount=0;
 				foreach ($checkout_items['Services'] as $mbdate=>$service){	
 					//you can set very high discount amounts for testing (so the comp works)
