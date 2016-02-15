@@ -323,7 +323,7 @@ class FirearmsController extends AppController {
 				$CartItems=array();
 				$itemkey=0;
 				//set higher for testing
-				$discount=1000;
+				$discount=0;
 				foreach ($checkout_items['Services'] as $mbdate=>$service){	
 					//you can set very high discount amounts for testing (so the comp works)
 					
