@@ -1,4 +1,23 @@
 <?php
+/*
+Production IDs (put these into the settings page now)
+
+** Product Categories
+32 - DoubleAmmo
+100001 - Firearms Reservations
+100002 - Retail
+
+** SessionIDs so far
+5,6,9,8
+
+
+** DoubleAmmo so far
+10112 - Gatling
+10113 - Pick Three
+
+** test clientID
+20160111185337924
+*/
 App::uses('AppController', 'Controller');
 
 class ProductsController extends AppController {
@@ -7,22 +26,36 @@ class ProductsController extends AppController {
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
+		//get settings from DB
+		$this->loadModel('Firearm');
+		$firearms=$this->Firearm->find('all');
+		$settings=array();
+		foreach($firearms as $val){
+			$settings[$val['Firearm']['name']]=$val['Firearm']['setting_value'];
+		}
 		//set some variables
+
+		//these are the sandbox Appointment IDs, make sure they are sellable online (90 and 120 are not by default_)
+		$this->CFE_ComboTypeIDs=explode(',',$settings['appointmentSessionIDs']);
+		$dbl=explode(',',$settings['doubleSessionIDs']);
+		$this->CFE_DoubleTypeIDs=array();
+		//as long as they listed them in the same order this works
+		foreach ($dbl as $k=>$v){
+			$this->CFE_DoubleTypeIDs[$this->CFE_ComboTypeIDs[$k]]=$v;
+		}
+		$cat[$settings['retailCategoryID']]=array('name'=>'Retail','prodtype'=>'Product');
+		$cat[$settings['doubleCategoryID']]=array('name'=>'Double','prodtype'=>'Double');
+		$this->CFE_Categories=$cat;
+
+		//old way, description did nothing
+		//$this->CFE_ComboTypeIDs=array(214=>'Cowboy',265=>'Rifle',266=>'Gatling');
+			//sessionIDs to products
+		//$this->CFE_DoubleTypeIDs=array(265=>1237,214=>1237,266=>1238);
 		//26 is the Retail from Sandbox, get this by inspecting dropdown element in product add/edit
 		//the only way to do this is to set manually here (this data cannot be found via API call)
 		//32 is Food which is the "Double"
-		$this->CFE_Categories=array(26=>array('name'=>'Retail','prodtype'=>'Product'),32=>array('name'=>'Double','prodtype'=>'Double'));
-		
-		//these are from live CFE environment
-		//$this->CFE_Categories=array(100001=>'Firearm Reservations',100002=>'Retail');
-
-		//these are the sandbox Appointment IDs, make sure they are sellable online (90 and 120 are not by default_)
-		$this->CFE_ComboTypeIDs=array(214=>'Cowboy',265=>'Rifle',266=>'Gatling');
-		
-		//for "Double the Fun" connect a package ID(key) to a "double-fun" product
-		//BOOKING ADD-ONS DIDN'T WORK! EVEN AFTER THE TESTNG
-		//now simply link a product id, currently Food category
-		$this->CFE_DoubleTypeIDs=array(265=>1237,214=>1237,266=>1238);
+		//OLD WAY ALL FROM DB NOW
+		//$this->CFE_Categories=array(26=>array('name'=>'Retail','prodtype'=>'Product'),32=>array('name'=>'Double','prodtype'=>'Double'));
 		require_once('MB_API.php');
 		
 	}
@@ -66,9 +99,20 @@ class ProductsController extends AppController {
 					$product['CategoryName']=$cat_name['name'];
 					$product['prodtype']=$cat_name['prodtype'];
 					$product['barcodeID']=$product['ID'];
-					//must deal with MINDBODY strange way of rounding tax, if hundreds is even then it rounds down but if odd rounds up			
-					$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
+					//must deal with Banker's tax rounding if hundreds is even then it rounds down but if odd rounds up
+					//NO I THINK THAT REP WAS WRONG! DAMNIT!
+/*								
+					$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,3)*100;
+					debug($tax);
 					if ( $tax & 1 )$tax++;
+					*/
+					
+					//I think if there is ANY value in thousands place it rounds up, otherwise leaves it alone
+					$rawtax=$product['OnlinePrice']*$product['TaxRate'];
+					$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,3)*100;
+					$digit3=explode('.',$rawtax);
+					if (isset($digit3[1])&&strlen($digit3[1])>2) $tax++;
+					//debug($tax);
 					$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
 					
 					$this->Product->create();
@@ -83,7 +127,7 @@ class ProductsController extends AppController {
 			}
 		}
 		
-		foreach ($this->CFE_ComboTypeIDs as $ses_id=>$ses_name){
+		foreach ($this->CFE_ComboTypeIDs as $ses_id){
 			$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>array($ses_id)));
 			//there is no description of services sent by the API - DOH!
 			//debug($data);
@@ -99,12 +143,14 @@ class ProductsController extends AppController {
 				$product['barcodeID']=$product['ID'];
 				unset($product['ID']);
 				$product['CategoryID']=$product['ProductID'];
-				$product['CategoryName']=$ses_name;
+				$product['CategoryName']='Service';
 				$product['prodtype']='Service';	
 				$product['SessionTypeID']=$ses_id;	
 				$product['SessionTypeName']='Service';
 				$product['DoubleTypeID']=$this->CFE_DoubleTypeIDs[$ses_id];
 				$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
+				//debug($tax);
+				//unless it finished even, in which case no rounding!
 				if ( $tax & 1 )$tax++;
 				$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
 				$this->Product->create();

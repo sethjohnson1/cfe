@@ -21,7 +21,8 @@ create table firearms(
 	created datetime,
 	modified datetime,
 	name varchar(255),
-	setting_value varchar(255),
+	description text,
+	setting_value text,
 	setting_date_value datetime
 	
 );

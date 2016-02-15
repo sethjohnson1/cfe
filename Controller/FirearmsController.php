@@ -176,7 +176,8 @@ class FirearmsController extends AppController {
 		//came from the picktime action, basically build an array and then write it to a cookie, should be a proper "CartItem" 
 		if (isset($this->request->data['Picktime'])){
 			$picktime=$this->request->data['Picktime'];
-			$mbtime=date('H:m',strtotime($picktime['slot']));
+			//debug($picktime);
+			$mbtime=date('H:i',strtotime($picktime['slot']));
 			//make sure you always have trailing zeros or bookings do not work!!
 			$mbdate=$picktime['picktime'].'T'.$mbtime.':00';
 			$cart_items['Services'][$mbdate]=$services[$picktime['package_id']];
@@ -285,6 +286,7 @@ class FirearmsController extends AppController {
 		$tax_total=$final_total-$checkout_total;
 		$final_total=round($final_total,2);
 		$this->Cookie->write('CheckoutTotal',$final_total);
+		$this->Cookie->write('SubTotals',array('tax'=>$tax_total,'sub'=>$checkout_total));
 		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
 		$this->render('checkout','frontend');
 	}
@@ -309,6 +311,9 @@ class FirearmsController extends AppController {
 			$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
 				'Test'=>true,
 				'Clients'=>array('Client'=>$client)));
+				/*
+				Set test to false, then debug "add" to get a real client ID then set test back to false to avoid flooding DB with test clients
+				*/
 			//debug($add);
 			if ($add['AddOrUpdateClientsResult']['ErrorCode']==200){
 				//client added, now checkout the cart
@@ -340,7 +345,7 @@ class FirearmsController extends AppController {
 					if ($qty>0){
 						$CartItems[$itemkey]['Quantity']=$qty;
 						$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
-						$CartItems[$itemkey]['DiscountAmount']=0;
+						$CartItems[$itemkey]['DiscountAmount']=1330;
 						$itemkey++;
 						//debug($CartItems);
 					}
@@ -376,7 +381,7 @@ class FirearmsController extends AppController {
 
 				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
 					//just for testing!
-					'ClientID'=>'5695ecef-b2c8-406a-b4ec-ca35c0a80194',
+					'ClientID'=>'56c0c605-0dfc-4a74-8246-204fc0a80194',
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
@@ -388,7 +393,8 @@ class FirearmsController extends AppController {
 				//NOTICE: It only returns the last appointment booked, but I confirmed it DOES book them all in MINDBODY
 				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
 					//wow it's a miracle
-					//REMEMBER TO KILL THE COOKIE HERE!!
+					//REMEMBER TO KILL THE COOKIEs HERE!!
+					//SubTotals, CheckoutTotal, CartItems (maybe just ALL of them?)
 					
 				
 				}
@@ -405,7 +411,11 @@ class FirearmsController extends AppController {
 			}
 		}
 		
-		//debug($checkout);
+		$subs=$this->Cookie->read('SubTotals');
+		$final_total=$this->Cookie->read('CheckoutTotal');
+		$tax_total=$subs['tax'];
+		$checkout_total=$subs['sub'];
+		$this->set(compact('final_total','tax_total','checkout_total'));
 		$this->render('transact','frontend');
 	}
 	//everything below is useful test stuff
