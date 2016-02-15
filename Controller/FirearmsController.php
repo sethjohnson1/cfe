@@ -384,6 +384,8 @@ class FirearmsController extends AppController {
 				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
 					//just for testing!
 					'ClientID'=>'56c0c605-0dfc-4a74-8246-204fc0a80194',
+					//this is a TEST client from production
+					'ClientID'=>'20160111185337924',
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
