@@ -322,11 +322,13 @@ class FirearmsController extends AppController {
 				//make array ready for MINDBODY API
 				$CartItems=array();
 				$itemkey=0;
+				//set higher for testing
+				$discount=1000;
 				foreach ($checkout_items['Services'] as $mbdate=>$service){	
 					//you can set very high discount amounts for testing (so the comp works)
 					
 					$CartItems[$itemkey]['Quantity']=1;
-					$CartItems[$itemkey]['DiscountAmount']=1000;
+					$CartItems[$itemkey]['DiscountAmount']=$discount;
 					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$service['barcodeID']), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
 					//this part will often return NULL at the slightest error, make sure the ABOVE call is working as it relies on it (and goes to the same key)
 					$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$service['StaffID'],'isMale'=>false),'SessionType'=>array('ID'=>$service['SessionTypeID']),'Notes'=>'TESTING'); // the notes don't work, leaving them here to remind me
@@ -336,7 +338,7 @@ class FirearmsController extends AppController {
 						if ($service['Double']=='Double'){
 							$CartItems[$itemkey]['Quantity']=1;
 							$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$service['DoubleTypeID']), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
-							$CartItems[$itemkey]['DiscountAmount']=0;
+							$CartItems[$itemkey]['DiscountAmount']=$discount;
 							$itemkey++;
 						}
 					}	
@@ -345,7 +347,7 @@ class FirearmsController extends AppController {
 					if ($qty>0){
 						$CartItems[$itemkey]['Quantity']=$qty;
 						$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
-						$CartItems[$itemkey]['DiscountAmount']=1330;
+						$CartItems[$itemkey]['DiscountAmount']=$discount;
 						$itemkey++;
 						//debug($CartItems);
 					}

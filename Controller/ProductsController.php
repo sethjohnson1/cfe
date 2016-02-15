@@ -8,7 +8,7 @@ Production IDs (put these into the settings page now)
 100002 - Retail
 
 ** SessionIDs so far
-5,6,9,8
+5,6(gatling),9,8
 
 
 ** DoubleAmmo so far
