@@ -26,6 +26,7 @@ echo $this->Form->create();
 <?
 
 echo $this->Form->input('maxBookableDays',array('class'=>'form-control'));
+echo $this->Form->input('bookingInterval',array('class'=>'form-control','label'=>'Booking interval in seconds (1800 is 30 min)'));
 
 echo $this->Form->input('closedDays',array('class'=>'form-control','label'=>'Closed Days comma listed, see Christmas and Thanksgiving below for format')).'<br />';
 

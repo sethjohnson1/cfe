@@ -122,6 +122,7 @@ class FirearmsController extends AppController {
 					}
 				$staff_times=array();
 				foreach($data['GetBookableItemsResult']['ScheduleItems']['ScheduleItem'] as $key=>$schitem){
+					//debug($schitem);
 					$interval=$schitem['StartDateTime'];
 					do {
 						//make sure not in the past, GetBookableItems returns past times, time zone is set in private config file. 900 is a 15 minute
@@ -129,7 +130,7 @@ class FirearmsController extends AppController {
 						if (strtotime($interval) > (time()+900)){
 							$available_times[strtotime($interval)]=$schitem['Staff']['ID'];
 						}
-						$interval=date('c',strtotime($interval)+1800);
+						$interval=date('c',strtotime($interval)+$this->CFE_settings['bookingInterval']);
 						//debug($schitem['Staff']['ID']);
 					}
 					while ($interval <= $schitem['EndDateTime']);
@@ -141,9 +142,10 @@ class FirearmsController extends AppController {
 				debug($data);
 			}
 			ksort($available_times);
+			
 			$selected_package=$this->CFE_services[$package_id];
 		//	$this->set('request',$mb->getXMLRequest());
-			$this->set(compact('available_times','pickdate','package_id','selected_package'));
+			$this->set(compact('available_times','pickdate','package_id','session_id','selected_package'));
 			$this->render('picktime','frontend');
 		}
 		else{
@@ -398,7 +400,6 @@ class FirearmsController extends AppController {
 				//NOTICE: It only returns the last appointment booked, but I confirmed it DOES book them all in MINDBODY
 				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
 				//wow it's a miracle
-					//$this->Session->destroy();
 					$this->Cookie->write(array('SuccessfulCheckout'=>'miracle'));
 					$this->Session->setFlash('Booking successful. See you soon!', 'flash_success');
 					return $this->redirect(array('action' => 'thankyou'));
@@ -430,13 +431,15 @@ class FirearmsController extends AppController {
 	$legit=$this->Cookie->read('SuccessfulCheckout');
 	if ($legit=='miracle'){
 			$cart=$this->Cookie->read('CartItems');
+			//erase all trace!
+			$this->Session->destroy();
 			$this->set(compact('cart'));
 			$this->render('thankyou','frontend');
-			}
+		}
 	
 	else{
 		$this->Session->setFlash('Page Expired.', 'flash_danger');
-		return $this->redirect('/');
+		return $this->redirect(array('action'=>'pickpkg'));
 		}
 	}
 	//everything below is useful test stuff

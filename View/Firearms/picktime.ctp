@@ -46,16 +46,6 @@ setInterval("displaytime()", 1000)
 
 
 </div>
-<?
-echo $this->Form->create('Firearm',array('url'=>array('action'=>'cart')));
-echo $this->Form->input('pickdate',array('type'=>'hidden','value'=>$pickdate,'name'=>'data[Picktime][picktime]'));
-echo $this->Form->input('package_id',array('type'=>'hidden','value'=>$package_id,'name'=>'data[Picktime][package_id]'));
-
-foreach ($available_times as $key=>$slot):
-	$slot_view=date('g:i a',$key);
-	//slot is the staff_id now
-	
-?>
 <style>
 .picktime{
 	padding:0px;
@@ -64,6 +54,29 @@ foreach ($available_times as $key=>$slot):
 	width: 100%;
 }
 </style>
+<?
+echo $this->Form->create('Firearm',array('url'=>array('action'=>'cart')));
+echo $this->Form->input('pickdate',array('type'=>'hidden','value'=>$pickdate,'name'=>'data[Picktime][picktime]'));
+echo $this->Form->input('package_id',array('type'=>'hidden','value'=>$package_id,'name'=>'data[Picktime][package_id]'));
+
+foreach ($available_times as $key=>$slot):
+	$slot_view=date('g:i a',$key);
+	//slot is the staff_id now
+	$int=1800;
+	//build "disabled" buttons for empty times
+	if (isset($prevkey)&&$prevkey+$int<$key){
+		do {
+			$prevkey=$prevkey+$int;
+			$empty=date('g:i a',$prevkey);
+			echo '<div class="col-xs-12 col-md-6 picktime" style="">';
+			echo $this->Form->submit($empty, array('div' => false,'class'=>'btn btn-default btn-lg date-btns','name'=>'BOOKED','value'=>'','disabled'=>'disabled','title'=>'Already booked!'));
+			echo '</div>';
+		}
+		while ($prevkey<$key-$int);
+	}
+	
+?>
+
 <div class="col-xs-12 col-md-6 picktime" style="">
 <?
 //$slot is the available staff_ID
@@ -71,7 +84,7 @@ foreach ($available_times as $key=>$slot):
 echo $this->Form->input($slot,array('type'=>'hidden','value'=>$slot,'name'=>'data[Picktime]['.$slot_view.']'));
 echo $this->Form->submit($slot_view, array('div' => false,'class'=>'btn btn-default btn-lg date-btns','name'=>'data[Picktime][slot]','value'=>'value'.$key,'onclick'=>$this->element('blockui',array('msg'=>'Loading cart...'))));
 
-
+$prevkey=$key;
 
 ?>
 </div>
