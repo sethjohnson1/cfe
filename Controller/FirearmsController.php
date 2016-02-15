@@ -403,7 +403,7 @@ class FirearmsController extends AppController {
 					debug($checkout);
 				}
 				
-				$this->set('request',$mb->getXMLRequest());
+				//$this->set('request',$mb->getXMLRequest());
 			}
 			else {
 				$this->Session->setFlash('Unable to save client, please ensure all fields are filled out properly.', 'flash_danger');
