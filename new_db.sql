@@ -64,6 +64,18 @@ create table products(
 	DoubleTypeID int
 );
 
+drop table descriptions;
+create table descriptions(
+	id int not null auto_increment,
+	primary key(id),
+	created datetime,
+	modified datetime,
+	packageid int,
+	description text,
+	visible tinyint(1)
+	);
+
+	/** OLD
 -- filled in by GetBookableItems, but only when needed very long call
 drop table bookdates;
 create table bookdates(
@@ -74,6 +86,7 @@ create table bookdates(
 	bookdate varchar(255)
 );
 
+*/
 
 /** OLD
 drop table packages;

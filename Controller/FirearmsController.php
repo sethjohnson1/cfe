@@ -382,13 +382,13 @@ class FirearmsController extends AppController {
 				$Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
 				
 				//for testing with comp
-				$Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
+				//$Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
 
 				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
-					//just for testing!
+					//just for testing! (proper value is set above)
 					'ClientID'=>'56c2111d-25c8-48c0-bb25-48cdc0a80194',
 					//this is a TEST client from production
-					//'ClientID'=>'20160111185337924',
+					'ClientID'=>'20160111185337924',
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
@@ -433,6 +433,7 @@ class FirearmsController extends AppController {
 			$cart=$this->Cookie->read('CartItems');
 			//erase all trace!
 			$this->Session->destroy();
+			$this->Cookie->destroy();
 			$this->set(compact('cart'));
 			$this->render('thankyou','frontend');
 		}
