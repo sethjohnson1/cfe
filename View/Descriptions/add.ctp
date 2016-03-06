@@ -6,6 +6,7 @@
 	<?php
 	if (isset($edit)) echo $this->Form->input('id');
 		echo $this->Form->input('packageid', array('class'=>'form-control'));
+		echo $this->Form->input('name', array('class'=>'form-control'));
 		echo $this->Form->input('description', array('class'=>'form-control'));
 		echo $this->Form->input('visible', array('class'=>'','label'=>false,'div'=>false)).' Visible';
 		?>

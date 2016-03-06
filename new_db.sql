@@ -71,6 +71,7 @@ create table descriptions(
 	created datetime,
 	modified datetime,
 	packageid int,
+	name varchar(255),
 	description text,
 	visible tinyint(1)
 	);

@@ -56,9 +56,17 @@ class FirearmsController extends AppController {
 		$this->CFE_settings=$opts;
 	}
 	
+	public function entry(){
+		$this->set('TheTitle','Welcome');
+		$this->render('entry','frontend');
+	}
+	
+	
+	
 	public function pickpkg(){
 		$pickpkg=$this->CFE_services;
 		$this->set(compact('pickpkg'));
+		$this->set('TheTitle','Package Selection');
 		$this->render('pickpkg','frontend');
 	}
 	
@@ -88,6 +96,7 @@ class FirearmsController extends AppController {
 		$selected_package=$this->CFE_services[$package_id];
 		
 		$this->set(compact('lastday','dates','closed','selected_package','package_id','session_id'));
+		$this->set('TheTitle','Date Selection');
 		$this->render('pickdate','frontend');
 	}
 
@@ -146,6 +155,7 @@ class FirearmsController extends AppController {
 			$selected_package=$this->CFE_services[$package_id];
 		//	$this->set('request',$mb->getXMLRequest());
 			$this->set(compact('available_times','pickdate','package_id','session_id','selected_package'));
+			$this->set('TheTitle','Time slot selection');
 			$this->render('picktime','frontend');
 		}
 		else{
@@ -236,6 +246,7 @@ class FirearmsController extends AppController {
 			}
 		}
 		$this->set(compact('cart_items','packages','extras','cart_total'));
+		$this->set('TheTitle','Cart');
 		$this->render('cart','frontend');
 	}
 	
@@ -290,6 +301,7 @@ class FirearmsController extends AppController {
 		$this->Cookie->write('CheckoutTotal',$final_total);
 		$this->Cookie->write('SubTotals',array('tax'=>$tax_total,'sub'=>$checkout_total));
 		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
+		$this->set('TheTitle','Checkout Step One');
 		$this->render('checkout','frontend');
 	}
 	
@@ -424,6 +436,7 @@ class FirearmsController extends AppController {
 		$tax_total=$subs['tax'];
 		$checkout_total=$subs['sub'];
 		$this->set(compact('final_total','tax_total','checkout_total'));
+		$this->set('TheTitle','Final Checkout');
 		$this->render('transact','frontend');
 	}
 	public function thankyou() {
@@ -435,6 +448,7 @@ class FirearmsController extends AppController {
 			$this->Session->destroy();
 			$this->Cookie->destroy();
 			$this->set(compact('cart'));
+			$this->set('TheTitle','Confirmation');
 			$this->render('thankyou','frontend');
 		}
 	

@@ -39,7 +39,7 @@
 
 <?php 
 	if(!empty($TheTitle))	
-		echo '<title>'.$TheTitle.'</title>';
+		echo '<title>'.$TheTitle.': Cody Firearms Experience</title>';
 	else 
 		echo '<title>CFE Test Site</title>';
 		
@@ -85,8 +85,70 @@ s.parentNode.insertBefore(ga, s);
 ?>
 </head>
 <body>
+<div class="container sitewide">
+<?//the menu array is set on the AppController?>
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Cody Firearms Experience</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+             <?
+		 //draw menu, first do some housekeeping
+		foreach ($menu_array as $key=>$val):
 
-<div class="container-fluid">
+		if (isset($val['action']) && $this->request['action']==$val['action']) $active='active';
+		else $active='';
+		if (!isset($menu_array[$key]['dropdown'])):
+			?>
+		  
+		  <li class="<?=$active?>">
+		  <?=$this->Html->link($key,$val)?>
+		  </li>
+
+		<?else:?>
+              <!-- left this here as it may be useful later -->
+			  <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+				<?=ucfirst($key)?>
+				<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+				<?foreach ($menu_array[$key]['dropdown'] as $k=>$v):?>
+                  <li>
+				  <?=$this->Html->link($k,$v)?>
+				  </li>
+				 <?endforeach?>
+                </ul>
+              </li>
+           <?
+		   endif;
+		   endforeach;
+		   ?>
+		   <li>
+			  <!-- button type="button" class="btn btn-success navbar-btn" data-toggle="modal" data-target="#contactModal">Get Notified</button -->
+		  </li>
+		   </ul>
+            <!--ul class="nav navbar-nav navbar-right">
+
+            </ul -->
+          </div><!--/.nav-collapse -->
+        </div><!--/container menu -->
+      </nav> 
+
+ <script>
+/* hides menu toggle on outside click */
+$(document).on('click',function(){
+	$('.collapse').collapse('hide');
+})
+
+</script>
 
 			<?php echo $this->Session->flash(); ?>
 

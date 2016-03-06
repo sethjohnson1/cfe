@@ -3,6 +3,7 @@
 foreach ($descriptions as $k=>$v):
 	//debug($v);?>
 	<h3><strong>Appointment ID</strong> <?=$v['Description']['id']?></h3>
+	<h3><strong><?=$v['Description']['name']?></strong></h3>
 	<div class="well">
 	<?=$v['Description']['description']?>
 	</div>
