@@ -29,6 +29,13 @@
  * ...and connect the rest of 'Pages' controller's URLs.
  */
 	Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
+	
+	//since I couldn't figure out how to config the Auth component I just do this...
+	Router::redirect('/users/login', '/');
+	
+	//this only allows the secret login url
+	Router::connect('/'.Configure::read('login_action'),array('action'=>'secretlogin','controller'=>'firearms'));
+	Router::redirect('/firearms/secretlogin', '/');
 
 /**
  * Load all plugin routes. See the CakePlugin documentation on

@@ -3,8 +3,8 @@ App::uses('Controller', 'Controller');
 class AppController extends Controller {
 
 	public $components = array('DebugKit.Toolbar','Search.Prg','Session','Auth'=>array('loginRedirect' => array(
-                'controller' => 'descriptions',
-                'action' => 'index'
+                'controller' => 'products',
+                'action' => 'settings'
             )));
 	
 	public function beforeFilter() {

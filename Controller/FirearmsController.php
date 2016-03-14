@@ -473,9 +473,29 @@ class FirearmsController extends AppController {
 	}
 	
 	public function secretlogin(){
-		
+		if ($this->request->is('post')) {
+			if($this->request->data['Login']['pwd']==Configure::read('login_password')){
+				if ($this->Auth->login(array('username'=>'admin'))) {
+					return $this->redirect($this->Auth->redirectUrl());
+					$this->Session->setFlash('Logged in.', 'flash_success');
+				}
+				else{
+					$this->Session->setFlash('Something is broken.', 'flash_danger');
+				}
+			}
+			else{
+				$this->Session->setFlash('Ehh... IP logged', 'flash_danger');
+			}
+		}
 		//use a private variable to name the action, it's also gitignored
-		$this->render(Configure::read('login_action')),'frontend');
+		$this->render('secretlogin','frontend');
+	}
+	public function logout(){
+	if ($this->Auth->logout()) {
+		//return $this->redirect($this->Auth->redirectUrl());
+		$this->Session->setFlash('Ok bye-bye.', 'flash_success');
+		return $this->redirect('/');
+	}
 	}
 	//everything below is useful test stuff (and is now located on the Old controller file)
 }

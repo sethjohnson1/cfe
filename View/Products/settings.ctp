@@ -8,6 +8,12 @@
 </style>
 <div class="row">
 <div class="col-xs-12">
+<h3>
+<?=$this->Html->link('Update_Product_DB',array('action'=>'update'))?> |
+<?=$this->Html->link('Descriptions',array('action'=>'index','controller'=>'descriptions'))?> |
+<?=$this->Html->link('Logout',array('action'=>'logout','controller'=>'firearms'))?> |
+
+</h3>
 <h1>Global settings</h1>
 <?
 echo $this->Form->create();
