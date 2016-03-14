@@ -9,7 +9,6 @@ class FirearmsController extends AppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->loadModel('Product');
-		$this->Auth->allow();
 		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
 		foreach ($extras as $extra){
@@ -62,17 +61,6 @@ class FirearmsController extends AppController {
 		$this->set(compact('pickpkg'));
 		$this->set('TheTitle','Welcome');
 		$this->render('entry','frontend');
-	}
-	
-	public function frontview($id=null) {
-		$this->loadModel('Description');
-		if (!$this->Description->exists($id)) {
-			throw new NotFoundException(__('Invalid webpage'));
-		}
-		$options = array('conditions' => array('Description.' . $this->Description->primaryKey => $id));
-		$this->set('description', $this->Description->find('first', $options));
-		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id))));
-		$this->render('frontview','frontend');
 	}
 	
 	
@@ -471,11 +459,157 @@ class FirearmsController extends AppController {
 		return $this->redirect(array('action'=>'pickpkg'));
 		}
 	}
-	
-	public function secretlogin(){
+	//everything below is useful test stuff
+	public function index() {
+		require_once('MB_API.php');
+		$mb = new MB_API();
 		
-		//use a private variable to name the action, it's also gitignored
-		$this->render(Configure::read('login_action')),'frontend');
+		/*
+			SessionTypeID 214 is the 90 min reservation from the sandbox, get this by hovering over it in MINDBODY GUI
+		*/
+		//26 is Retail from Sandbox, get this by inspecting dropdown element on GUI
+		$data=$mb->GetProducts(array('SellOnline'=>true,'CategoryIDs'=>array(26)));
+		//$data=$mb->GetServices(array('SellOnline'=>true,'SessionTypeIDs'=>$this->CFESessionTypeIDs));
+		//this only gets Session times and only shows dates starting in 1899 in Sandbox?
+		//$data = $mb->GetActiveSessionTimes(array('XMLDetail'=>'Full','PageSize'=>3,'CurrentPageIndex'=>0,'StartTime'=>'2015-12-30T00:00:00','EndTime'=>'2016-01-06T20:00:00','SessionTypeIDs'=>array(214)));
+		
+		//this works great for getting services
+		//$data = $mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SellOnline'=>true,'SessionTypeIDs'=>$this->CFESessionTypeIDs,'PageSize'=>1));
+		
+		//if only one returned then fix it up
+
+		//get staff, doesn't do much for us 
+		//$data=$mb->GetStaff(array('SessionTypeID'=>214,'StartDateTime'=>'2015-12-31T10:30:00'));
+		//not sure what these are, found them in "Arrivals"
+		//$data=$mb->GetPackages(array('SellOnline'=>false));
+		
+		//beginning demo of how o add asi values to the request
+	/*	$CartItems=array(
+			//numbering the array here seems to work fine. Yay!
+			0=>array(
+				'Quantity'=>1,
+				'Item' => new SoapVar(array('ID'=>"1234"), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5'),
+				'DiscountAmount' => 1234),
+			1=>array(
+				'Quantity'=>1,
+				'Item' => new SoapVar(array('ID'=>"1234"), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5'),
+				'DiscountAmount' => 1234)
+			);
+			debug($CartItems);
+		$data = $mb->CheckoutShoppingCart(array(
+			'Test'=>true,
+			'ClientID'=>1234,
+			'CartItems'=>$CartItems,
+			'Payments' => array(
+			'PaymentInfo' => new SoapVar(array('Amount'=>"1234"), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5'))
+		));
+		*/
+		debug($data);
+
+		//$this->set('request',$mb->getXMLRequest());
 	}
-	//everything below is useful test stuff (and is now located on the Old controller file)
+	
+
+	
+	public function addclient() {
+		require_once('MB_API.php');
+		$mb = new MB_API();
+
+		//this works!
+		$book=$mb->AddOrUpdateAppointments(array(
+			'Test'=>false,
+			//'SendEmail'=>true,
+			'Appointments'=>array(
+				'Appointment'=>array(
+					'StartDateTime'=>'2016-01-14T06:30:00',
+					//1 is 'Clubville' use GetLocations to find yours
+					'Location'=>array('ID'=>1),
+					'Staff'=>array('ID'=>100000263,'isMale'=>false),
+					'Duration'=>90,
+					'Client'=>array('ID'=>'5695ecef-b2c8-406a-b4ec-ca35c0a80194'),
+					'SessionType'=>array('ID'=>214),
+					//'StaffRequested'=>true
+				)
+				
+				)
+		));
+		
+		//if this returns Success then it worked
+		debug($book);
+		
+
+		//$this->set('request',$mb->getXMLRequest());
+	}
+	
+	public function mobile() {
+		$this->Prg->commonProcess();
+		$this->Firearm->recursive = 0;
+		$this->paginate = array('conditions' => $this->Firearm->parseCriteria($this->Prg->parsedParams()));
+		$this->set('firearms', $this->paginate());
+		$this->layout='jq';
+		
+		//$this->render('i');
+	}
+	
+	public function details() {
+	//	debug('what the hell');
+		$this->layout='jq';
+	}
+
+	public function view($id = null) {
+		if (!$this->Firearm->exists($id)) {
+			throw new NotFoundException(__('Invalid firearm'));
+		}
+		$options = array('conditions' => array('Firearm.' . $this->Firearm->primaryKey => $id));
+		$this->set('firearm', $this->Firearm->find('first', $options));
+	}
+
+	public function add() {
+		if ($this->request->is('post')) {
+			$this->Firearm->create();
+			if ($this->Firearm->save($this->request->data)) {
+				$this->Session->setFlash(__('The firearm has been saved.'));
+				return $this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The firearm could not be saved. Please, try again.'));
+			}
+		}
+		$orders = $this->Firearm->Order->find('list');
+		$packages = $this->Firearm->Package->find('list');
+		$this->set(compact('orders', 'packages'));
+	}
+
+	public function edit($id = null) {
+		if (!$this->Firearm->exists($id)) {
+			throw new NotFoundException(__('Invalid firearm'));
+		}
+		if ($this->request->is(array('post', 'put'))) {
+			if ($this->Firearm->save($this->request->data)) {
+				$this->Session->setFlash(__('The firearm has been saved.'));
+				return $this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The firearm could not be saved. Please, try again.'));
+			}
+		} else {
+			$options = array('conditions' => array('Firearm.' . $this->Firearm->primaryKey => $id));
+			$this->request->data = $this->Firearm->find('first', $options);
+		}
+		$orders = $this->Firearm->Order->find('list');
+		$packages = $this->Firearm->Package->find('list');
+		$this->set(compact('orders', 'packages'));
+	}
+
+	public function delete($id = null) {
+		$this->Firearm->id = $id;
+		if (!$this->Firearm->exists()) {
+			throw new NotFoundException(__('Invalid firearm'));
+		}
+		$this->request->allowMethod('post', 'delete');
+		if ($this->Firearm->delete()) {
+			$this->Session->setFlash(__('The firearm has been deleted.'));
+		} else {
+			$this->Session->setFlash(__('The firearm could not be deleted. Please, try again.'));
+		}
+		return $this->redirect(array('action' => 'index'));
+	}
 }

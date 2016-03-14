@@ -61,10 +61,14 @@ class ProductsController extends AppController {
 	}
 	public function index() {
 		//this should be a dashboard to update stuff, just a tester now
-		$data = $mb->GetServices(array('SellOnline'=>true));
+		//$data = $mb->GetServices(array('SellOnline'=>true));
 		//$this->loadModel('Package');
 		//$data=$this->Package->find('all');
-		debug($data);
+		//debug($data);
+		$this->Product->recursive = 0;
+		$this->set('products', $this->Paginator->paginate());
+		$this->render('index','frontend');
+
 		
 	}
 	
@@ -227,4 +231,25 @@ class ProductsController extends AppController {
 		$this->render('settings','frontend');
 		
 	}
+	
+	public function edit($id = null) {
+		if (!$this->Product->exists($id)) {
+			throw new NotFoundException(__('Invalid Product'));
+		}
+		if ($this->request->is(array('post', 'put'))) {
+			if ($this->Product->save($this->request->data)) {
+				$this->Session->setFlash('The Product has been saved.','flash_success');
+				return $this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash('The Product could not be saved. Please, try again.','flash_danger');
+			}
+		} else {
+			$options = array('conditions' => array('Product.' . $this->Product->primaryKey => $id));
+			$this->request->data = $this->Product->find('first', $options);
+		}
+	$this->set('edit',1);
+	$this->render('edit','frontend');
+	}
+	
+	
 }

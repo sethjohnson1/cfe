@@ -26,8 +26,9 @@ $carousel=array(
 )
 );
 ?>
-
-<div id="cfe_entry_Carousel" class="carousel slide" data-ride="carousel">
+<div class="row">
+<div class="col-xs-12">
+<div id="cfe_entry_Carousel" class="carousel slide" data-ride="carousel"  >
       <!-- Indicators -->
       <ol class="carousel-indicators">
 	  <?
@@ -60,3 +61,27 @@ $carousel=array(
         <span class="sr-only">Next</span>
       </a>
 </div><!-- /cfe_entry_Carousel -->
+</div>
+</div><!-- carousel row -->
+<div class="row">
+<div class="col-md-6">
+<h3>Real Firearms, Real Experience</h3>
+<p>Bacon ipsum dolor amet ground round bresaola ham hock sirloin. Alcatra tri-tip leberkas ground round picanha tail filet mignon doner capicola jerky porchetta bresaola. Doner pork loin kielbasa meatball chuck drumstick rump hamburger bacon porchetta tail chicken sirloin. Jowl meatball frankfurter shank, venison doner sirloin filet mignon leberkas pork belly kevin brisket.</p>
+</div>
+<div class="col-md-6">
+<h3>Family enviro</h3>
+<p>Bacon ipsum dolor amet ground round bresaola ham hock sirloin. Alcatra tri-tip leberkas ground round picanha tail filet mignon doner capicola jerky porchetta bresaola. Doner pork loin kielbasa meatball chuck drumstick rump hamburger bacon porchetta tail chicken sirloin. Jowl meatball frankfurter shank, venison doner sirloin filet mignon leberkas pork belly kevin brisket.</p>
+</div>
+</div>
+<div class="row jumbotron" style="background-color:#dccba9">
+<div class="col-xs-12">
+
+<h1 align=center>Book Online<small> Show up and shoot</small></h1>
+<?foreach ($pickpkg as $id=>$pkg):?>
+<div class="col-xs-12" style="padding:10px;">
+<?=$this->Html->link($pkg['Name'],array('action'=>'pickdate',$id,$pkg['SessionTypeID']),array('class'=>'btn btn-lg btn-success date-btns','style'=>'','onclick'=>$this->element('blockui',array('msg'=>'Checking dates...'))))?>
+
+</div>
+<?endforeach?>
+</div>
+</div>

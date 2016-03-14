@@ -2,7 +2,10 @@
 App::uses('Controller', 'Controller');
 class AppController extends Controller {
 
-	public $components = array('DebugKit.Toolbar','Search.Prg','Session');
+	public $components = array('DebugKit.Toolbar','Search.Prg','Session','Auth'=>array('loginRedirect' => array(
+                'controller' => 'descriptions',
+                'action' => 'index'
+            )));
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
@@ -11,7 +14,7 @@ class AppController extends Controller {
 		//debug($desc);
 		$pkg_menu=array();
 		foreach ($desc as $d){
-			$pkg_menu[$d['Description']['name']]=array('controller'=>'descriptions','action'=>'frontview',$d['Description']['id']);
+			$pkg_menu[$d['Description']['name']]=array('controller'=>'firearms','action'=>'frontview',$d['Description']['id']);
 		}
 		$menu_array=array(
 			'Home'=>array('action'=>'entry','controller'=>'firearms'),

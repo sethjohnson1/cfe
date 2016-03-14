@@ -85,10 +85,13 @@ s.parentNode.insertBefore(ga, s);
 ?>
 </head>
 <body>
-<div class="container sitewide">
+<style>
+
+</style>
+<div class="container sitewide" style="padding-bottom:50px">
 <?//the menu array is set on the AppController?>
       <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
+        <div class="container sitewide">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
               <span class="sr-only">Toggle navigation</span>
@@ -151,9 +154,31 @@ $(document).on('click',function(){
 </script>
 
 			<?php echo $this->Session->flash(); ?>
-
+<div style="padding-top: 50px">
 			<?php echo $this->fetch('content'); ?>
-			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC. Credit card processing and online booking are Powered by <a href="http://www.mindbody.com">MINDBODY</a>.'?></p>
+</div>
 </div><!-- /container -->
+<div class="container" style="padding-top:60px">			
+			<footer class="footer row" style="margin: 0 10px 0 10px;">
+
+
+		<div class="col-sm-4">
+		<h4>Mission Statement</h4>
+		<p>To provide a quality environment that explains the historical significance and evolution of firearms in the old west that teaches firearms safety and use, and allows people to experience that history through the actual use of firearms.</p>
+		</div>
+		
+		<div class="col-sm-4">
+		<h4>Services</h4>
+		<p class="small">We can put anything here you want, such as hours, contact information, additional things like privacy policy, mission statement, etc.</p>
+		</div>
+		
+		<div class="col-sm-4">
+		<h4>More Info</h4>
+		<p class="small">We can put anything here you want, such as hours, contact information, additional things like privacy policy, mission statement, etc.</p>
+		</div>
+
+      </footer>
+			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC. Credit card processing and online booking are Powered by <a href="http://www.mindbody.com">MINDBODY</a>.'?></p>
+</div>
 </body>
 </html>

@@ -5,4 +5,6 @@ class Description extends AppModel {
 
 //	public $displayField = 'name';
 
+public $belongsTo = array('Product');
+
 }

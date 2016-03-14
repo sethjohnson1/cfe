@@ -38,7 +38,7 @@ echo $this->Form->input('session_id',array('type'=>'hidden','value'=>$session_id
 			<p><a href="#" onclick="location.reload();">Reset</a></p>
 			<?=$this->Form->submit('Continue', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','onclick'=>$this->element('blockui',array('msg'=>'Finding time slots...'))))?>
         </div>
-		<?//debug($closed);?>
+
         <script type="text/javascript">
             $(function () {
                 $('#pickdate').datetimepicker({

@@ -70,10 +70,10 @@ create table descriptions(
 	primary key(id),
 	created datetime,
 	modified datetime,
-	packageid int,
 	name varchar(255),
 	description text,
-	visible tinyint(1)
+	visible tinyint(1),
+	product_id int
 	);
 
 	/** OLD
