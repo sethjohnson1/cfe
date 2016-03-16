@@ -46,8 +46,8 @@ $carousel=array(
 			else $active='';
 		?>
 		<div class="item <?=$active?>">
-		<?=$this->Html->image('entry_carousel/carousel_'.$key,array('alt'=>'Cody Firearms Experience Welcome','class'=>'hidden-xs hidden-sm'))?>
-		<?=$this->Html->image('entry_carousel/carousel_sm_'.$key,array('alt'=>'Cody Firearms Experience Welcome','class'=>'hidden-md hidden-lg'))?>
+		<?=$this->Html->image('entry_carousel/carousel_'.$key.'.jpg',array('alt'=>'Cody Firearms Experience Welcome','class'=>'hidden-xs hidden-sm'))?>
+		<?=$this->Html->image('entry_carousel/carousel_sm_'.$key.'.jpg',array('alt'=>'Cody Firearms Experience Welcome','class'=>'hidden-md hidden-lg'))?>
 
         </div>
 		<?endforeach?>
