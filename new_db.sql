@@ -72,6 +72,7 @@ create table descriptions(
 	modified datetime,
 	name varchar(255),
 	description text,
+	pagetype varchar(255),
 	visible tinyint(1),
 	product_id int
 	);

@@ -11,7 +11,7 @@
 
 <?php 
 
-	echo $this->Html->charset(); 
+	//echo $this->Html->charset(); 
 	//echo $this->Html->meta('icon', $this->Html->url('http://collections.centerofthewest.org/img/truckerhat.ico'));
 	
 
@@ -99,7 +99,7 @@ s.parentNode.insertBefore(ga, s);
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Cody Firearms Experience</a>
+            <?=$this->Html->link('Cody Firearms Experience','/',array('class'=>'navbar-brand'))?>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -168,17 +168,25 @@ $(document).on('click',function(){
 		</div>
 		
 		<div class="col-sm-4">
-		<h4>Services</h4>
+		<h4>Range Features</h4>
 		<p class="small">We can put anything here you want, such as hours, contact information, additional things like privacy policy, mission statement, etc.</p>
 		</div>
 		
 		<div class="col-sm-4">
-		<h4>More Info</h4>
-		<p class="small">We can put anything here you want, such as hours, contact information, additional things like privacy policy, mission statement, etc.</p>
+		<h4>About Us</h4>
+		<ul>
+		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Contact CFE</a></li>
+		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Terms and Conditions</a></li>
+		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Privacy Policy</a></li>	
+		</ul>
 		</div>
 
       </footer>
 			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC. Credit card processing and online booking are Powered by <a href="http://www.mindbody.com">MINDBODY</a>.'?></p>
 </div>
+<?
+//load all the modals
+echo $this->element('modal_contact');
+?>
 </body>
 </html>

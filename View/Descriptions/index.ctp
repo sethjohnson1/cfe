@@ -1,4 +1,10 @@
-<h3><?=$this->Html->link('Add New',array('action'=>'add'))?></h3>
+<h3>
+<? echo $this->Html->link('Add New',array('action'=>'add')).' | Filter: ';
+foreach($pagetypes as $pt){
+	echo $this->Html->link($pt,array('action'=>'index','?'=>array('filter'=>$pt))).' | ';
+}
+
+?></h3>
 <?
 foreach ($descriptions as $k=>$v):
 	//debug($v);?>

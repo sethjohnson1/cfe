@@ -65,8 +65,8 @@ $carousel=array(
 </div><!-- carousel row -->
 <div class="row">
 <div class="col-md-6">
-<h3>Real Firearms, Real Experience</h3>
-<p>Bacon ipsum dolor amet ground round bresaola ham hock sirloin. Alcatra tri-tip leberkas ground round picanha tail filet mignon doner capicola jerky porchetta bresaola. Doner pork loin kielbasa meatball chuck drumstick rump hamburger bacon porchetta tail chicken sirloin. Jowl meatball frankfurter shank, venison doner sirloin filet mignon leberkas pork belly kevin brisket.</p>
+<h3>Firearms and Stories of the West</h3>
+<p>The West – A place big and bold – Plains, Prairie, Desert, Mountains. Enjoy Brilliant sunsets and dark star-studded nights that shroud rushing rivers, spouting geysers, and extensive forests.  This is home to people for more than 10,000 years who relish the wild places and live off the bounty of the land. They’ve revered, conquered, tamed, settled.  Some only visit, but they are part of the Western fabric, too. Firearms are integral to the story of this great landscape and its people.</p>
 </div>
 <div class="col-md-6">
 <h3>Family enviro</h3>

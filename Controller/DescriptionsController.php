@@ -7,6 +7,12 @@ class DescriptionsController extends AppController {
 
 	public function beforeFilter() {
 		parent::beforeFilter();
+		$this->pagetypes=array(
+			'Package'=>'Package',
+			'Gun'=>'Gun',
+			'Feature'=>'Feature'
+		);
+		$this->set('pagetypes',$this->pagetypes);
 		//$this->Auth->allow('frontview');
 	}
 
@@ -26,7 +32,11 @@ class DescriptionsController extends AppController {
 
 	public function index() {
 		$this->Description->recursive = 0;
-		$this->set('descriptions', $this->Paginator->paginate());
+		$conditions=array();
+		if (isset($this->request->query['filter'])){
+			$conditions=array('Description.pagetype'=>$this->request->query['filter']);
+		}
+		$this->set('descriptions', $this->Description->find('all',array('conditions'=>$conditions)));
 		$this->render('index','frontend');
 	}
 

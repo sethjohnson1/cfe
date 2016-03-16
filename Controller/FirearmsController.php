@@ -63,7 +63,8 @@ class FirearmsController extends AppController {
 		$this->set('TheTitle','Welcome');
 		$this->render('entry','frontend');
 	}
-	
+	//this one is being phased out!
+	/*
 	public function frontview($id=null) {
 		$this->loadModel('Description');
 		if (!$this->Description->exists($id)) {
@@ -71,8 +72,30 @@ class FirearmsController extends AppController {
 		}
 		$options = array('conditions' => array('Description.' . $this->Description->primaryKey => $id));
 		$this->set('description', $this->Description->find('first', $options));
-		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id))));
+		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id,'Description.pagetype'=>'Package'))));
 		$this->render('frontview','frontend');
+	}
+*/
+	public function gunview($id=null) {
+		$this->loadModel('Description');
+		if (!$this->Description->exists($id)) {
+			throw new NotFoundException(__('Invalid webpage'));
+		}
+		$options = array('conditions' => array('Description.' . $this->Description->primaryKey => $id));
+		$this->set('description', $this->Description->find('first', $options));
+		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id,'Description.pagetype'=>'Package'))));
+		$this->render('gunview','frontend');
+	}
+	
+	public function featureview($id=null) {
+		$this->loadModel('Description');
+		if (!$this->Description->exists($id)) {
+			throw new NotFoundException(__('Invalid webpage'));
+		}
+		$options = array('conditions' => array('Description.' . $this->Description->primaryKey => $id));
+		$this->set('description', $this->Description->find('first', $options));
+		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id))));
+		$this->render('featureview','frontend');
 	}
 	
 	
