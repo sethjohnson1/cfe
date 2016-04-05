@@ -35,7 +35,6 @@ class ProductsController extends AppController {
 		}
 		//set some variables
 
-		//these are the sandbox Appointment IDs, make sure they are sellable online (90 and 120 are not by default_)
 		$this->CFE_ComboTypeIDs=explode(',',$settings['appointmentSessionIDs']);
 		$dbl=explode(',',$settings['doubleSessionIDs']);
 		$this->CFE_DoubleTypeIDs=array();
@@ -184,6 +183,31 @@ class ProductsController extends AppController {
 			//debug($settings);
 			//just for testing, may not want to do this - the loop does it individually
 			$this->Firearm->deleteAll(array(1=>1));
+			//build the appoint/double into a single setting as it was originally
+			foreach ($settings['appointmentSessionIDs'] as $k=>$s){
+				trim($s," \t\n\r\0\x0B");
+				if (empty($s)) unset($settings['appointmentSessionIDs'][$k]);
+			}
+			$astr='';
+			$dstr='';
+			$c=0;
+			foreach ($settings['appointmentSessionIDs'] as $s){
+				$astr.=$s;
+				$c++;
+				if ($c<count($settings['appointmentSessionIDs'])) $astr.=',';	
+				trim($astr," \t\n\r\0\x0B");		
+			}
+			$c=0;
+			foreach ($settings['doubleSessionIDs'] as $s){
+				$dstr.=$s;
+				$c++;
+				if ($c<count($settings['appointmentSessionIDs'])) $dstr.=',';			
+			}
+			//save trouble of having to explode later, use tmp array
+			$filldata1=$settings['appointmentSessionIDs'];
+			$settings['appointmentSessionIDs']=$astr;
+			$filldata2=$settings['doubleSessionIDs'];
+			$settings['doubleSessionIDs']=$dstr;
 			foreach ($settings as $setting=>$value){
 				$this->Firearm->deleteAll(array('Firearm.name'=>$setting));
 				$setting_val['name']=$setting;
@@ -192,6 +216,11 @@ class ProductsController extends AppController {
 				$this->Firearm->create();
 				if ($this->Firearm->save($setting_val)) {
 					$this->Session->setFlash('Settings have been updated','flash_success');
+					unset($this->request->data['Product']['appointmentSessionIDs']);
+					unset($this->request->data['Product']['doubleSessionIDs']);
+					foreach($filldata1 as $k=>$v) $this->request->data['Product']['appointmentSessionIDs'][$k]=$v;
+					foreach($filldata2 as $k=>$v) $this->request->data['Product']['doubleSessionIDs'][$k]=$v;
+					
 				}
 			}				
 			//update bookdates table - no need right now, just do the math on the other controller
@@ -223,6 +252,13 @@ class ProductsController extends AppController {
 			//$this->request->data['Product'] = array();
 				$this->request->data['Product'][$val['Firearm']['name']]=$val['Firearm']['setting_value'];
 			}
+			
+			$filldata1=explode(',',$this->request->data['Product']['appointmentSessionIDs']);
+			unset($this->request->data['Product']['appointmentSessionIDs']);
+			foreach($filldata1 as $k=>$v) $this->request->data['Product']['appointmentSessionIDs'][$k]=$v;
+			$filldata2=explode(',',$this->request->data['Product']['doubleSessionIDs']);
+			unset($this->request->data['Product']['doubleSessionIDs']);
+			foreach($filldata2 as $k=>$v) $this->request->data['Product']['doubleSessionIDs'][$k]=$v;
 		}
 
 		

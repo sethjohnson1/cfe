@@ -18,15 +18,15 @@ foreach ($cart_items['Services'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 //debug($id);
 ?>
-<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=date('h:i a',strtotime($date_time[1]))?></td> <td><?=$id['OnlinePrice']?></strike></span></td>
+<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=date('h:i a',strtotime($date_time[1]))?></td> <td><?=money_format('$%i',$id['OnlinePrice'])?></strike></span></td>
 <td><?
 $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;YES! Double My Fun</em></th><td>Twice the ammo, twice the fun! <span style="color:red">Online discount!</span></td>
+<tr><th class="row"><em>&nbsp;&nbsp;YES! Double My Fun</em></th><td>Twice the ammo, twice the fun!</td>
 <td></td>
-<td><span style="color:red"><strike><?=$id['DoubleInfo']['Price']?></strike></span>&nbsp;&nbsp;<?=$id['DoubleInfo']['OnlinePrice']?></td>
+<td><?=money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td>
 <td>
 <? //using default naming makes this checkbox behave much nicer!!?>
 <?=$this->Form->input($mbdate,array('type'=>'checkbox','label'=>false,'div'=>false,'onclick'=>'$("#update_button").click()'));?>
@@ -56,13 +56,13 @@ You must have at least one package to complete checkout<br />
 </div><!-- /package column -->
 
 <div class="col-xs-12">
-<h2>Targets and Extra Guns<small style="color:red"> Buy Online and Save!</small></h2>
+<h2>Targets and Extra Guns</h2>
 <?
 //still need to fill in this info somehow
 ?>
 <?if (isset($extras)){?>
 <table class="table table-hover"> 
-<thead> <tr> <th>Item</th> <th>Description</th> <th>Retail</th> <th>Online Price</th><th>Qty</th> </tr> </thead><tbody> 
+<thead> <tr> <th>Item</th> <th>Description</th> <th>Price</th><th>Qty</th> </tr> </thead><tbody> 
 <script>
 //this doesn't work on my iPad mini - tried some workarounds and none worked, moving on (everyone else seems to work, so heck with em)
 $( document ).ready(function() {
@@ -82,7 +82,7 @@ if (isset($cart_items['Extras'][$extra['barcodeID']])){
 }
 
 ?>
-<tr> <th scope="row"><?=$extra['Name']?></th> <td><?=$extra['ShortDesc']?></td> <td><span style="color:red"><strike><?=$extras[$id]['Price']?></strike></span></td> <td><span style="color:green"><strong> <?=$extras[$id]['OnlinePrice']?></strong></span></td>
+<tr> <th scope="row"><?=$extra['Name']?></th> <td><?=$extra['ShortDesc']?></td> <td><?=money_format('$%i',$extras[$id]['OnlinePrice'])?></td> 
 <td>
 <?=$this->Form->input($extra['barcodeID'],array('type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>99,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'))?>
 </td> </tr>
@@ -111,7 +111,7 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 <h2><small>Shirts, hats, drinks/snacks and other merchandise are available at our full retail store.</small></h2>
 </div><!-- /add-ons column -->
 <div class="col-xs-12 col-pad">
-<h2 align="">Cart Total: <?='$'.$cart_total?><br /><small> Tax will be added at checkout</small></h2>
+<h2 align="">Cart Total: <?=money_format('$%i',$cart_total)?><br /><small> Tax will be added at checkout</small></h2>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">
 <?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button','onclick'=>$this->element('blockui',array('msg'=>'Updating cart...'))))?>

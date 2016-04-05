@@ -35,11 +35,29 @@ echo $this->Form->input('maxBookableDays',array('class'=>'form-control'));
 echo $this->Form->input('bookingInterval',array('class'=>'form-control','label'=>'Booking interval in seconds (1800 is 30 min)'));
 
 echo $this->Form->input('closedDays',array('class'=>'form-control','label'=>'Closed Days comma listed, see Christmas and Thanksgiving below for format')).'<br />';
+?>
+<h4>Package ID &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Double Ammo ID</h4>
+<div class="row">
+<?for ($i=0;$i<10;$i++):?>
+<div class="col-xs-6 ">
+<?
+if (isset($this->request->data['Product']['appointmentSessionIDs'][$i])) $val=$this->request->data['Product']['appointmentSessionIDs'][$i];
+else $val='';
+echo $this->Form->input('appointmentSessionIDs',array('class'=>'form-control','label'=>false,'name'=>'data[Product][appointmentSessionIDs]['.$i.']','value'=>$val));
+?>
+</div>
+<div class="col-xs-6 ">
+<?
+if (isset($this->request->data['Product']['doubleSessionIDs'][$i])) $val=$this->request->data['Product']['doubleSessionIDs'][$i];
+else $val='';
+echo $this->Form->input('doubleSessionIDs',array('class'=>'form-control','label'=>false,'name'=>'data[Product][doubleSessionIDs]['.$i.']','value'=>$val)).'<br />';
+?>
+</div>
+<?endfor;?>
+</div>
 
-echo $this->Form->input('appointmentSessionIDs',array('class'=>'form-control','label'=>'Comma listed session IDs of packages')).'<br />';
-echo $this->Form->input('doubleSessionIDs',array('class'=>'form-control','label'=>'Comma listed product IDs of Double-fun IN SAME ORDER AS ABOVE')).'<br />';
-
-echo $this->Form->input('everythingSessionID',array('class'=>'form-control','label'=>'All That & a Gat Session IDs - You must have one package assigned just to gatling and another to all lanes, comma list in order you want them booked')).'<br />';
+<?
+//echo $this->Form->input('everythingSessionID',array('class'=>'form-control','label'=>'All That & a Gat Session IDs - You must have one package assigned just to gatling and another to all lanes, comma list in order you want them booked')).'<br />';
 echo $this->Form->input('retailCategoryID',array('class'=>'form-control','label'=>'Retail category ID')).'<br />';
 echo $this->Form->input('doubleCategoryID',array('class'=>'form-control','label'=>'Double-fun category ID')).'<br />';
 
