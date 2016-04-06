@@ -10,12 +10,17 @@ class AppController extends Controller {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->loadModel('Description');
-		$desc=$this->Description->find('all',array('conditions'=>array('Description.pagetype'=>'Package','Description.visible'=>true)));
-		//debug($desc);
-		$pkg_menu=array();
+		$desc=$this->Description->find('all',array('conditions'=>array('Description.pagetype'=>'history','Description.visible'=>true)));
+		$history_menu=array();
 		foreach ($desc as $d){
-			$pkg_menu[$d['Description']['name']]=array('controller'=>'firearms','action'=>'gunview',$d['Description']['id']);
+			$history_menu[$d['Description']['name']]=array('controller'=>'firearms','action'=>'learn','history',$d['Description']['slug']);
 		}
+		$desc=$this->Description->find('all',array('conditions'=>array('Description.pagetype'=>'firearm','Description.visible'=>true)));
+		$firearm_menu=array();
+		foreach ($desc as $d){
+			$firearm_menu[$d['Description']['name']]=array('controller'=>'firearms','action'=>'learn','firearm',$d['Description']['slug']);
+		}
+		/*
 		$desc=$this->Description->find('all',array('conditions'=>array('Description.pagetype'=>'Gun','Description.visible'=>true)));
 		$gun_menu=array();
 		foreach ($desc as $d){
@@ -26,10 +31,13 @@ class AppController extends Controller {
 		foreach ($desc as $d){
 			$f_menu[$d['Description']['name']]=array('controller'=>'firearms','action'=>'featureview',$d['Description']['id']);
 		}
+		*/
 		$menu_array=array(
-			'Features'=>array('dropdown'=>$f_menu),
-			'Packages'=>array('dropdown'=>$pkg_menu),
-			'Guns'=>array('dropdown'=>$gun_menu)
+			//'Features'=>array('dropdown'=>$f_menu),
+			'Features'=>array('controller'=>'firearms','action'=>'features'),
+			'Firearms History'=>array('dropdown'=>$history_menu),
+			'Key Firearms'=>array('dropdown'=>$firearm_menu),
+			'Packages'=>array('controller'=>'firearms','action'=>'packages')
 		);
 		$this->set(compact('menu_array'));
 	}

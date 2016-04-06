@@ -41,12 +41,12 @@
 	if(!empty($TheTitle))	
 		echo '<title>'.$TheTitle.': Cody Firearms Experience</title>';
 	else 
-		echo '<title>CFE Test Site</title>';
+		echo '<title>Cody Firearms Experience</title>';
 		
 	if(!empty($TheDescription))	
 		echo '<meta name="description" content="'.$TheDescription.'" />';
 	else
-		echo '<meta name="description" content="CFE test website" />';
+		echo '<meta name="description" content="Featuring a family-friendly western arcade, and guided experiences with authentic western firearms in a modern facility. Full retail with unique and interesting items." />';
 
 	
 

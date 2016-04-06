@@ -63,6 +63,13 @@ class FirearmsController extends AppController {
 		$this->set('TheTitle','Welcome');
 		$this->render('entry','frontend');
 	}
+
+	public function features(){
+		$pickpkg=$this->CFE_services;
+		$this->set(compact('pickpkg'));
+		$this->set('TheTitle','Features');
+		$this->render('features','frontend');
+	}
 	//this one is being phased out!
 	/*
 	public function frontview($id=null) {
@@ -76,17 +83,31 @@ class FirearmsController extends AppController {
 		$this->render('frontview','frontend');
 	}
 */
-	public function gunview($id=null) {
+//this is used to render a single element
+	public function learn($pagetype=null,$slug=null) {
 		$this->loadModel('Description');
-		if (!$this->Description->exists($id)) {
-			throw new NotFoundException(__('Invalid webpage'));
-		}
-		$options = array('conditions' => array('Description.' . $this->Description->primaryKey => $id));
-		$this->set('description', $this->Description->find('first', $options));
-		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id,'Description.pagetype'=>'Package'))));
-		$this->render('gunview','frontend');
+		$options = array('conditions' => array('Description.slug'=>$slug));
+		$desc=$this->Description->find('first', $options);
+		if (empty($desc)) throw new NotFoundException(__('Invalid webpage'));
+		$this->set('description',$desc );
+		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.slug !='=>$slug,'Description.pagetype'=>$pagetype))));
+		//SET META HERE
+		$this->render('learn','frontend');
 	}
 	
+//this is for one page with all the packages (and also not necessary...)
+	public function packages() {
+		$this->loadModel('Description');
+		$packages=$this->Description->find('all', array('conditions'=>array('Description.pagetype'=>'package')));
+		//debug($packages);
+		$this->set(compact('packages'));
+		$this->set('TheTitle','Packages');
+		$this->set('TheDescription','Shoot the guns of the Old West, including Mountain Man rifles and a Gatling Gun. Located in Cody Wyoming near Yellowstone.');
+		$this->render('packages','frontend');
+	}
+	
+
+	/*
 	public function featureview($id=null) {
 		$this->loadModel('Description');
 		if (!$this->Description->exists($id)) {
@@ -97,16 +118,16 @@ class FirearmsController extends AppController {
 		$this->set('others', $this->Description->find('all', array('conditions'=>array('Description.id !='=>$id))));
 		$this->render('featureview','frontend');
 	}
+	*/
 	
-	
-	
+
 	public function pickpkg(){
 		$pickpkg=$this->CFE_services;
 		$this->set(compact('pickpkg'));
 		$this->set('TheTitle','Package Selection');
 		$this->render('pickpkg','frontend');
 	}
-	
+
 	public function pickdate($package_id=null,$session_id=null){
 		if (!isset($package_id) || !isset($session_id)){
 			$this->Session->setFlash('Please select a package first', 'flash_danger');

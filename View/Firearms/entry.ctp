@@ -27,7 +27,7 @@ $carousel=array(
 );
 ?>
 <div class="row">
-<div class="col-xs-12">
+<div class="col-xs-12 no-pad">
 <div id="cfe_entry_Carousel" class="carousel slide" data-ride="carousel"  >
       <!-- Indicators -->
       <ol class="carousel-indicators">
@@ -63,20 +63,59 @@ $carousel=array(
 </div><!-- /cfe_entry_Carousel -->
 </div>
 </div><!-- carousel row -->
+	<script>
+	//example to  customize carousel, set to zero for testing
+	$('.carousel').carousel({
+		interval: 0
+	});
+	</script>
 <div class="row">
-<div class="col-md-6">
-<h3>Firearms and Stories of the West</h3>
-<p>The West – A place big and bold – Plains, Prairie, Desert, Mountains. Enjoy Brilliant sunsets and dark star-studded nights that shroud rushing rivers, spouting geysers, and extensive forests.  This is home to people for more than 10,000 years who relish the wild places and live off the bounty of the land. They’ve revered, conquered, tamed, settled.  Some only visit, but they are part of the Western fabric, too. Firearms are integral to the story of this great landscape and its people.</p>
-</div>
-<div class="col-md-6">
-<h3>Family enviro</h3>
-<p>Bacon ipsum dolor amet ground round bresaola ham hock sirloin. Alcatra tri-tip leberkas ground round picanha tail filet mignon doner capicola jerky porchetta bresaola. Doner pork loin kielbasa meatball chuck drumstick rump hamburger bacon porchetta tail chicken sirloin. Jowl meatball frankfurter shank, venison doner sirloin filet mignon leberkas pork belly kevin brisket.</p>
+
+<div class="col-xs-12">
+<h1>Western-Themed Arcade <small>Fun for the entire family</small></h1>
 </div>
 </div>
-<div class="row jumbotron" style="background-color:#dccba9">
+
+<div class="row">
+<div class="col-xs-12 no-pad">
+<img src="http://placehold.it/1170x293" class="img-responsive"/>
+</div>
+<div class="col-xs-12">
+<h1>State-of-the-Art Range <small>Modern Facility with Western feel</small></h1>
+<h2>heading two</h2>
+<h3>heading three</h3>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-12 no-pad">
+<img src="http://placehold.it/1170x293" class="img-responsive"/>
+</div>
+<div class="col-xs-12">
+<h1>North American Widlife Display <small>Coming soon!</small></h1>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-12 no-pad">
+<img src="http://placehold.it/1170x293" class="img-responsive"/>
+</div>
+</div>
+<div class="row">
+<div class="col-sm-4" style="padding-top:17px">
+<?=$this->Html->link('Browse Packages',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-success btn-lg date-btns'))?>
+</div>
+<div class="col-sm-4" style="padding-top:17px">
+<?=$this->Html->link('Learn More',array('action'=>'learn','history','horses_and_firearms'),array('class'=>'btn btn-success btn-lg date-btns'))?>
+</div>
+<div class="col-sm-4" style="padding-top:17px">
+<?=$this->Html->link('Key Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-success btn-lg date-btns'))?>
+</div>
+</div>
+<div class="row jumbotron" style="background-color:#dccba9;margin-top:17px;">
 <div class="col-xs-12">
 
-<h1 align=center>Book Online<small> Show up and shoot</small></h1>
+<h1 align=center>Book Online<small> Hassle-free</small></h1>
 <?foreach ($pickpkg as $id=>$pkg):?>
 <div class="col-xs-12" style="padding:10px;">
 <?=$this->Html->link($pkg['Name'],array('action'=>'pickdate',$id,$pkg['SessionTypeID']),array('class'=>'btn btn-lg btn-success date-btns','style'=>'','onclick'=>$this->element('blockui',array('msg'=>'Checking dates...'))))?>

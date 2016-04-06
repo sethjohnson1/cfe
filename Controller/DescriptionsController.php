@@ -8,9 +8,10 @@ class DescriptionsController extends AppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->pagetypes=array(
-			'Package'=>'Package',
-			'Gun'=>'Gun',
-			'Feature'=>'Feature'
+			'package'=>'package',
+			'firearm'=>'firearm',
+			'history'=>'history'
+			//,'Feature'=>'Feature'
 		);
 		$this->set('pagetypes',$this->pagetypes);
 		//$this->Auth->allow('frontview');
