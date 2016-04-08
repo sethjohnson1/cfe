@@ -114,11 +114,11 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 <h2 align="">Cart Total: <?=money_format('$%i',$cart_total)?><br /><small> Tax will be added at checkout</small></h2>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">
-<?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button','onclick'=>$this->element('blockui',array('msg'=>'Updating cart...'))))?>
+<?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button','onclick'=>$this->element('blockui',array('msg'=>'Updating cart...'))))?>
 </div>
 
 <div class="col-xs-12 col-md-6 col-pad">
-<?echo $this->Form->submit('Checkout', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','name'=>'data[Cart][checkout_button]','disabled'=>$disabled,'onclick'=>$this->element('blockui',array('msg'=>'Checking out...'))));
+<?echo $this->Form->submit('Checkout', array('div' => false,'class'=>'btn btn-lg date-btns','name'=>'data[Cart][checkout_button]','disabled'=>$disabled,'onclick'=>$this->element('blockui',array('msg'=>'Checking out...'))));
 echo $this->Form->end();
 ?>
 </div>
@@ -126,10 +126,10 @@ echo $this->Form->end();
 <?//cart is empty
 else:?>
 <div class="col-xs-12" style="padding: 10px">
-<?=$this->Html->link('Browse Packages',array('action'=>'pickpkg'),array('class'=>'btn btn-lg btn-success date-btns'))?>
+<?=$this->Html->link('Packages',array('action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 <div class="col-xs-12" style="padding: 10px">
-<?=$this->Html->link('Learn More',array('action'=>'about'),array('class'=>'btn btn-lg btn-primary date-btns'))?>
+<?=$this->Html->link('About Us',array('action'=>'entry'),array('class'=>'btn btn-lg btn-primary'))?>
 </div>
 
 <?endif?>

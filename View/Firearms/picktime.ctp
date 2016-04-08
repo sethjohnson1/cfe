@@ -50,7 +50,7 @@ setInterval("displaytime()", 1000)
 .picktime{
 	padding:0px;
 }
-.date-btns{
+.time-btns{
 	width: 100%;
 }
 </style>
@@ -69,7 +69,7 @@ foreach ($available_times as $key=>$slot):
 			$prevkey=$prevkey+$int;
 			$empty=date('g:i a',$prevkey);
 			echo '<div class="col-xs-12 col-md-6 picktime" style="">';
-			echo $this->Form->submit($empty, array('div' => false,'class'=>'btn btn-default btn-lg date-btns','name'=>'BOOKED','value'=>'','disabled'=>'disabled','title'=>'Already booked!'));
+			echo $this->Form->submit($empty, array('div' => false,'class'=>'btn btn-default btn-lg time-btns','name'=>'BOOKED','value'=>'','disabled'=>'disabled','title'=>'Already booked!'));
 			echo '</div>';
 		}
 		while ($prevkey<$key-$int);
@@ -82,7 +82,7 @@ foreach ($available_times as $key=>$slot):
 //$slot is the available staff_ID
 //echo $slot;
 echo $this->Form->input($slot,array('type'=>'hidden','value'=>$slot,'name'=>'data[Picktime]['.$slot_view.']'));
-echo $this->Form->submit($slot_view, array('div' => false,'class'=>'btn btn-default btn-lg date-btns','name'=>'data[Picktime][slot]','value'=>'value'.$key,'onclick'=>$this->element('blockui',array('msg'=>'Loading cart...'))));
+echo $this->Form->submit($slot_view, array('div' => false,'class'=>'btn btn-default btn-lg time-btns','name'=>'data[Picktime][slot]','value'=>'value'.$key,'onclick'=>$this->element('blockui',array('msg'=>'Loading cart...'))));
 
 $prevkey=$key;
 

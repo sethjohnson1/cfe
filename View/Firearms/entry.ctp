@@ -69,13 +69,13 @@ $carousel=array(
 </div>
 <div class="row">
 <div class="col-sm-4 top-pad">
-<?=$this->Html->link('Browse',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
+<?=$this->Html->link('Packages',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 <div class="col-sm-4 top-pad">
 <?=$this->Html->link('Firearms History',array('action'=>'learn','history','horses_and_firearms'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 <div class="col-sm-4 top-pad">
-<?=$this->Html->link('Key Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-lg date-btns'))?>
+<?=$this->Html->link('Our Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 </div>
 <div class="row jumbotron" style="background-color:transparent;margin-top:17px;">

@@ -69,6 +69,6 @@ echo $this->Form->input('Discounts', array(
 Total: <?=money_format('$%i',$final_total)?>
 
 </h3>
-<?=$this->Html->link('Proceed to Payment >>',array('action'=>'transact'),array('class'=>'btn btn-lg btn-success date-btns','onclick'=>$this->element('blockui',array('msg'=>'Loading...'))))?>
+<?=$this->Html->link('Proceed to Payment >>',array('action'=>'transact'),array('class'=>'btn btn-lg date-btns','onclick'=>$this->element('blockui',array('msg'=>'Loading...'))))?>
 </div>
 </div><!--  /checkout row -->

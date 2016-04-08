@@ -21,6 +21,15 @@
 	font-weight: bolder;
 	font-family: Arial;
 }
+.time-btns{
+	width:90%;
+	font-size:1.8em;
+	margin: 0 auto;
+	display: block;
+	box-shadow:5px 5px 8px #888888;
+	border-radius:0px;
+
+}
 
 .btn:hover{
 	/*text-decoration:underline;*/
