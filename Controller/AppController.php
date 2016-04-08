@@ -34,9 +34,9 @@ class AppController extends Controller {
 		*/
 		$menu_array=array(
 			//'Features'=>array('dropdown'=>$f_menu),
-			'Features'=>array('controller'=>'firearms','action'=>'features'),
+			//'Features'=>array('controller'=>'firearms','action'=>'features'),
 			'Firearms History'=>array('dropdown'=>$history_menu),
-			'Key Firearms'=>array('dropdown'=>$firearm_menu),
+			'Our Firearms'=>array('dropdown'=>$firearm_menu),
 			'Packages'=>array('controller'=>'firearms','action'=>'packages')
 		);
 		$this->set(compact('menu_array'));

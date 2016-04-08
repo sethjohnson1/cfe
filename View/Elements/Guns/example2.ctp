@@ -1,7 +1,7 @@
 <div class="col-xs-12 col-md-6">
 <h2 class="package-title"><?=$pkg['Description']['name']?></h2>
 <?//debug($pkg)?>
-<?=$this->Html->image('packages/2guns_gatling.jpg',array('class'=>'img-responsive'))?>
+<?=$this->Html->image('packages/not_sure2.jpg',array('class'=>'img-responsive'))?>
 </div>
 <div class="col-xs-12 col-md-6" style="padding-top:69px">
 
@@ -10,8 +10,13 @@
 
 
 
-  <tr><th scope="row">Description</th>
- <td>Pick any two and the Gatling</td></tr>
+  <tr><th scope="row">Firearms</th>
+ <td>
+ <ul>
+ <li>musket one</li>
+ <li>something else</li>
+ </ul>
+ </td></tr>
  <tr><th scope="row">Historic Timeframe
  </th>
  <td>1760-1830 
@@ -21,7 +26,7 @@
 
  <tr><th scope="row">Action
  </th>
- <td>Depends, Handcrank
+ <td>Flintlock, Handcrank
  </td></tr>
 
  <tr><th scope="row">Ammunition

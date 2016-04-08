@@ -88,17 +88,19 @@ s.parentNode.insertBefore(ga, s);
 <style>
 
 </style>
-<div class="container sitewide" style="padding-bottom:50px">
+<div class="container sitewide entire" style="padding-bottom:50px">
 <?//the menu array is set on the AppController?>
       <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container sitewide">
+        <div class="container sitewide navbar-only">
           <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <?=$this->Html->image('45_long_colt.png',array('style'=>'float:left;width:13%;padding:6px','class'=>'hidden-sm hidden-xs'))?>
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
               <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
+			
             <?=$this->Html->link('Cody Firearms Experience','/',array('class'=>'navbar-brand'))?>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
@@ -157,9 +159,8 @@ $(document).on('click',function(){
 <div style="padding-top: 50px">
 			<?php echo $this->fetch('content'); ?>
 </div>
-</div><!-- /container -->
-<div class="container" style="padding-top:60px">			
-			<footer class="footer row" style="margin: 0 10px 0 10px;">
+
+<footer class="footer row" style="margin: 0 10px 0 10px;">
 
 
 		<div class="col-sm-4">
@@ -183,7 +184,8 @@ $(document).on('click',function(){
 
       </footer>
 			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC. Credit card processing and online booking are Powered by <a href="http://www.mindbody.com">MINDBODY</a>.'?></p>
-</div>
+</div><!-- /container -->
+
 <?
 //load all the modals
 echo $this->element('modal_contact');

@@ -28,39 +28,7 @@ $carousel=array(
 ?>
 <div class="row">
 <div class="col-xs-12 no-pad">
-<div id="cfe_entry_Carousel" class="carousel slide" data-ride="carousel"  >
-      <!-- Indicators -->
-      <ol class="carousel-indicators">
-	  <?
-	  foreach($carousel as $key=>$val):
-	  if ($key==0) $active='active';
-	  else $active='';
-	  ?>
-        <li data-target="#cfe_entry_Carousel" data-slide-to="<?=$key?>" class="<?=$active?>"></li>
-     <?endforeach?>
-	 </ol>
-	 
-      <div class="carousel-inner" role="listbox">
-        <?foreach($carousel as $key=>$val):
-			if ($key==0) $active='active';
-			else $active='';
-		?>
-		<div class="item <?=$active?>">
-		<?=$this->Html->image('entry_carousel/carousel_'.$key.'.jpg',array('alt'=>'Cody Firearms Experience Welcome','class'=>'hidden-xs hidden-sm'))?>
-		<?=$this->Html->image('entry_carousel/carousel_sm_'.$key.'.jpg',array('alt'=>'Cody Firearms Experience Welcome','class'=>'hidden-md hidden-lg'))?>
-
-        </div>
-		<?endforeach?>
-      </div>
-      <a class="left carousel-control" href="#cfe_entry_Carousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="right carousel-control" href="#cfe_entry_Carousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-</div><!-- /cfe_entry_Carousel -->
+<?=$this->Html->image('cody_firearms_experience.jpg',array('class'=>'img-responsive'))?>
 </div>
 </div><!-- carousel row -->
 	<script>
@@ -69,7 +37,7 @@ $carousel=array(
 		interval: 0
 	});
 	</script>
-<div class="row">
+<div class="row top-pad">
 
 <div class="col-xs-12">
 <h1>Western-Themed Arcade <small>Fun for the entire family</small></h1>
@@ -78,41 +46,39 @@ $carousel=array(
 
 <div class="row">
 <div class="col-xs-12 no-pad">
-<img src="http://placehold.it/1170x293" class="img-responsive"/>
+<?=$this->Html->image('examples/arcade.jpg',array('class'=>'img-responsive'))?>
 </div>
-<div class="col-xs-12">
+<div class="col-xs-12 top-pad">
 <h1>State-of-the-Art Range <small>Modern Facility with Western feel</small></h1>
-<h2>heading two</h2>
-<h3>heading three</h3>
 </div>
 </div>
 
 <div class="row">
 <div class="col-xs-12 no-pad">
-<img src="http://placehold.it/1170x293" class="img-responsive"/>
+<?=$this->Html->image('examples/range.jpg',array('class'=>'img-responsive'))?>
 </div>
-<div class="col-xs-12">
+<div class="col-xs-12 top-pad">
 <h1>North American Widlife Display <small>Coming soon!</small></h1>
 </div>
 </div>
 
 <div class="row">
 <div class="col-xs-12 no-pad">
-<img src="http://placehold.it/1170x293" class="img-responsive"/>
+<?=$this->Html->image('examples/wildlife.jpg',array('class'=>'img-responsive'))?>
 </div>
 </div>
 <div class="row">
-<div class="col-sm-4" style="padding-top:17px">
-<?=$this->Html->link('Browse Packages',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-success btn-lg date-btns'))?>
+<div class="col-sm-4 top-pad">
+<?=$this->Html->link('Browse',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
-<div class="col-sm-4" style="padding-top:17px">
-<?=$this->Html->link('Learn More',array('action'=>'learn','history','horses_and_firearms'),array('class'=>'btn btn-success btn-lg date-btns'))?>
+<div class="col-sm-4 top-pad">
+<?=$this->Html->link('Firearms History',array('action'=>'learn','history','horses_and_firearms'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
-<div class="col-sm-4" style="padding-top:17px">
-<?=$this->Html->link('Key Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-success btn-lg date-btns'))?>
+<div class="col-sm-4 top-pad">
+<?=$this->Html->link('Key Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 </div>
-<div class="row jumbotron" style="background-color:#dccba9;margin-top:17px;">
+<div class="row jumbotron" style="background-color:transparent;margin-top:17px;">
 <div class="col-xs-12">
 
 <h1 align=center>Book Online<small> Hassle-free</small></h1>
