@@ -1,7 +1,7 @@
 <div class="col-xs-12 col-md-6">
 <h2 class="package-title"><?=$pkg['Description']['name']?></h2>
 <?//debug($pkg)?>
-<?=$this->Html->image('packages/2guns_gatling.jpg',array('class'=>'img-responsive'))?>
+<?=$this->Html->image('packages/2guns_gatling.jpg',array('class'=>'img-responsive img-center'))?>
 </div>
 <div class="col-xs-12 col-md-6" style="padding-top:69px">
 
