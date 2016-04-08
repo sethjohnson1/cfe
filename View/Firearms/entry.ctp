@@ -78,7 +78,7 @@ $carousel=array(
 <?=$this->Html->link('Our Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 </div>
-<div class="row jumbotron" style="background-color:transparent;margin-top:17px;">
+<div class="row jumbotron firearm" style="margin-top:17px;">
 <div class="col-xs-12">
 
 <h1 align=center>Book Online<small> Hassle-free</small></h1>
