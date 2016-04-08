@@ -164,15 +164,11 @@ $(document).on('click',function(){
 <footer class="footer row" style="margin: 0 10px 0 10px;">
 
 
-		<div class="col-sm-4">
+		<div class="col-sm-8">
 		<h4>Mission Statement</h4>
 		<p>To provide a quality environment that explains the historical significance and evolution of firearms in the old west that teaches firearms safety and use, and allows people to experience that history through the actual use of firearms.</p>
 		</div>
-		
-		<div class="col-sm-4">
-		<h4>Range Features</h4>
-		<p class="small">We can put anything here you want, such as hours, contact information, additional things like privacy policy, mission statement, etc.</p>
-		</div>
+
 		
 		<div class="col-sm-4">
 		<h4>About Us</h4>
