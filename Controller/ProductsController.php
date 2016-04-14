@@ -180,7 +180,13 @@ class ProductsController extends AppController {
 		$firearm=$this->Firearm->find('all');
 		if ($this->request->is('post')) {
 			$settings=$this->request->data['Product'];
-			//debug($settings);
+			$discounts['ids']=$settings['discountIDs'];
+			$discounts['descs']=$settings['discountDesc'];
+			$discounts['amounts']=$settings['amount'];
+			unset($settings['discountIDs']);
+			unset($settings['discountDesc']);
+			unset($settings['amount']);
+			debug($settings);
 			//just for testing, may not want to do this - the loop does it individually
 			$this->Firearm->deleteAll(array(1=>1));
 			//build the appoint/double into a single setting as it was originally
@@ -222,7 +228,20 @@ class ProductsController extends AppController {
 					foreach($filldata2 as $k=>$v) $this->request->data['Product']['doubleSessionIDs'][$k]=$v;
 					
 				}
-			}				
+			}
+			//now save the discounts
+			
+			foreach ($discounts['ids'] as $k=>$d){
+				$this->Firearm->create();
+				$discount_val['name']='discount';
+				$discount_val['setting_value']=$d;
+				$discount_val['description']=$discounts['descs'][$k];
+				$discount_val['amount']=$discounts['amounts'][$k];
+				if (!empty($discount_val['setting_value'])){
+					if ($this->Firearm->save($discount_val)) {
+					}
+				}
+			}
 			//update bookdates table - no need right now, just do the math on the other controller
 			/*
 			$this->loadModel('Bookdate');
@@ -247,10 +266,19 @@ class ProductsController extends AppController {
 			
 		}
 		else {
+			$discount_fill=array();
+			$dikey=0;
 			foreach ($firearm as $key=>$val){
 			//debug($firearm);
 			//$this->request->data['Product'] = array();
 				$this->request->data['Product'][$val['Firearm']['name']]=$val['Firearm']['setting_value'];
+				
+				if ($val['Firearm']['name']=='discount'){
+					$discount_fill[$dikey]['desc']=$val['Firearm']['description'];
+					$discount_fill[$dikey]['setting_value']=$val['Firearm']['setting_value'];
+					$discount_fill[$dikey]['amount']=$val['Firearm']['amount'];
+					$dikey++;
+				}
 			}
 			
 			$filldata1=explode(',',$this->request->data['Product']['appointmentSessionIDs']);
@@ -262,7 +290,7 @@ class ProductsController extends AppController {
 		}
 
 		
-		$this->set(compact('firearm','days'));
+		$this->set(compact('firearm','days','discount_fill'));
 		
 		$this->render('settings','frontend');
 		

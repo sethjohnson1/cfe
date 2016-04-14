@@ -109,6 +109,34 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 
 <?}?>
 <h2><small>Shirts, hats, drinks/snacks and other merchandise are available at our full retail store.</small></h2>
+<h3>Discount <small>Applied at final payment, please bring card or ID</small></h3>
+<style>
+.radio{
+	margin-left:30px;
+}
+.radio input[type=radio]{
+	//margin-left:0px;
+}
+</style>
+<?
+//still not sure best way to do this, using underscores/explode for now, fuck it
+$options=array();
+foreach ($discounts as $dival){
+	$options[$dival['Firearm']['amount'].'_'.$dival['Firearm']['setting_value']]=$dival['Firearm']['description'];
+}
+$options[0]='None';
+echo $this->Form->input('Discounts', array(
+    //'before' => '--before--',
+    //'between' => '<div class="radio_btn"',
+	//'after' => '--after--',
+	'label'=>false,
+	'legend'=>false,
+	'class'=>'radio_dis',
+    'separator' => '<br/>',
+	'type'=>'radio',
+	'value'=>0,
+    'options' => $options
+));?>
 </div><!-- /add-ons column -->
 <div class="col-xs-12 col-pad">
 <h2 align="">Cart Total: <?=money_format('$%i',$cart_total)?><br /><small> Tax will be added at checkout</small></h2>

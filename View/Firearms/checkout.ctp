@@ -18,7 +18,7 @@ endforeach?>
 
 <?if (isset($checkout_items['Extras'])){?>
 <table class="table table-hover"> 
-<thead> <tr> <th>Item</th> <th>Description</th> <th>Retail</th><th>Qty</th> </tr> </thead><tbody> 
+<thead> <tr> <th>Item</th> <th>Description</th> <th>Price</th><th>Qty</th> </tr> </thead><tbody> 
 <?
 
 foreach ($checkout_items['Extras'] as $id=>$extra):
@@ -27,7 +27,7 @@ $qty_val=$checkout_items['Extras'][$id];
 
 
 ?>
-<tr> <th scope="row"><?=$extras[$id]['Name']?></th> <td><?=$extras[$id]['ShortDesc']?></td> <td><span style="color:red"><strike><?=$extras[$id]['Price']?></strike></span></td> <td><?=money_format('$%i',$extras[$id]['OnlinePrice'])?></td>
+<tr> <th scope="row"><?=$extras[$id]['Name']?></th> <td><?=$extras[$id]['ShortDesc']?></td><td><?=money_format('$%i',$extras[$id]['OnlinePrice'])?></td>
 <td>
 <?=$qty_val?>
 </td> </tr>
@@ -40,30 +40,10 @@ endforeach;
 }?>
 </tbody>
 </table>
-<style>
-.radio{
-	margin-left:30px;
-}
-.radio input[type=radio]{
-	//margin-left:0px;
-}
-</style>
-<h3><?=$this->Html->link('<< Back to Cart',array('action'=>'cart'))?></h3>
-<h3>Discounts <small>Applied at final payment, please bring card or ID</small></h3>
-<?
 
-echo $this->Form->input('Discounts', array(
-    //'before' => '--before--',
-    //'between' => '<div class="radio_btn"',
-	//'after' => '--after--',
-	'label'=>false,
-	'legend'=>false,
-	'class'=>'radio_dis',
-    'separator' => '<br/>',
-	'type'=>'radio',
-	'value'=>0,
-    'options' => array(1=>'Cardholder save $5', 123413=>'Active duty or retired United States military, save $10', 456=>'Senior (age 65 and up) save $5',0=>'None')
-));?>
+<?//debug($discounts)?>
+<h3><?=$this->Html->link('<< Back to Cart',array('action'=>'cart'))?></h3>
+
 <h3 align="center">Sub-Total: <small><em>only</em></small> <?=money_format('$%i',$checkout_total)?><br />
 <small>Tax: <?=money_format('$%i',$tax_total)?></small><br />
 Total: <?=money_format('$%i',$final_total)?>

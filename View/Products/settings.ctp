@@ -55,6 +55,33 @@ echo $this->Form->input('doubleSessionIDs',array('class'=>'form-control','label'
 </div>
 <?endfor;?>
 </div>
+<h4>Discount ID &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Description &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Amount</h4>
+<?//debug($discount_fill)?>
+<div class="row">
+<?for ($i=0;$i<3;$i++):?>
+<div class="col-xs-4 ">
+<?
+if (isset($discount_fill[$i]['setting_value'])) $val=$discount_fill[$i]['setting_value'];
+else $val='';
+echo $this->Form->input('discountIDs',array('class'=>'form-control','label'=>false,'name'=>'data[Product][discountIDs]['.$i.']','value'=>$val));
+?>
+</div>
+<div class="col-xs-4 ">
+<?
+if (isset($discount_fill[$i]['desc'])) $val=$discount_fill[$i]['desc'];
+else $val='';
+echo $this->Form->input('discountDesc',array('class'=>'form-control','label'=>false,'name'=>'data[Product][discountDesc]['.$i.']','value'=>$val)).'<br />';
+?>
+</div>
+<div class="col-xs-4 ">
+<?
+if (isset($discount_fill[$i]['amount'])) $val=$discount_fill[$i]['amount'];
+else $val='';
+echo $this->Form->input('amount',array('class'=>'form-control','label'=>false,'name'=>'data[Product][amount]['.$i.']','value'=>$val)).'<br />';
+?>
+</div>
+<?endfor;?>
+</div>
 
 <?
 //echo $this->Form->input('everythingSessionID',array('class'=>'form-control','label'=>'All That & a Gat Session IDs - You must have one package assigned just to gatling and another to all lanes, comma list in order you want them booked')).'<br />';

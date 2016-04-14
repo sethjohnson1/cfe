@@ -23,6 +23,7 @@ create table firearms(
 	name varchar(255),
 	description text,
 	setting_value text,
+	amount int,
 	setting_date_value datetime
 	
 );

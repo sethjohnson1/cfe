@@ -10,7 +10,7 @@ class FirearmsController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Product');
 		$this->Auth->allow();
-		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
+		$this->CFE_discounts=$this->Firearm->find('all',array('conditions'=>array('Firearm.name'=>'discount')));$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
 		foreach ($extras as $extra){
 			$new_ex[$extra['Product']['barcodeID']]=$extra['Product'];
@@ -225,6 +225,7 @@ class FirearmsController extends AppController {
 	public function cart(){
 		$services=$this->CFE_services;
 		$extras=$this->CFE_extras;
+		$discounts=$this->CFE_discounts;
 		$this->Cookie->delete('CheckoutTotal');
 		$cart_items=$this->Cookie->read('CartItems');
 		//debug($cart_items);
@@ -303,7 +304,7 @@ class FirearmsController extends AppController {
 				$cart_total=$cart_total+($extras[$pid]['OnlinePrice']*$qty);	
 			}
 		}
-		$this->set(compact('cart_items','packages','extras','cart_total'));
+		$this->set(compact('cart_items','packages','extras','cart_total','discounts'));
 		$this->set('TheTitle','Cart');
 		$this->render('cart','frontend');
 	}
@@ -325,6 +326,7 @@ class FirearmsController extends AppController {
 	public function checkout(){
 		$services=$this->CFE_packages;
 		$extras=$this->CFE_extras;
+
 
 		$checkout_items=$this->Cookie->read('CheckoutItems');
 		if (!isset($checkout_items['Services'])){
