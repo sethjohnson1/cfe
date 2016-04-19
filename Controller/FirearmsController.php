@@ -262,6 +262,7 @@ class FirearmsController extends AppController {
 		if (isset($this->request->data['Cart']['update_button']) || isset($this->request->data['Cart']['checkout_button'])){
 		//first update cart
 			$update=$this->request->data['Cart'];
+			//debug($this->request->data);
 			$cart_items=$this->Cookie->read('CartItems');
 			$this->Cookie->delete('CartItems');
 			unset($cart_items['Extras']);
@@ -274,6 +275,14 @@ class FirearmsController extends AppController {
 				foreach ($this->request->data['Firearm'] as $dbl=>$on){
 					if ($on==1) $cart_items['Services'][$dbl]['Double']='Double';
 					else unset($cart_items['Services'][$dbl]['Double']);
+					
+					//discounts
+					if ($dbl=='Discount'){
+						//$discount_array=explode('_',$on);
+						//explode it later
+						$cart_items['Discount']=$on;
+					}
+					
 				}
 			}
 			
@@ -303,6 +312,10 @@ class FirearmsController extends AppController {
 			foreach ($cart_items['Extras'] as $pid=>$qty){
 				$cart_total=$cart_total+($extras[$pid]['OnlinePrice']*$qty);	
 			}
+		}
+		if (isset($cart_items['Discount'])){
+			$discount_array=explode('_',$cart_items['Discount']);
+			$cart_total=$cart_total-$discount_array[0];
 		}
 		$this->set(compact('cart_items','packages','extras','cart_total','discounts'));
 		$this->set('TheTitle','Cart');
@@ -355,6 +368,10 @@ class FirearmsController extends AppController {
 				$final_total=$final_total+($extras[$pid]['ExtendedPrice']*$qty);	
 				}		
 			}
+		}
+		if (isset($checkout_items['Discount'])){
+		//$checkout_total=$checkout_total-
+		debug($checkout_items['Discount']);
 		}
 		$tax_total=$final_total-$checkout_total;
 		$final_total=round($final_total,2);

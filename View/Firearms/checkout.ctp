@@ -8,10 +8,18 @@
 foreach ($checkout_items['Services'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
-<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=money_format('$%i',$id['OnlinePrice'])?></strike></span></td>
+<tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=money_format('$%i',$id['OnlinePrice'])?></td>
 <td><?if (isset($id['Double'])) echo '<strong>2x ammo</strong> add '.money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td> </tr>
 <?
 endforeach?>
+<?if($checkout_items['Discount']):
+$discount_array=explode('_',$checkout_items['Discount']);?>
+
+<tr> <th scope="row"></th> <td></td> <td><?=$discount_array[1]?> Discount:</td> <td><?=money_format('$%i',$discount_array[0])?></td>
+<td><strong>Please bring proof to have discount honored.</strong></td> </tr>
+<?
+
+endif;?>
 </tbody>
 </table>
 <h3>Extras</h3>

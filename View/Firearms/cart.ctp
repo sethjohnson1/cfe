@@ -62,7 +62,7 @@ You must have at least one package to complete checkout<br />
 ?>
 <?if (isset($extras)){?>
 <table class="table table-hover"> 
-<thead> <tr> <th>Item</th> <th>Description</th> <th>Price</th><th>Qty</th> </tr> </thead><tbody> 
+<thead> <tr> <th>Item</th> <th>Description</th> <th>Price</th><th>&nbsp;</th> </tr> </thead><tbody> 
 <script>
 //this doesn't work on my iPad mini - tried some workarounds and none worked, moving on (everyone else seems to work, so heck with em)
 $( document ).ready(function() {
@@ -84,7 +84,7 @@ if (isset($cart_items['Extras'][$extra['barcodeID']])){
 ?>
 <tr> <th scope="row"><?=$extra['Name']?></th> <td><?=$extra['ShortDesc']?></td> <td><?=money_format('$%i',$extras[$id]['OnlinePrice'])?></td> 
 <td>
-<?=$this->Form->input($extra['barcodeID'],array('type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>99,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'))?>
+<?=$this->Form->input($extra['barcodeID'],array('onchange'=>'$("#update_button").click()','type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>2,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'))?>
 </td> </tr>
 
 
@@ -109,7 +109,7 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 
 <?}?>
 <h2><small>Shirts, hats, drinks/snacks and other merchandise are available at our full retail store.</small></h2>
-<h3>Discount <small>Applied at final payment, please bring card or ID</small></h3>
+<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>
 <style>
 .radio{
 	margin-left:30px;
@@ -119,13 +119,18 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 }
 </style>
 <?
-//still not sure best way to do this, using underscores/explode for now, fuck it
+//still not sure best way to do this, using underscores/explode for now
+
 $options=array();
 foreach ($discounts as $dival){
 	$options[$dival['Firearm']['amount'].'_'.$dival['Firearm']['setting_value']]=$dival['Firearm']['description'];
 }
+//now set values
 $options[0]='None';
-echo $this->Form->input('Discounts', array(
+if (isset($this->request->data['Firearm']['Discount'])){
+	
+}
+echo $this->Form->input('Discount', array(
     //'before' => '--before--',
     //'between' => '<div class="radio_btn"',
 	//'after' => '--after--',
@@ -134,7 +139,8 @@ echo $this->Form->input('Discounts', array(
 	'class'=>'radio_dis',
     'separator' => '<br/>',
 	'type'=>'radio',
-	'value'=>0,
+	//'value'=>0,
+	'onchange'=>'$("#update_button").click()',
     'options' => $options
 ));?>
 </div><!-- /add-ons column -->
