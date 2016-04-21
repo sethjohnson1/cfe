@@ -351,9 +351,26 @@ class FirearmsController extends AppController {
 		$checkout_total=0;
 		$tax_total=0;
 		$final_total=0;
+		if (!empty($checkout_items['Discount'])){
+			$discount_array=explode('_',$checkout_items['Discount']);
+			//debug($discount_array);
+		}
+		else{
+			$discount_array[0]=0;
+		}
 		if (isset($checkout_items['Services'])){
 			foreach ($checkout_items['Services'] as $mbdate=>$pid){
-				$checkout_total=$checkout_total+$pid['OnlinePrice'];	
+				$checkout_total=($checkout_total+$pid['OnlinePrice'])-$discount_array[0];
+				//the extended price for package no longer works with discounts, doing a sloppy copy/paste for now
+				//I think if there is ANY value in thousands place it rounds up, otherwise leaves it alone
+				
+				$rawtax=$checkout_total*$pid['TaxRate'];
+				$tax=number_format(floor(($checkout_total*$pid['TaxRate'])*100)/100,3)*100;
+				$digit3=explode('.',$rawtax);
+				if (isset($digit3[1])&&strlen($digit3[1])>2) $tax++;
+				//debug($tax);
+				$pid['ExtendedPrice']=$checkout_total+($tax/100);
+				
 				$final_total=$final_total+$pid['ExtendedPrice'];
 				if (isset($pid['Double'])){
 					$checkout_total=$checkout_total+$pid['DoubleInfo']['OnlinePrice'];
@@ -369,13 +386,12 @@ class FirearmsController extends AppController {
 				}		
 			}
 		}
-		if (isset($checkout_items['Discount'])){
-		//$checkout_total=$checkout_total-
-		debug($checkout_items['Discount']);
-		}
+		
 		$tax_total=$final_total-$checkout_total;
+		//debug("\n\n".$checkout_total);
 		$final_total=round($final_total,2);
 		$this->Cookie->write('CheckoutTotal',$final_total);
+		$this->Cookie->write('DiscountTotal',$discount_array);
 		$this->Cookie->write('SubTotals',array('tax'=>$tax_total,'sub'=>$checkout_total));
 		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
 		$this->set('TheTitle','Checkout Step One');
@@ -385,7 +401,8 @@ class FirearmsController extends AppController {
 	public function transact(){
 		if (isset($this->request->data['Firearm'])){
 			$checkout_items=$this->Cookie->read('CheckoutItems');
-			//debug($checkout_items);
+			$discount_array=$this->Cookie->read('DiscountTotal');
+			//debug($discount_array);
 			$client=$this->request->data['Firearm'];
 			$client['Username']='web'.time();
 			$client['BirthDate']=date('Y-m-d',strtotime($client['BirthDate']));
@@ -413,10 +430,20 @@ class FirearmsController extends AppController {
 				//make array ready for MINDBODY API
 				$CartItems=array();
 				$itemkey=0;
-				//set higher for testing
+				//set higher for testing, overrideen below for production
 				if (null !== Configure::read('discountAmount')) $discount=Configure::read('discountAmount');
 				else $discount=0;
-				foreach ($checkout_items['Services'] as $mbdate=>$service){	
+				//debug($discount_array);
+	
+				foreach ($checkout_items['Services'] as $mbdate=>$service){
+			//overriding with actual discount
+				if (isset($discount_array[0])&&$discount_array[0]>0){
+					$discount=$discount_array[0];
+					//debug($discount);
+					unset($discount_array[0]);
+				}
+				else $discount=0;	
+debug($discount);				
 					//you can set very high discount amounts for testing (so the comp works)
 					//running the URLs over https fails and I don't know why, nor do I know if it will matter as long as the request is sent over https
 					$CartItems[$itemkey]['Quantity']=1;
@@ -439,7 +466,7 @@ class FirearmsController extends AppController {
 					if ($qty>0){
 						$CartItems[$itemkey]['Quantity']=$qty;
 						$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
-						$CartItems[$itemkey]['DiscountAmount']=$discount;
+						$CartItems[$itemkey]['DiscountAmount']=0;
 						$itemkey++;
 						//debug($CartItems);
 					}
@@ -481,7 +508,8 @@ class FirearmsController extends AppController {
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
-					'InStore'=>true
+					'InStore'=>true,
+					//'PromotionCode'=>'MILITARY'
 				));
 				//debug($CartItems);
 				//debug($checkout);
@@ -497,6 +525,9 @@ class FirearmsController extends AppController {
 				}
 				else {
 					$this->Session->setFlash('The request to checkout failed please try again or contact us.', 'flash_danger');
+					//errorCode 900 is Card Auth, so you can dump the message to user.
+					//hmm errorCode 900 is also input payment total, dump that to user as well
+					//send me an email here
 					debug($checkout);
 				}
 				
@@ -510,9 +541,11 @@ class FirearmsController extends AppController {
 		
 		$subs=$this->Cookie->read('SubTotals');
 		$final_total=$this->Cookie->read('CheckoutTotal');
+		$discount_array=$this->Cookie->read('DiscountTotal');
 		$tax_total=$subs['tax'];
 		$checkout_total=$subs['sub'];
-		$this->set(compact('final_total','tax_total','checkout_total'));
+		$this->set(compact('final_total','tax_total','checkout_total','discount_array'));
+		//debug($discount_array);
 		$this->set('TheTitle','Final Checkout');
 		$this->render('transact','frontend');
 	}

@@ -126,7 +126,7 @@ foreach ($discounts as $dival){
 	$options[$dival['Firearm']['amount'].'_'.$dival['Firearm']['setting_value']]=$dival['Firearm']['description'];
 }
 //now set values
-$options[0]='None';
+$options['']='None';
 if (isset($this->request->data['Firearm']['Discount'])){
 	
 }

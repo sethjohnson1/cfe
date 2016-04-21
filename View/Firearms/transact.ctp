@@ -104,6 +104,9 @@ endforeach;
 //'onclick'=>$this->element('blockui',array('msg'=>'Loading cart...'))
 ?>
 <h4 align="center">Sub-Total: <small><em>only</em></small> <?=money_format('$%i',$checkout_total)?><br />
+<?if (isset($discount_array[0])&&$discount_array[0]>0):?>
+<span style="color:red"><?=money_format('$%i',$discount_array[0])?> discount applied, please bring proof</span><br/>
+<?endif?>
 Tax: <?=money_format('$%i',$tax_total)?></h4>
 <h3 align="center">Total: <?=money_format('$%i',$final_total)?></h3>
 <?=$this->Form->submit('Submit Payment', array('div' => false,'class'=>'btn btn-lg date-btns'))?>

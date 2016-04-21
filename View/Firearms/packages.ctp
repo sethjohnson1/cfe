@@ -6,9 +6,16 @@
 
 <?//debug($packages);?>
 <?foreach ($packages as $id=>$pkg):?>
-<a name=<?=$pkg['Description']['description']?>></a>
+<a name=<?=$pkg['Description']['slug']?>></a>
 <div class="row package">
-<?=$this->element('Guns/'.$pkg['Description']['description'],array('pkg'=>$pkg))?>
+<?=$this->element('Guns/package_description',array('pkg'=>$pkg))?>
+
+<?
+/* THIS IS DISABLED, JUST USING DESCRIPTION FOR NOW, OLD WAY OF ECHO ELEMENT
+echo $this->element('Guns/'.$pkg['Description']['description'],array('pkg'=>$pkg))
+
+******/
+?>
 
 </div>
 <?endforeach?>

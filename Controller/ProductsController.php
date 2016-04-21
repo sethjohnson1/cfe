@@ -186,7 +186,7 @@ class ProductsController extends AppController {
 			unset($settings['discountIDs']);
 			unset($settings['discountDesc']);
 			unset($settings['amount']);
-			debug($settings);
+			//debug($settings);
 			//just for testing, may not want to do this - the loop does it individually
 			$this->Firearm->deleteAll(array(1=>1));
 			//build the appoint/double into a single setting as it was originally

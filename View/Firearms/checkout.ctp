@@ -15,7 +15,7 @@ endforeach?>
 <?if($checkout_items['Discount']):
 $discount_array=explode('_',$checkout_items['Discount']);?>
 
-<tr> <th scope="row"></th> <td></td> <td><?=$discount_array[1]?> Discount:</td> <td><?=money_format('$%i',$discount_array[0])?></td>
+<tr> <th scope="row"></th> <td></td> <td><?=$discount_array[1]?> Discount:</td> <td><?='-'.money_format('$%i',$discount_array[0])?></td>
 <td><strong>Please bring proof to have discount honored.</strong></td> </tr>
 <?
 

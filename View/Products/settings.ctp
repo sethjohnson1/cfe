@@ -38,7 +38,7 @@ echo $this->Form->input('closedDays',array('class'=>'form-control','label'=>'Clo
 ?>
 <h4>Package ID &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Double Ammo ID</h4>
 <div class="row">
-<?for ($i=0;$i<10;$i++):?>
+<?for ($i=0;$i<15;$i++):?>
 <div class="col-xs-6 ">
 <?
 if (isset($this->request->data['Product']['appointmentSessionIDs'][$i])) $val=$this->request->data['Product']['appointmentSessionIDs'][$i];
