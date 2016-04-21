@@ -99,7 +99,8 @@ class FirearmsController extends AppController {
 	public function packages() {
 		$this->loadModel('Description');
 		$packages=$this->Description->find('all', array('conditions'=>array('Description.pagetype'=>'package')));
-		//debug($packages);
+		//this unlinked some-damn-hiw
+	//	debug($packages);
 		$this->set(compact('packages'));
 		$this->set('TheTitle','Packages');
 		$this->set('TheDescription','Shoot the guns of the Old West, including Mountain Man rifles and a Gatling Gun. Located in Cody Wyoming near Yellowstone.');

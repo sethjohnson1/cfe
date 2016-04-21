@@ -7,7 +7,7 @@
 	<div class="col-md-6">
 		<div class="jumbotron firearm">
 		<h1><?=$description['Description']['name']?><small> Shoot "the gun to end all wars"!</small></h1>
-		<p></p>
+		<p>This is a little blurb about each gun</p>
 	</div>
 	</div>
 	
