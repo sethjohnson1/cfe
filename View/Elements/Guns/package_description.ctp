@@ -5,8 +5,8 @@
 
 <?
 	//first extract the image based on naming parameters
-	//this doesn't work on SiteGround hosting, moving on...
-	/*
+	//this doesn't work on SiteGround hosting, or DOES IS?
+	
 	$img_file_name='00_image_coming_soon.jpg';
 	$file_search=array();
 	$file_id=$pkg['Product']['SessionTypeID'];
@@ -23,8 +23,8 @@
 	else {
 		echo $this->Html->image('packages/'.$img_file_name,array('alt'=>'Package image coming soon','class'=>'img-responsive'));
 	}
-	*/
-echo $this->Html->image('packages/'.$pkg['Product']['SessionTypeID'].'.jpg',array('alt'=>'','class'=>'img-responsive'));
+	
+//echo $this->Html->image('packages/'.$pkg['Product']['SessionTypeID'].'.jpg',array('alt'=>'','class'=>'img-responsive'));
 
 ?>
 
