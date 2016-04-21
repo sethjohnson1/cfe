@@ -42,7 +42,7 @@ double set triggers.
 </div>
 <div class="row">
 <div class="col-xs-12 col-md-6" style="padding-top:10px">
-<?=$this->Html->link('Book Now',array('action'=>'packages','#'=>'civil_war'),array('class'=>'btn btn-lg btn-danger date-btns','style'=>''))?>
+<?=$this->Html->link('Book Now',array('action'=>'packages','#'=>'buffalo_bill_annie_oakley_package'),array('class'=>'btn btn-lg btn-danger date-btns','style'=>''))?>
 </div>
 <div class="col-xs-12 col-md-6" style="padding-top:10px">
 <?=$this->Html->link('Next &raquo;',array('controller'=>'firearms','action'=>'learn','history','indian_wars'),array('class'=>'btn btn-lg btn-danger date-btns','style'=>'','escape'=>false))?>
