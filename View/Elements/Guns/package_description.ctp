@@ -8,6 +8,7 @@
 	$img_file_name='00_image_coming_soon.jpg';
 	$file_search=array();
 	$file_id=$pkg['Product']['SessionTypeID'];
+	echo WWW_ROOT;
 	$file_search=glob(WWW_ROOT.'/img/packages/'.$file_id.'_*.jpg');
 	if (isset($file_search[0])){
 		$file_path=explode('/',$file_search[0]);
