@@ -105,7 +105,9 @@ color: #a22b29;
 }
 
 
-
+.navbar-brand{
+	font-size:1em;
+}
 .navbar-default .navbar-nav>li>a{
 	color:#54301a;
 }
