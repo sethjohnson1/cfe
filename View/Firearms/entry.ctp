@@ -27,8 +27,11 @@ $carousel=array(
 );
 ?>
 <div class="row">
-<div class="col-xs-12 no-pad">
+<div class="col-xs-12 no-pad hidden-xs hidden-sm">
 <?=$this->Html->image('cody_firearms_experience.jpg',array('class'=>'img-responsive'))?>
+</div>
+<div class="hidden-xl hidden-lg hidden-md no-pad">
+<?=$this->Html->image('cody_firearms_experience_portrait.jpg',array('class'=>'img-responsive'))?>
 </div>
 </div><!-- carousel row -->
 	<script>
