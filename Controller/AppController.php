@@ -2,14 +2,14 @@
 App::uses('Controller', 'Controller');
 class AppController extends Controller {
 
-	public $components = array('RequestHandler','Security','DebugKit.Toolbar','Search.Prg','Session','Auth'=>array('loginRedirect' => array(
+	public $components = array('RequestHandler','DebugKit.Toolbar','Search.Prg','Session','Auth'=>array('loginRedirect' => array(
                 'controller' => 'products',
                 'action' => 'settings'
             )));
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
-		$this->_setupSecurity();
+		//$this->_setupSecurity();
 		$this->loadModel('Description');
 		$desc=$this->Description->find('all',array('conditions'=>array('Description.pagetype'=>'history','Description.visible'=>true)));
 		$history_menu=array();
@@ -42,18 +42,13 @@ class AppController extends Controller {
 		);
 		$this->set(compact('menu_array'));
 	}
-	
+/*	
 	function _setupSecurity() {
     $this->Security->blackHoleCallback = '_badRequest';
     if(Configure::read('forceSSL')) {
         $this->Security->requireSecure('*');
     }
 }
-
-/**
-* The main SecurityComponent callback.
-* Handles both missing SSL problems and general bad requests.
-*/
 
 function _badRequest() {
     if(Configure::read('forceSSL') && !$this->RequestHandler->isSSL()) {
@@ -67,4 +62,5 @@ function _badRequest() {
     $this->redirect('https://' . env('SERVER_NAME') . $this->here);
     exit;
 }
+*/
 }
