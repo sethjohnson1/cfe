@@ -4,7 +4,9 @@ App::uses('AppModel', 'Model');
 class Description extends AppModel {
 
 //	public $displayField = 'name';
-
-public $belongsTo = array('Product');
+public $actsAs = array('Containable');
+public $belongsTo = array('Product'=>array(
+//'foreignKey'=>'SessionTypeID'
+));
 
 }

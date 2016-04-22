@@ -78,7 +78,9 @@ create table descriptions(
 	description text,
 	pagetype varchar(255),
 	visible tinyint(1),
-	product_id int
+	product_id int,
+	-- need this to link services back...
+	SessionTypeID int
 	);
 
 	/** OLD

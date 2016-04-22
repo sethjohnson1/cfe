@@ -1,6 +1,6 @@
 <div class ="col-xs-12">
 <div class ="jumbotron">
-<h1>Thank you. <small>A confirmation has been sent to your email. </small></h1>
+<h1>Thank you. <small>Your booking is confirmed </small></h1>
 <h2>Booked Lane Time(s):</h2>
 <ul>
 <?

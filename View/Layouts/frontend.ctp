@@ -94,7 +94,8 @@
               <span class="icon-bar"></span>
             </button>
 			
-            <?=$this->Html->link('Cody Firearms Experience','/',array('class'=>'navbar-brand'))?>
+            <?=$this->Html->link('Cody Firearms Experience','/',array('class'=>'navbar-brand hidden-xs'))?>
+			<?=$this->Html->link('Cody Firearms Experience','/',array('style'=>'font-size:.8em','class'=>'navbar-brand hidden-xl hidden-lg hidden-md hidden-sm'))?>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -163,11 +164,11 @@ $(document).on('click',function(){
 
 		
 		<div class="col-sm-4">
-		<h4>About Us</h4>
+		<h4>Contact Us</h4>
 		<ul>
-		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Contact CFE</a></li>
-		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Terms and Conditions</a></li>
-		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Privacy Policy</a></li>	
+		<li>142 W. Yellowstone Ave Cody, Wyoming, USA 82414</li>
+		<li>(307)586-4287</li>
+		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Email</a></li>	
 		</ul>
 		</div>
 

@@ -52,7 +52,12 @@ class DescriptionsController extends AppController {
 			}
 		}
 		$this->request->data['Description']['visible']=1;
-		$products = $this->Description->Product->find('list',array('conditions' => array('Product.CategoryName' => 'Service')));
+		$all_products = $this->Description->Product->find('all',array('conditions' => array('Product.CategoryName' => 'Service')));
+		$products=array();
+		foreach ($all_products as $k=>$v){
+			$products[$v['Product']['SessionTypeID']]=$v['Product']['Name'];
+		}
+		//debug($products);
 		$this->set(compact('products'));
 		$this->render('add','frontend');
 	}
@@ -73,7 +78,11 @@ class DescriptionsController extends AppController {
 			$options = array('conditions' => array('Description.' . $this->Description->primaryKey => $id));
 			$this->request->data = $this->Description->find('first', $options);
 		}
-	$products = $this->Description->Product->find('list',array('conditions' => array('Product.CategoryName' => 'Service')));
+		$all_products = $this->Description->Product->find('all',array('conditions' => array('Product.CategoryName' => 'Service')));
+		$products=array();
+		foreach ($all_products as $k=>$v){
+			$products[$v['Product']['SessionTypeID']]=$v['Product']['Name'];
+		}
 	$this->set(compact('products'));
 	$this->set('edit',1);
 	$this->render('add','frontend');

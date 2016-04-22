@@ -98,9 +98,15 @@ class FirearmsController extends AppController {
 //this is for one page with all the packages (and also not necessary...)
 	public function packages() {
 		$this->loadModel('Description');
+		$this->loadModel('Product');
 		$packages=$this->Description->find('all', array('conditions'=>array('Description.pagetype'=>'package')));
-		//this unlinked some-damn-hiw
-	//	debug($packages);
+		//there should be a way to do this with Models but I am moving on!
+		foreach ($packages as $k=>$v){
+			$prod=$this->Product->find('first',array('conditions'=>array('Product.SessionTypeID'=>$v['Description']['SessionTypeID'])));
+			$packages[$k]['Product']=$prod['Product'];
+		}
+		
+		//debug($packages);
 		$this->set(compact('packages'));
 		$this->set('TheTitle','Packages');
 		$this->set('TheDescription','Shoot the guns of the Old West, including Mountain Man rifles and a Gatling Gun. Located in Cody Wyoming near Yellowstone.');
@@ -418,7 +424,7 @@ class FirearmsController extends AppController {
 			require_once('MB_API.php');
 			$mb = new MB_API();
 			$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
-				'Test'=>true,
+				'Test'=>false,
 				'Clients'=>array('Client'=>$client)));
 				/*
 				Set test to false, then debug "add" to get a real client ID then set test back to false to avoid flooding DB with test clients
@@ -444,7 +450,8 @@ class FirearmsController extends AppController {
 					unset($discount_array[0]);
 				}
 				else $discount=0;	
-debug($discount);				
+				//THIS DOESN'T WORK RIGHT, MINDBODY API DOING SOMETHING ELSE
+				//debug($discount);				
 					//you can set very high discount amounts for testing (so the comp works)
 					//running the URLs over https fails and I don't know why, nor do I know if it will matter as long as the request is sent over https
 					$CartItems[$itemkey]['Quantity']=1;
@@ -503,9 +510,9 @@ debug($discount);
 
 				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
 					//just for testing! (proper value is set above)
-					'ClientID'=>'56c2111d-25c8-48c0-bb25-48cdc0a80194',
+					//'ClientID'=>'56c2111d-25c8-48c0-bb25-48cdc0a80194',
 					//this is a TEST client from production
-					'ClientID'=>'20160111185337924',
+					//'ClientID'=>'20160111185337924',
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
@@ -525,7 +532,14 @@ debug($discount);
 				
 				}
 				else {
-					$this->Session->setFlash('The request to checkout failed please try again or contact us.', 'flash_danger');
+					//debug($checkout['CheckoutShoppingCartResult']['ErrorCode']);
+					if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==900){
+						$error_msg=$checkout['CheckoutShoppingCartResult']['Message'];
+					}
+					else
+					$error_msg='';
+					$this->Session->setFlash('The request to checkout failed please try again or contact us. <br /><strong>ERROR:</strong><br/>"'.$error_msg.'"<br />
+					If the error persists call us at (307)586-4287 for help.', 'flash_danger');
 					//errorCode 900 is Card Auth, so you can dump the message to user.
 					//hmm errorCode 900 is also input payment total, dump that to user as well
 					//send me an email here

@@ -14,7 +14,8 @@
 		echo $this->Form->input('description', array('class'=>'form-control'));
 		echo $this->Form->input('pagetype', array('class'=>'form-control','options'=>$pagetypes));?>
 		<?
-		echo $this->Form->input('product_id', array('class'=>'form-control'));
+		//echo $this->Form->input('product_id', array('class'=>'form-control'));
+		echo $this->Form->input('Description.SessionTypeID', array('class'=>'form-control','type'=>'select','options'=>$products));
 		
 		echo $this->Form->input('visible', array('class'=>'','label'=>false,'div'=>false)).' Visible';
 		

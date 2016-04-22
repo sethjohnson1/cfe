@@ -60,6 +60,7 @@ $carousel=array(
 <div class="col-xs-12 no-pad">
 <?=$this->Html->image('examples/range.jpg',array('class'=>'img-responsive'))?>
 </div>
+
 <div class="col-xs-12 top-pad">
 <h1>North American Widlife Display <small>Coming soon!</small></h1>
 </div>
@@ -67,9 +68,13 @@ $carousel=array(
 
 <div class="row">
 <div class="col-xs-12 no-pad">
-<?=$this->Html->image('examples/wildlife.jpg',array('class'=>'img-responsive'))?>
+<?=$this->Html->image('examples/front_photo.jpg',array('class'=>'img-responsive'))?>
+</div>
+<div class="col-xs-12 top-pad">
+<h1 align="center">142 W. Yellowstone Ave.<br /><small>Cody, Wyoming, USA 82414<br/>(307)586-4287</small></h1>
 </div>
 </div>
+
 <div class="row">
 <div class="col-sm-4 top-pad">
 <?=$this->Html->link('Packages',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
@@ -78,7 +83,7 @@ $carousel=array(
 <?=$this->Html->link('Firearms History',array('action'=>'learn','history','horses_and_firearms'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 <div class="col-sm-4 top-pad">
-<?=$this->Html->link('Our Firearms',array('action'=>'learn','firearm','gatling_gun'),array('class'=>'btn btn-lg date-btns'))?>
+<?=$this->Html->link('Our Firearms',array('action'=>'learn','firearm','indian_trade_musket'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 </div>
 <div class="row jumbotron firearm" style="margin-top:17px;">

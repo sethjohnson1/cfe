@@ -28,8 +28,8 @@ $client_inputs=array(
 	'HomePhone'=>array('Secondary Phone',false),
 	//'WorkPhone'=>'307-999-9999',
 	'BirthDate'=>array('Birth Date',1),
-	'EmergencyContactInfoName'=>array('Emergency Contact name',1),
-	'EmergencyContactInfoPhone'=>array('Emergency Contact phone',1)
+	'EmergencyContactInfoName'=>array('Emergency Contact name',false),
+	'EmergencyContactInfoPhone'=>array('Emergency Contact phone',false)
 	//'ReferredBy'=>'website'
 );
 $billing_inputs=array(
@@ -51,7 +51,7 @@ for ($x=0; $x<=10;$x++){
 	$years[date('Y',strtotime('today + '.$x.' years'))]= date('Y',strtotime('today + '.$x.' years'));
 }
 //set this to FALSE and it's disabled
-$testdata='TESTING_TRUE'?>
+$testdata=false?>
 <div class="row">
 <div class="col-xs-12">
 <h3>Shooter Registration</h3>
