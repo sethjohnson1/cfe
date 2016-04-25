@@ -9,7 +9,7 @@ foreach ($checkout_items['Services'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
 <tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=$date_time[1]?></td> <td><?=money_format('$%i',$id['OnlinePrice'])?></td>
-<td><?if (isset($id['Double'])) echo '<strong>2x ammo</strong> add '.money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td> </tr>
+<td><?if (isset($id['Double'])) echo '<strong>Add a friend (2x ammo)</strong> +'.money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td> </tr>
 <?
 endforeach?>
 <?if($checkout_items['Discount']):

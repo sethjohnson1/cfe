@@ -99,7 +99,7 @@ class FirearmsController extends AppController {
 	public function packages() {
 		$this->loadModel('Description');
 		$this->loadModel('Product');
-		$packages=$this->Description->find('all', array('conditions'=>array('Description.pagetype'=>'package')));
+		$packages=$this->Description->find('all', array('conditions'=>array('Description.pagetype'=>'package','Description.visible'=>1)));
 		//there should be a way to do this with Models but I am moving on!
 		foreach ($packages as $k=>$v){
 			$prod=$this->Product->find('first',array('conditions'=>array('Product.SessionTypeID'=>$v['Description']['SessionTypeID'])));
@@ -154,10 +154,10 @@ class FirearmsController extends AppController {
 			//set the last day over and over
 			$lastday=$theday;
 		}
-		//debug($dates);
+		//7:00pm cutoff time for now
+		if (date('H')>18) array_push($closed,date('Y-m-d'));
 
-				
-		//debug($lastday);			
+		//debug($closed);			
 		$selected_package=$this->CFE_services[$package_id];
 		
 		$this->set(compact('lastday','dates','closed','selected_package','package_id','session_id'));
@@ -182,6 +182,7 @@ class FirearmsController extends AppController {
 			$options['EndDate']=$pickdate;
 			//this is REQUIRED for the call
 			$options['SessionTypeIDs']=array($session_id);
+			//debug($options);
 			$data = $mb->GetBookableItems($options);
 			//debug($data);
 			if ($data['GetBookableItemsResult']['ErrorCode']==200){

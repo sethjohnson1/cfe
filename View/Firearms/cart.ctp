@@ -24,7 +24,7 @@ $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;YES! Double My Fun</em></th><td>Twice the ammo, twice the fun!</td>
+<tr><th class="row"><em>&nbsp;&nbsp;Add a friend</em></th><td>Bring a friend and get 2x ammo!</td>
 <td></td>
 <td><?=money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td>
 <td>
@@ -37,7 +37,7 @@ echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($m
 endforeach?>
 </tbody>
 </table>
-<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?><small> Max 1 shooter per slot </small></h4>
+<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?></h4>
 <?} 
 //no valid packages
 else{
