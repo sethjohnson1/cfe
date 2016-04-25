@@ -239,31 +239,12 @@ class ProductsController extends AppController {
 				$discount_val['amount']=$discounts['amounts'][$k];
 				if (!empty($discount_val['setting_value'])){
 					if ($this->Firearm->save($discount_val)) {
+						
 					}
 				}
 			}
-			//update bookdates table - no need right now, just do the math on the other controller
-			/*
-			$this->loadModel('Bookdate');
-			$dates=array();
-			$closed=explode(',',$settings['closedDays']);
-			for ($i=0;$i<$settings['maxBookableDays'];$i++){
-				$bookdate=date('Y-m-d', strtotime('today + '.$i.' days'));
-				foreach ($closed as $c){
-					if ($bookdate==$c) continue 2;
-				}
-				foreach ($days as $day){
-					if (!$settings[$day] && date('l',strtotime($bookdate)==$day)){
-					//must be doing something wrong here, check for days
-						debug($day);
-					}
-				}
-				
-				//save
-				//debug($bookdate);
-			}
-			*/
-			
+			//redirect now so values properly fill in
+			return $this->redirect(array('action' => 'settings'));
 		}
 		else {
 			$discount_fill=array();
@@ -289,7 +270,7 @@ class ProductsController extends AppController {
 			foreach($filldata2 as $k=>$v) $this->request->data['Product']['doubleSessionIDs'][$k]=$v;
 		}
 
-		
+		//debug($discount_fill);
 		$this->set(compact('firearm','days','discount_fill'));
 		
 		$this->render('settings','frontend');
