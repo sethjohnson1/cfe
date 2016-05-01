@@ -138,8 +138,8 @@
 			<?
 			$social_media=array(
 				'Facebook'=>array('img'=>'facebook_45x45.png','link'=>'https://www.facebook.com/Codyfirearmexperience/'),
-				'Google'=>array('img'=>'google_45x45.png','link'=>'https://www.facebook.com/Codyfirearmexperience/'),
-				'Twitter'=>array('img'=>'twitter_45x45.png','link'=>'https://twitter.com'),
+				//'Google'=>array('img'=>'google_45x45.png','link'=>'https://www.facebook.com/Codyfirearmexperience/'),
+				//'Twitter'=>array('img'=>'twitter_45x45.png','link'=>'https://twitter.com'),
 				//'Mail'=>array('img'=>'mail_45x45.png','link'=>'#contactModal')
 			);
 			?>
