@@ -12,7 +12,7 @@
 
 <?php 
 
-	//echo $this->Html->charset(); 
+	echo $this->Html->charset(); 
 	//echo $this->Html->meta('icon', $this->Html->url('http://collections.centerofthewest.org/img/truckerhat.ico'));
 	
 
