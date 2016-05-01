@@ -134,9 +134,36 @@
 			  <!-- button type="button" class="btn btn-success navbar-btn" data-toggle="modal" data-target="#contactModal">Get Notified</button -->
 		  </li>
 		   </ul>
-            <!--ul class="nav navbar-nav navbar-right">
+            <ul class="hidden-sm hidden-xs nav navbar-nav navbar-right cfe-social-icons">
+			<?
+			$social_media=array(
+				'Facebook'=>array('img'=>'facebook_45x45.png','link'=>'https://www.facebook.com/Codyfirearmexperience/'),
+				//'Google'=>array('img'=>'google_45x45.png','link'=>'https://www.facebook.com/Codyfirearmexperience/'),
+				//'Twitter'=>array('img'=>'twitter_45x45.png','link'=>'https://twitter.com'),
+				//'Mail'=>array('img'=>'mail_45x45.png','link'=>'#contactModal')
+			);
+			?>
+			<?foreach ($social_media as $name=>$s):?>
+			<li><?=$this->Html->link($this->Html->image('social_media/'.$s['img'],array('alt'=>$name,'class'=>'img-responsive')),$s['link'],array('escape'=>false,))?></li>
+			<?endforeach?>
+			
+            </ul>
+			<!-- small social media -->
+			<ul class="hidden-lg hidden-xl hidden-md nav navbar-nav navbar-right cfe-social-icons">
+			 <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+				<?=$this->Html->image('social_media/rss_45x45.png')?>
+				<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+				<?foreach ($social_media as $name=>$s):?>
+                  <li>
+				  <?=$this->Html->link($this->Html->image('social_media/'.$s['img'],array('alt'=>$name,'class'=>'img-responsive','style'=>'float:left; padding-right:3px')).' '.$name,$s['link'],array('escape'=>false))?>
+				  </li>
+				 <?endforeach?>
 
-            </ul -->
+                </ul>
+              </li>
+			</ul>
           </div><!--/.nav-collapse -->
         </div><!--/container menu -->
       </nav> 
@@ -156,8 +183,19 @@ $(document).on('click',function(){
 
 <footer class="footer row" style="margin: 0 10px 0 10px;">
 
+		<div class="col-sm-4">
+		<h4>Stay Connected</h4>
+		<div class="nothing">
+		<?foreach ($social_media as $name=>$s):?>
+                  
+				  <?=$this->Html->link($this->Html->image('social_media/'.$s['img'],array('alt'=>$name,'class'=>'img-responsive','style'=>'float: left; padding-right:4px;')).' ',$s['link'],array('escape'=>false))?>
+		<?endforeach?>
+		</div>
+		<div style="padding-top:20px">More coming soon!</div>
 
-		<div class="col-sm-8">
+		</div>
+
+		<div class="col-sm-4">
 		<h4>Mission Statement</h4>
 		<p>To provide a quality environment that explains the historical significance and evolution of firearms in the old west that teaches firearms safety and use, and allows people to experience that history through the actual use of firearms.</p>
 		</div>
@@ -167,7 +205,7 @@ $(document).on('click',function(){
 		<h4>Contact Us</h4>
 		<ul>
 		<li>142 W. Yellowstone Ave Cody, Wyoming, USA 82414</li>
-		<li>(307)586-4287</li>
+		<li>(307) 586-4287</li>
 		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Email</a></li>	
 		</ul>
 		</div>

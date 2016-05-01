@@ -217,3 +217,10 @@ background-image: url(https://codyfirearmsexperience.com/img/speckled_bg.jpg);
 margin: auto;
 display: block;
 }
+
+.cfe-social-icons img{
+	width:25px;
+}
+.cfe-social-icons a{
+	margin-left:-16px;
+}
