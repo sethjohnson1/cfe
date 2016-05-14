@@ -1,5 +1,6 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('CakeEmail','Network/Email');
 		//App::import('Vendor', 'Mindbody/MB_API.php');
 
 class FirearmsController extends AppController {
@@ -580,7 +581,14 @@ class FirearmsController extends AppController {
 	
 	else{
 		$this->Session->setFlash('Page Expired.', 'flash_danger');
-		return $this->redirect(array('action'=>'pickpkg'));
+		$Email = new CakeEmail();
+					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
+					$Email->to('seth@sethjohnson.net');
+					$Email->subject('Here are your Edit Codes');
+					$Email->send('Test');
+					
+		//disabled for email testing
+		//return $this->redirect(array('action'=>'pickpkg'));
 		}
 	}
 	
