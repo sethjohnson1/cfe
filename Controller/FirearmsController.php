@@ -575,20 +575,20 @@ class FirearmsController extends AppController {
 			$this->Session->destroy();
 			$this->Cookie->destroy();
 			$this->set(compact('cart'));
+			//send the email
+			$Email = new CakeEmail();
+			$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
+			$Email->to('seth@sethjohnson.net');
+			$Email->subject('Here are your Edit Codes');
+			$Email->send('Test');
+
 			$this->set('TheTitle','Confirmation');
 			$this->render('thankyou','frontend');
 		}
 	
 	else{
 		$this->Session->setFlash('Page Expired.', 'flash_danger');
-		$Email = new CakeEmail();
-					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
-					$Email->to('seth@sethjohnson.net');
-					$Email->subject('Here are your Edit Codes');
-					$Email->send('Test');
-					
-		//disabled for email testing
-		//return $this->redirect(array('action'=>'pickpkg'));
+		return $this->redirect(array('action'=>'pickpkg'));
 		}
 	}
 	
