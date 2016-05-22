@@ -403,6 +403,35 @@ class FirearmsController extends AppController {
 		$this->Cookie->write('DiscountTotal',$discount_array);
 		$this->Cookie->write('SubTotals',array('tax'=>$tax_total,'sub'=>$checkout_total));
 		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
+		
+		//make an email while we have all the info readily available
+		$email_body="CODY FIREARMS EXPERIENCE ORDER CONFIRMATION \n\n";
+		foreach ($checkout_items['Services'] as $mbdate=>$id){
+			$date_time=explode('T',$mbdate);
+			$email_body.="PACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
+			if (isset($id['Double'])) $email_body.= " Add a friend (2x ammo)+".money_format('$%i',$id['DoubleInfo']['OnlinePrice']);
+		}
+		if($checkout_items['Discount']){
+			$discount_array=explode('_',$checkout_items['Discount']);
+			$email_body.="\n\nDISCOUNT: ".money_format('$%i',$discount_array[0])."\nPlease bring proof to have discount honored.\n";
+		}
+
+		if (isset($checkout_items['Extras'])){
+			$email_body.="\n\nExtras:\n\n";
+			foreach ($checkout_items['Extras'] as $id=>$extra){
+			$qty_val=$checkout_items['Extras'][$id];
+			if ($qty_val>0){
+				//$email_body.="\n\nExtras:\n\n";
+				$email_body.=$extras[$id]['Name']."\t x".$qty_val."\tPRICE: ".money_format('$%i',$extras[$id]['OnlinePrice'])."\n";
+				}
+			}
+		}
+		$email_body.="\nSUBTOTAL:\t".money_format('$%i',$checkout_total);
+		$email_body.="\nTAX:\t\t".money_format('$%i',$tax_total);
+		$email_body.="\nTOTAL:\t\t".money_format('$%i',$final_total);
+		$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.";
+
+		$this->Cookie->write('emailConfirmation',$email_body);
 		$this->set('TheTitle','Checkout Step One');
 		$this->render('checkout','frontend');
 	}
@@ -411,6 +440,7 @@ class FirearmsController extends AppController {
 		if (isset($this->request->data['Firearm'])){
 			$checkout_items=$this->Cookie->read('CheckoutItems');
 			$discount_array=$this->Cookie->read('DiscountTotal');
+			$email_confirmation=$this->Cookie->read('emailConfirmation');
 			//debug($discount_array);
 			$client=$this->request->data['Firearm'];
 			$client['Username']='web'.time();
@@ -422,6 +452,7 @@ class FirearmsController extends AppController {
 			$client['ID']=CakeText::uuid();
 			$client['EmailOptIn']=0;
 			$client['ReferredBy']='website';
+
 			
 			require_once('MB_API.php');
 			$mb = new MB_API();
@@ -528,6 +559,15 @@ class FirearmsController extends AppController {
 				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
 				//wow it's a miracle
 					$this->Cookie->write(array('SuccessfulCheckout'=>'miracle'));
+					//send the email before redirecting:
+					$Email = new CakeEmail();
+					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
+					//$Email->to('seth@sethjohnson.net');
+					$Email->to($client['Email']);
+					$Email->subject('Booking confirmation');
+					$Email->send($email_confirmation);
+
+					
 					$this->Session->setFlash('Booking successful. See you soon!', 'flash_success');
 					return $this->redirect(array('action' => 'thankyou'));
 					
@@ -541,7 +581,7 @@ class FirearmsController extends AppController {
 					else
 					$error_msg='';
 					$this->Session->setFlash('The request to checkout failed please try again or contact us. <br /><strong>ERROR:</strong><br/>"'.$error_msg.'"<br />
-					If the error persists call us at (307)586-4287 for help.', 'flash_danger');
+					If the error persists call us at 307-586-4287 for help.', 'flash_danger');
 					//errorCode 900 is Card Auth, so you can dump the message to user.
 					//hmm errorCode 900 is also input payment total, dump that to user as well
 					//send me an email here
@@ -571,17 +611,11 @@ class FirearmsController extends AppController {
 	$legit=$this->Cookie->read('SuccessfulCheckout');
 	if ($legit=='miracle'){
 			$cart=$this->Cookie->read('CartItems');
+			//debug($cart);
 			//erase all trace!
 			$this->Session->destroy();
 			$this->Cookie->destroy();
 			$this->set(compact('cart'));
-			//send the email
-			$Email = new CakeEmail();
-			$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
-			$Email->to('seth@sethjohnson.net');
-			$Email->subject('Here are your Edit Codes');
-			$Email->send('Test');
-
 			$this->set('TheTitle','Confirmation');
 			$this->render('thankyou','frontend');
 		}
