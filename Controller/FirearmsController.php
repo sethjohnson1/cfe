@@ -403,44 +403,35 @@ class FirearmsController extends AppController {
 		$this->Cookie->write('DiscountTotal',$discount_array);
 		$this->Cookie->write('SubTotals',array('tax'=>$tax_total,'sub'=>$checkout_total));
 		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
-		
-		//make an email while we have all the info readily available
-		$email_body="CODY FIREARMS EXPERIENCE ORDER CONFIRMATION \n\n";
-		foreach ($checkout_items['Services'] as $mbdate=>$id){
-			$date_time=explode('T',$mbdate);
-			$email_body.="PACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
-			if (isset($id['Double'])) $email_body.= " Add a friend (2x ammo)+".money_format('$%i',$id['DoubleInfo']['OnlinePrice']);
-		}
-		if($checkout_items['Discount']){
-			$discount_array=explode('_',$checkout_items['Discount']);
-			$email_body.="\n\nDISCOUNT: ".money_format('$%i',$discount_array[0])."\nPlease bring proof to have discount honored.\n";
-		}
-
-		if (isset($checkout_items['Extras'])){
-			$email_body.="\n\nExtras:\n\n";
-			foreach ($checkout_items['Extras'] as $id=>$extra){
-			$qty_val=$checkout_items['Extras'][$id];
-			if ($qty_val>0){
-				//$email_body.="\n\nExtras:\n\n";
-				$email_body.=$extras[$id]['Name']."\t x".$qty_val."\tPRICE: ".money_format('$%i',$extras[$id]['OnlinePrice'])."\n";
-				}
-			}
-		}
-		$email_body.="\nSUBTOTAL:\t".money_format('$%i',$checkout_total);
-		$email_body.="\nTAX:\t\t".money_format('$%i',$tax_total);
-		$email_body.="\nTOTAL:\t\t".money_format('$%i',$final_total);
-		$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.";
-
-		$this->Cookie->write('emailConfirmation',$email_body);
+		//for building the email	
+		$this->Cookie->write('checkoutExtras',$checkout_items['Extras']);
+		$this->Cookie->write('checkoutSubtotal',$checkout_total);
+		$this->Cookie->write('checkoutTax',$tax_total);
 		$this->set('TheTitle','Checkout Step One');
 		$this->render('checkout','frontend');
 	}
 	
 	public function transact(){
-		if (isset($this->request->data['Firearm'])){
+		/* these just for testing	$extras=$this->CFE_extras;
 			$checkout_items=$this->Cookie->read('CheckoutItems');
 			$discount_array=$this->Cookie->read('DiscountTotal');
-			$email_confirmation=$this->Cookie->read('emailConfirmation');
+			$Amount=$this->Cookie->read('CheckoutTotal');
+			$Extras=$this->Cookie->read('checkoutExtras');
+			$Subtotal=$this->Cookie->read('checkoutSubtotal');
+			$Tax=$this->Cookie->read('checkoutTax');
+		*/
+		if (isset($this->request->data['Firearm'])){
+			$extras=$this->CFE_extras;
+			$checkout_items=$this->Cookie->read('CheckoutItems');
+			$discount_array=$this->Cookie->read('DiscountTotal');
+			$Amount=$this->Cookie->read('CheckoutTotal');
+			
+			//these are only needed for the email
+			$Extras=$this->Cookie->read('checkoutExtras');
+			$Subtotal=$this->Cookie->read('checkoutSubtotal');
+			$Tax=$this->Cookie->write('checkoutTax');
+		
+			
 			//debug($discount_array);
 			$client=$this->request->data['Firearm'];
 			$client['Username']='web'.time();
@@ -466,7 +457,8 @@ class FirearmsController extends AppController {
 			if ($add['AddOrUpdateClientsResult']['ErrorCode']==200){
 				//client added, now checkout the cart
 				//use this amount to ensure there was no discrepency (i.e. open in another window)
-				$Amount=$this->Cookie->read('CheckoutTotal');
+				//doing this further up now
+				//$Amount=$this->Cookie->read('CheckoutTotal');
 				//make array ready for MINDBODY API
 				$CartItems=array();
 				$itemkey=0;
@@ -559,13 +551,41 @@ class FirearmsController extends AppController {
 				if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==200){
 				//wow it's a miracle
 					$this->Cookie->write(array('SuccessfulCheckout'=>'miracle'));
+
+					//make an email
+					$email_body="CODY FIREARMS EXPERIENCE ORDER CONFIRMATION \n\n";
+					foreach ($checkout_items['Services'] as $mbdate=>$id){
+						$date_time=explode('T',$mbdate);
+						$email_body.="PACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
+						if (isset($id['Double'])) $email_body.= " Add a friend (2x ammo)+".money_format('$%i',$id['DoubleInfo']['OnlinePrice']);
+					}
+					if($checkout_items['Discount']){
+						$discount_array=explode('_',$checkout_items['Discount']);
+						$email_body.="\n\nDISCOUNT: ".money_format('$%i',$discount_array[0])."\nPlease bring proof to have discount honored.\n";
+					}
+
+					if (isset($Extras)){
+						$email_body.="\n\nExtras:\n\n";
+						foreach ($Extras as $id=>$extra){
+						$qty_val=$Extras[$id];
+						if ($qty_val>0){
+							//$email_body.="\n\nExtras:\n\n";
+							$email_body.=$extras[$id]['Name']."\t x".$qty_val."\tPRICE: ".money_format('$%i',$extras[$id]['OnlinePrice'])."\n";
+							}
+						}
+					}
+					$email_body.="\nSUBTOTAL:\t".money_format('$%i',$Subtotal);
+					$email_body.="\nTAX:\t\t".money_format('$%i',$Tax);
+					$email_body.="\nTOTAL:\t\t".money_format('$%i',$Amount);
+					$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.";
+					
 					//send the email before redirecting:
 					$Email = new CakeEmail();
 					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
 					//$Email->to('seth@sethjohnson.net');
 					$Email->to($client['Email']);
 					$Email->subject('Booking confirmation');
-					$Email->send($email_confirmation);
+					$Email->send($email_body);
 
 					
 					$this->Session->setFlash('Booking successful. See you soon!', 'flash_success');

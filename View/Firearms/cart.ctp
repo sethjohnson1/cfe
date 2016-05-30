@@ -109,7 +109,7 @@ Don't forget to add targets and other fun extras to maximize your experience.<br
 
 <?}?>
 <h2><small>Shirts, hats, drinks/snacks and other merchandise are available at our full retail store.</small></h2>
-<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>
+
 <style>
 .radio{
 	margin-left:30px;
@@ -130,6 +130,11 @@ $options['']='None';
 if (isset($this->request->data['Firearm']['Discount'])){
 	
 }
+//the discount is still not working, disabled for now
+
+//echo '<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>';
+
+
 echo $this->Form->input('Discount', array(
     //'before' => '--before--',
     //'between' => '<div class="radio_btn"',
@@ -138,11 +143,13 @@ echo $this->Form->input('Discount', array(
 	'legend'=>false,
 	'class'=>'radio_dis',
     'separator' => '<br/>',
-	'type'=>'radio',
+	'type'=>'hidden',
 	//'value'=>0,
 	'onchange'=>'$("#update_button").click()',
     'options' => $options
-));?>
+));
+
+?>
 </div><!-- /add-ons column -->
 <div class="col-xs-12 col-pad">
 <h2 align="">Cart Total: <?=money_format('$%i',$cart_total)?><br /><small> Tax will be added at checkout</small></h2>

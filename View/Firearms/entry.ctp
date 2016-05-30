@@ -41,11 +41,16 @@ $carousel=array(
 	});
 	</script>
 <div class="row top-pad">
-
+<div class="col-xs-12">
+<?=$this->Html->link('Book Online Now!',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
+</div>
+</div>
+<div class="row top-pad">
 <div class="col-xs-12">
 <h1>Western-Themed Arcade <small>Fun for the entire family</small></h1>
 </div>
 </div>
+
 
 <div class="row">
 <div class="col-xs-12 no-pad">
