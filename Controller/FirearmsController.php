@@ -424,15 +424,14 @@ class FirearmsController extends AppController {
 			$extras=$this->CFE_extras;
 			$checkout_items=$this->Cookie->read('CheckoutItems');
 			$discount_array=$this->Cookie->read('DiscountTotal');
+			//use this amount to ensure there was no discrepency (i.e. open in another window)
 			$Amount=$this->Cookie->read('CheckoutTotal');
 			
 			//these are only needed for the email
 			$Extras=$this->Cookie->read('checkoutExtras');
 			$Subtotal=$this->Cookie->read('checkoutSubtotal');
 			$Tax=$this->Cookie->read('checkoutTax');
-		
-			
-			//debug($discount_array);
+
 			$client=$this->request->data['Firearm'];
 			$client['Username']='web'.time();
 			$client['BirthDate']=date('Y-m-d',strtotime($client['BirthDate']));
@@ -447,45 +446,49 @@ class FirearmsController extends AppController {
 			
 			require_once('MB_API.php');
 			$mb = new MB_API();
+			if (Configure::read('testMode')=='yes') $clientTest=true;
+			else $clientTest=false;
 			$add=$mb->AddOrUpdateClients(array('XMLDetail'=>'Basic',
-				'Test'=>false,
+				'Test'=>$clientTest,
 				'Clients'=>array('Client'=>$client)));
 				/*
-				Set test to false, then debug "add" to get a real client ID then set test back to false to avoid flooding DB with test clients
+				Set test to false, then debug "add" to get a real client ID then set test back to false to avoid flooding DB with test clients - THIS IS NOW HANDLED BY A PRIVATE VARIABLE IN private config
 				*/
 			//debug($add);
 			if ($add['AddOrUpdateClientsResult']['ErrorCode']==200){
 				//client added, now checkout the cart
 				//use this amount to ensure there was no discrepency (i.e. open in another window)
-				//doing this further up now
-				//$Amount=$this->Cookie->read('CheckoutTotal');
+
 				//make array ready for MINDBODY API
 				$CartItems=array();
 				$itemkey=0;
-				//set higher for testing, overrideen below for production
-				if (null !== Configure::read('discountAmount')) $discount=Configure::read('discountAmount');
-				else $discount=0;
-				//debug($discount_array);
 	
 				foreach ($checkout_items['Services'] as $mbdate=>$service){
+				//debug($mbdate);
 			//overriding with actual discount
 				if (isset($discount_array[0])&&$discount_array[0]>0){
 					$discount=$discount_array[0];
 					//debug($discount);
 					unset($discount_array[0]);
 				}
-				else $discount=0;	
+				else $discount=0;
+				
+				//finally, it can be overridden for testing
+				if (null !== Configure::read('discountAmount') && Configure::read('testMode')=='yes' && Configure::read('discountAmount')>0) $discount=Configure::read('discountAmount');
 				//THIS DOESN'T WORK RIGHT, MINDBODY API DOING SOMETHING ELSE
 				//debug($discount);				
 					//you can set very high discount amounts for testing (so the comp works)
 					//running the URLs over https fails and I don't know why, nor do I know if it will matter as long as the request is sent over https
 					$CartItems[$itemkey]['Quantity']=1;
 					$CartItems[$itemkey]['DiscountAmount']=$discount;
+					//SendEmail doesn't work so I deleted it
 					$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$service['barcodeID']), SOAP_ENC_ARRAY, 'Service', 'http://clients.mindbodyonline.com/api/0_5');
 					//this part will often return NULL at the slightest error, make sure the ABOVE call is working as it relies on it (and goes to the same key)
 					$CartItems[$itemkey]['Appointments']['Appointment']=array('StartDateTime'=>$mbdate,'Location'=>array('ID'=>1),'Staff'=>array('ID'=>$service['StaffID'],'isMale'=>false),'SessionType'=>array('ID'=>$service['SessionTypeID']),'Notes'=>'TESTING'); // the notes don't work, leaving them here to remind me
 					$itemkey++;
-					//then the Double
+					//then the Double ah need to zero out discount here!
+					if (null !== Configure::read('discountAmount') && Configure::read('testMode')=='yes') $discount=Configure::read('discountAmount');
+					else $discount=0;
 					if (isset($service['Double'])){
 						if ($service['Double']=='Double'){
 							$CartItems[$itemkey]['Quantity']=1;
@@ -496,10 +499,12 @@ class FirearmsController extends AppController {
 					}	
 				}
 				foreach ($checkout_items['Extras'] as $product_id=>$qty){
+					if (null !== Configure::read('discountAmount') && Configure::read('testMode')=='yes') $discount=Configure::read('discountAmount');
+					else $discount=0;
 					if ($qty>0){
 						$CartItems[$itemkey]['Quantity']=$qty;
 						$CartItems[$itemkey]['Item'] = new SoapVar(array('ID'=>$product_id), SOAP_ENC_ARRAY, 'Product', 'http://clients.mindbodyonline.com/api/0_5');
-						$CartItems[$itemkey]['DiscountAmount']=0;
+						$CartItems[$itemkey]['DiscountAmount']=$discount;
 						$itemkey++;
 						//debug($CartItems);
 					}
@@ -508,8 +513,6 @@ class FirearmsController extends AppController {
 				//build payment info
 				$PaymentInfo['CreditCardNumber']=$this->request->data['Firearm']['CreditCardNumber'];
 				$PaymentInfo['Amount']=$Amount;
-				//$PaymentInfo['Amount']=0;
-
 				
 				if (strlen($this->request->data['Firearm']['ExpYear'])==2) $PaymentInfo['ExpYear']='20'.$this->request->data['Firearm']['ExpYear'];
 				else $PaymentInfo['ExpYear']=$this->request->data['Firearm']['ExpYear'];
@@ -528,20 +531,22 @@ class FirearmsController extends AppController {
 					$PaymentInfo['BillingState']=$this->request->data['Firearm']['State'];
 					$PaymentInfo['BillingPostalCode']=$this->request->data['Firearm']['PostalCode'];
 				}
-				$Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
-				
+								
 				//for testing with comp
-				//$Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
-
-				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,'ClientID'=>$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'],
-					//just for testing! (proper value is set above)
-					//'ClientID'=>'56c2111d-25c8-48c0-bb25-48cdc0a80194',
-					//this is a TEST client from production
-					//'ClientID'=>'20160111185337924',
+				if (Configure::read('testMode')=='yes') $Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
+				
+				else $Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
+				
+				if (Configure::read('testMode')=='yes') $ClientID='57378ab1-2a34-41cd-8a3a-8724c0a80194';
+				else $ClientID=$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'];
+				
+				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,
+					'ClientID'=>$ClientID,
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
 					//products WILL NOT SELL unless you say InStore...
 					'InStore'=>true,
+					//this applies the discount to ALL items and is therefore worthless in our situation
 					//'PromotionCode'=>'MILITARY'
 				));
 				//debug($CartItems);
@@ -579,10 +584,10 @@ class FirearmsController extends AppController {
 					$email_body.="\nTOTAL:\t\t".money_format('$%i',$Amount);
 					$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.";
 					
-					//send the email before redirecting:
+					//send the email before redirecting, this can be done from MINDBODY someday
 					$Email = new CakeEmail();
 					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
-					//$Email->to('seth@sethjohnson.net');
+					$Email->to(Configure::read('adminEmail'));
 					$Email->to($client['Email']);
 					$Email->subject('Booking confirmation');
 					$Email->send($email_body);
@@ -597,6 +602,8 @@ class FirearmsController extends AppController {
 					//debug($checkout['CheckoutShoppingCartResult']['ErrorCode']);
 					if ($checkout['CheckoutShoppingCartResult']['ErrorCode']==900){
 						$error_msg=$checkout['CheckoutShoppingCartResult']['Message'];
+					//	debug("\n\n".$mb->getXMLRequest());
+					//	debug("\n\n".$mb->getXMLResponse());
 					}
 					else
 					$error_msg='';

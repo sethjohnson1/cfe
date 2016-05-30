@@ -7,8 +7,20 @@ $disabled=false;
 <h1>Shopping Cart <small>The arsenal awaits</small></h1>
 </div>
 <div class="col-xs-12">
-<h2>Lane Reservations</h2>
-<?if (isset($cart_items['Services'])){?>
+<h2>Lane Reservation</h2>
+<?
+
+if (isset($cart_items['Services'])){?>
+
+<?//temporary error for multiple packages
+$svc_cnt=count($cart_items['Services'])-1;
+$temp_err='';
+ if( count($cart_items['Services'])>1){
+	$temp_err= '<h3 style="color:red;">Only one package can be booked online at a time right now, we\'re working on fixing it. Either remove '.$svc_cnt.' item(s) or give us a ring at (307) 586-4287 for help.</h3>';
+	$disabled=true;
+	echo $temp_err;
+ }
+?>
 <table class="table table-hover"> 
 <thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 
 <?
@@ -37,7 +49,8 @@ echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($m
 endforeach?>
 </tbody>
 </table>
-<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?></h4>
+<!-- THIS IS DISABLED FOR NOW until I get some answers from MINDBODY API team, however it can still be done by use of Back button (and then fails at checkout) Also change Lane Reservation to plural when fixed -->
+<!-- h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?></h4 -->
 <?} 
 //no valid packages
 else{
@@ -125,34 +138,43 @@ $options=array();
 foreach ($discounts as $dival){
 	$options[$dival['Firearm']['amount'].'_'.$dival['Firearm']['setting_value']]=$dival['Firearm']['description'];
 }
-//now set values
 $options['']='None';
-if (isset($this->request->data['Firearm']['Discount'])){
-	
-}
-//the discount is still not working, disabled for now
 
-//echo '<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>';
-
-
-echo $this->Form->input('Discount', array(
-    //'before' => '--before--',
+//we have to make an entire option array to get the value right
+ $option_array=array(
+	//'before' => '--before--',
     //'between' => '<div class="radio_btn"',
 	//'after' => '--after--',
 	'label'=>false,
 	'legend'=>false,
 	'class'=>'radio_dis',
     'separator' => '<br/>',
-	'type'=>'hidden',
-	//'value'=>0,
+	'type'=>'radio',
+	'value'=>'',
 	'onchange'=>'$("#update_button").click()',
     'options' => $options
-));
+);
+
+if (isset($this->request->data['Firearm']['Discount'])){
+	unset($option_array['value']);
+}
+//else $opt_array['value']='';
+//the discount is still not working, disabled for now
+
+
+echo '<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>';
+
+
+echo $this->Form->input('Discount', $option_array);
 
 ?>
 </div><!-- /add-ons column -->
 <div class="col-xs-12 col-pad">
 <h2 align="">Cart Total: <?=money_format('$%i',$cart_total)?><br /><small> Tax will be added at checkout</small></h2>
+<?
+//this is a temporary thing, hopefully
+echo $temp_err;
+?>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">
 <?=$this->Form->submit('Update', array('div' => false,'class'=>'btn btn-lg date-btns','name'=>'data[Cart][update_button]','id'=>'update_button','onclick'=>$this->element('blockui',array('msg'=>'Updating cart...'))))?>
