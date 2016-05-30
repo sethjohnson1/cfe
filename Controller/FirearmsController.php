@@ -429,7 +429,7 @@ class FirearmsController extends AppController {
 			//these are only needed for the email
 			$Extras=$this->Cookie->read('checkoutExtras');
 			$Subtotal=$this->Cookie->read('checkoutSubtotal');
-			$Tax=$this->Cookie->write('checkoutTax');
+			$Tax=$this->Cookie->read('checkoutTax');
 		
 			
 			//debug($discount_array);
