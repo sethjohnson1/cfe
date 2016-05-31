@@ -27,6 +27,9 @@ unload, and go back again."
 </div>
 <div class="row history-body">
 <div class="col-xs-12">
+<?=$this->Html->image('panel_gifs/Buffalo-skull-wagon.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+</div>
+<div class="col-xs-12">
 <h3>LONG SHOT DOWN UNDER</h3>
 <h4>
 Tom Selleck as Matthew Quigley in the film

@@ -41,6 +41,9 @@ horses as they took the cattle north.
 </div>
 <div class="row history-body">
 <div class="col-xs-12">
+<?=$this->Html->image('panel_gifs/cattle-on-trail.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+</div>
+<div class="col-xs-12">
 <h3>MOVING THE HERD TO MONTANA</h3>
 <h4>
 Nelson Story brought a herd of cattle from

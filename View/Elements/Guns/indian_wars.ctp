@@ -28,6 +28,9 @@ equipped with the Springfield Trapdoor.
 </div>
 <div class="row history-body">
 <div class="col-xs-12">
+<?=$this->Html->image('panel_gifs/little-big-horn.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+</div>
+<div class="col-xs-12">
 <h3>RED CLOUD'S WAGON BOX FIGHT</h3>
 <h4>
 Six civilians and 26 US Army soldiers took refuge

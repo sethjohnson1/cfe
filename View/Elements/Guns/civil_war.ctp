@@ -44,6 +44,10 @@ also came under attack. Two soldiers escaped,
 but the remainder died in the fight.
 </h4>
 </div>
+<div class="col-xs-12">
+
+	<?=$this->Html->image('panel_gifs/Platte-Bridge-Station-NPS-Jackson.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+
 </div>
 <div class="row">
 <div class="col-xs-12 col-md-6" style="padding-top:10px">

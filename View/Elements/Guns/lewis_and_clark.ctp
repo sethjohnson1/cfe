@@ -31,8 +31,11 @@ when he demonstrated its repeating operation.
 </div>
 </div>
 <div class="row history-body">
+<div class="col-xs-12 col-md-6">
 
-<div class="col-xs-12">
+	<?=$this->Html->image('panel_gifs/lewis_and_clark.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+</div>
+<div class="col-xs-12 col-md-6">
 <h3>John Colter - Cody Country</h3>
 <h4>
 One of the best hunters with the Corps

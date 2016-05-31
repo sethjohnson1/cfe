@@ -67,7 +67,7 @@ $carousel=array(
 </div>
 
 <div class="col-xs-12 top-pad">
-<h1>North American Widlife Display <small>Coming soon!</small></h1>
+<h1>North American Widlife Display <small>Now Open! Photos Coming soon</small></h1>
 </div>
 </div>
 

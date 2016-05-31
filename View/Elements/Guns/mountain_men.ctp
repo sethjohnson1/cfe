@@ -26,7 +26,9 @@ the Bighorn Basin.
 </div>
 </div>
 <div class="row history-body">
-
+<div class="col-xs-12">
+<?=$this->Html->image('panel_gifs/mountain_men.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+</div>
 <div class="col-xs-12">
 <h3>LIFE & BURIAL OF
 JEREMIAH JOHNSTON</h3>

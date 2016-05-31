@@ -24,6 +24,9 @@ and sharp shooting.
 </div>
 <div class="row history-body">
 <div class="col-xs-12">
+<?=$this->Html->image('panel_gifs/Buffalo_Bills_Wild_West_Show,_1890.gif',array('style'=>'padding-top:50px; ','class'=>'img-responsive img-center'))?>
+</div>
+<div class="col-xs-12">
 <h3>LITTLE SURE SHOT</h3>
 <h4>
 Annie Oakley was one of Cody’s stars, demonstrating
