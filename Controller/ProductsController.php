@@ -296,5 +296,39 @@ class ProductsController extends AppController {
 	$this->render('edit','frontend');
 	}
 	
+	public function youtube() {
+		$youtube=$this->Firearm->find('first',array('conditions'=>array('Firearm.name'=>'YouTube')));
+		if ($this->request->is('post')) {
+			//debug($this->request->data);
+			$this->Firearm->deleteAll(array('Firearm.name'=>'YouTube'));
+			$setting_val['name']='YouTube';
+			$setting_val['setting_value']=$this->request->data['Product']['YouTube'];
+			$this->Firearm->create();
+			if ($this->Firearm->save($setting_val)) {
+				$this->Session->setFlash('Updated YouTube video','flash_success');
+				return $this->redirect(array('action' => 'entry','controller'=>'firearms'));
+			}
+		}
+		$this->set(compact('youtube'));
+		$this->render('youtube','frontend');
+	}
+	
+	public function classes() {
+		//test call for classes
+		$mb = new MB_API();
+		
+		//get the date one year out
+		$date=date('Y-m-d',strtotime(date("Y-m-d", time()) . " + 365 days"));
+		//make sure you always have trailing zeros or bookings do not work!!
+		$mbdate=$date.'T12:00:00';
+		
+		//$data=$mb->GetClasses(array('EndDateTime'=>$mbdate));
+		//debug($data);
+		$data2=$mb->GetClassDescriptions();
+		//DOES NOT work without LocationID and HideRelatedPrograms
+		$data2=$mb->GetServices(array('LocationID'=>1,'HideRelatedPrograms'=>true,'SessionTypeIDs'=>array('35')));
+		debug($data2);
+	}
+	
 	
 }

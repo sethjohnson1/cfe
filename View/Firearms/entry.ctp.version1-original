@@ -27,19 +27,12 @@ $carousel=array(
 );
 ?>
 <div class="row">
-<div class="col-xs-12 col-md-8 no-pad">
-<?=$this->Html->image('cfe_new_homepage.jpg',array('class'=>'img-responsive'))?>
+<div class="col-xs-12 no-pad hidden-xs hidden-sm">
+<?=$this->Html->image('cody_firearms_experience.jpg',array('class'=>'img-responsive'))?>
 </div>
-
-<div class="col-xs-12 col-md-4 no-pad">
-<div class="video-container">
-         <iframe src="http://www.youtube.com/embed/<?=$youtube['Firearm']['setting_value']?>" frameborder="0" width="560" height="315"></iframe>
+<div class="hidden-xl hidden-lg hidden-md no-pad">
+<?=$this->Html->image('cody_firearms_experience_portrait.jpg',array('class'=>'img-responsive'))?>
 </div>
-</div>
-<div class="col-xs-12 col-md-4 no-pad" style="">
-<?=$this->Html->image('shooters.jpg',array('class'=>'img-responsive'))?>
-</div>
-
 </div><!-- carousel row -->
 	<script>
 	//example to  customize carousel, set to zero for testing
