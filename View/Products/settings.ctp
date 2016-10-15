@@ -89,6 +89,7 @@ echo $this->Form->input('amount',array('class'=>'form-control','label'=>false,'n
 echo $this->Form->input('nontaxableCategoryID',array('class'=>'form-control','label'=>'No Tax category ID')).'<br />';
 echo $this->Form->input('taxableCategoryID',array('class'=>'form-control','label'=>'Tax category ID')).'<br />';
 echo $this->Form->input('doubleCategoryID',array('class'=>'form-control','label'=>'Double-fun category ID')).'<br />';
+echo $this->Form->input('YouTube',array('class'=>'form-control','label'=>'YouTube video ID')).'<br />';
 
 echo $this->Form->submit('Save', array('div' => false,'class'=>'pad btn btn-success btn-lg date-btns'));
 echo $this->Form->end();
