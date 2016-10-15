@@ -1,3 +1,0 @@
-[15-Feb-2016 11:46:24 America/Denver] PHP Fatal error:  Cannot use isset() on the result of a function call (you can use "null !== func()" instead) in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/Controller/FirearmsController.php on line 326
-[15-Oct-2016 06:55:29 America/Denver] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE) in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/View/Elements/Guns/package_description.ctp on line 49
-[15-Oct-2016 07:10:47 America/Denver] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE) in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/View/Elements/Guns/package_description.ctp on line 49
