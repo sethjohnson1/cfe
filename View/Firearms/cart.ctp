@@ -36,7 +36,7 @@ $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
-<tr><th class="row"><em>&nbsp;&nbsp;Add a friend</em></th><td>Bring a friend and get 2x ammo!</td>
+<tr><th class="row"><em>&nbsp;&nbsp;Double Ammo</em></th><td>Get 2x ammo and double your fun!</td>
 <td></td>
 <td><?=money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td>
 <td>
@@ -97,7 +97,15 @@ if (isset($cart_items['Extras'][$extra['barcodeID']])){
 ?>
 <tr> <th scope="row"><?=$extra['Name']?></th> <td><?=$extra['ShortDesc']?></td> <td><?=money_format('$%i',$extras[$id]['OnlinePrice'])?></td> 
 <td>
-<?=$this->Form->input($extra['barcodeID'],array('onchange'=>'$("#update_button").click()','type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>2,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'))?>
+<?
+//old way with a number
+
+echo $this->Form->input($extra['barcodeID'],array('onchange'=>'$("#update_button").click()','type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>2,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'));
+
+//now a checkbox, can't get it to work, will do later
+//echo $this->Form->input($extra['barcodeID'],array('onclick'=>'$("#update_button").click()','type'=>'checkbox','label'=>false,'div'=>false,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'));
+
+?>
 </td> </tr>
 
 
@@ -161,11 +169,11 @@ if (isset($this->request->data['Firearm']['Discount'])){
 //else $opt_array['value']='';
 //the discount is still not working, disabled for now
 
+/* discounts disabled! */
+//echo '<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>';
 
-echo '<h3>Discount <small>Applied at final payment, please bring card or ID. Limit one discount per order.</small></h3>';
 
-
-echo $this->Form->input('Discount', $option_array);
+//echo $this->Form->input('Discount', $option_array);
 
 ?>
 </div><!-- /add-ons column -->

@@ -45,8 +45,8 @@
  <tr><th scope="row">Price
  </th>
  <td>
- <?if ($pkg['Product']['Price']==49) echo '<span style="color:red; font-weight: bold">ONLY '.money_format('$%i',$pkg['Product']['Price']).'</span>';
- else echo money_format('$%i',$pkg['Product']['Price'])?>
+ <? if ($pkg['Product']['Price']==49) echo '<span style="color:red; font-weight: bold">ONLY '.money_format('$%i',$pkg['Product']['Price']).'</span>';
+ else echo '<strike>'.money_format('$%i',$pkg['Product']['Price']).'</strike>'. '&nbsp;&nbsp;<span style="color:red">'.money_format('$%i',$pkg['Product']['OnlinePrice']).' Online special!</span>';?>
  
  
  </td></tr>

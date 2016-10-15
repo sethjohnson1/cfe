@@ -565,7 +565,7 @@ class FirearmsController extends AppController {
 						$email_body.="PACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
 						if (isset($id['Double'])) $email_body.= " Add a friend (2x ammo)+".money_format('$%i',$id['DoubleInfo']['OnlinePrice']);
 					}
-					if($checkout_items['Discount']){
+					if(!empty($checkout_items['Discount'])){
 						$discount_array=explode('_',$checkout_items['Discount']);
 						$email_body.="\n\nDISCOUNT: ".money_format('$%i',$discount_array[0])."\nPlease bring proof to have discount honored.\n";
 					}

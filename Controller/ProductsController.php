@@ -42,7 +42,8 @@ class ProductsController extends AppController {
 		foreach ($dbl as $k=>$v){
 			$this->CFE_DoubleTypeIDs[$this->CFE_ComboTypeIDs[$k]]=$v;
 		}
-		$cat[$settings['retailCategoryID']]=array('name'=>'Retail','prodtype'=>'Product');
+		$cat[$settings['taxableCategoryID']]=array('name'=>'TaxedRetail','prodtype'=>'Product');
+		$cat[$settings['nontaxableCategoryID']]=array('name'=>'Retail','prodtype'=>'Product');
 		$cat[$settings['doubleCategoryID']]=array('name'=>'Double','prodtype'=>'Double');
 		$this->CFE_Categories=$cat;
 

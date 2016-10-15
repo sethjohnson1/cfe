@@ -86,7 +86,8 @@ echo $this->Form->input('amount',array('class'=>'form-control','label'=>false,'n
 
 <?
 //echo $this->Form->input('everythingSessionID',array('class'=>'form-control','label'=>'All That & a Gat Session IDs - You must have one package assigned just to gatling and another to all lanes, comma list in order you want them booked')).'<br />';
-echo $this->Form->input('retailCategoryID',array('class'=>'form-control','label'=>'Retail category ID')).'<br />';
+echo $this->Form->input('nontaxableCategoryID',array('class'=>'form-control','label'=>'No Tax category ID')).'<br />';
+echo $this->Form->input('taxableCategoryID',array('class'=>'form-control','label'=>'Tax category ID')).'<br />';
 echo $this->Form->input('doubleCategoryID',array('class'=>'form-control','label'=>'Double-fun category ID')).'<br />';
 
 echo $this->Form->submit('Save', array('div' => false,'class'=>'pad btn btn-success btn-lg date-btns'));

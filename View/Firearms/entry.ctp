@@ -28,12 +28,12 @@ $carousel=array(
 ?>
 <div class="row">
 <div class="col-xs-12 col-md-8 no-pad">
-<?=$this->Html->image('cfe_new_homepage.jpg',array('class'=>'img-responsive'))?>
+<?$main_img=$this->Html->image('cfe_new_homepage.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
 </div>
 
 <div class="col-xs-12 col-md-4 no-pad">
 <div class="video-container">
-         <iframe src="http://www.youtube.com/embed/<?=$youtube['Firearm']['setting_value']?>" frameborder="0" width="560" height="315"></iframe>
+         <iframe src="https://www.youtube.com/embed/<?=$youtube['Firearm']['setting_value']?>" frameborder="0" width="560" height="315"></iframe>
 </div>
 </div>
 <div class="col-xs-12 col-md-4 no-pad" style="">
@@ -107,6 +107,6 @@ $carousel=array(
 <?=$this->Html->link($pkg['Name'],array('action'=>'pickdate',$id,$pkg['SessionTypeID']),array('class'=>'btn btn-lg btn-success date-btns','style'=>'','onclick'=>$this->element('blockui',array('msg'=>'Checking dates...'))))?>
 
 </div>
-<?endforeach?>
+<?endforeach?><h3 align=center>Call us for lane rental information. Memberships available! (307) 586-4287</h3>
 </div>
 </div>

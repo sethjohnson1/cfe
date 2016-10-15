@@ -12,7 +12,7 @@ $date_time=explode('T',$mbdate);
 <td><?if (isset($id['Double'])) echo '<strong>Add a friend (2x ammo)</strong> +'.money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td> </tr>
 <?
 endforeach?>
-<?if($checkout_items['Discount']):
+<?if(!empty($checkout_items['Discount'])):
 $discount_array=explode('_',$checkout_items['Discount']);?>
 
 <tr> <th scope="row"></th> <td></td> <td><?=$discount_array[1]?> Discount:</td> <td><?='-'.money_format('$%i',$discount_array[0])?></td>
