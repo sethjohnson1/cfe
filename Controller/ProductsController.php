@@ -92,7 +92,7 @@ class ProductsController extends AppController {
 		
 		//first big loop through all Categories, this is the only way as the API won't return the Category ID
 		foreach ($this->CFE_Categories as $cat_id=>$cat_name){
-			
+			//SellOnline must be specified or the call fails, using 0 (not false!) gets non-online products too, experimenting with that now
 			$data=$mb->GetProducts(array('SellOnline'=>true,'CategoryIDs'=>array($cat_id)));
 		//	debug($data);
 			if ($data['GetProductsResult']['ErrorCode']==200){
