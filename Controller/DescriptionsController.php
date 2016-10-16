@@ -37,7 +37,7 @@ class DescriptionsController extends AppController {
 		if (isset($this->request->query['filter'])){
 			$conditions=array('Description.pagetype'=>$this->request->query['filter']);
 		}
-		$this->set('descriptions', $this->Description->find('all',array('conditions'=>$conditions)));
+		$this->set('descriptions', $this->Description->find('all',array('conditions'=>$conditions,'order'=>'Description.modified DESC')));
 		$this->render('index','frontend');
 	}
 

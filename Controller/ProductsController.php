@@ -60,14 +60,21 @@ class ProductsController extends AppController {
 		
 	}
 	public function index() {
-		//this should be a dashboard to update stuff, just a tester now
+		//this is my testing zone
+		require_once('MB_API.php');
+		$mb = new MB_API();
 		//$data = $mb->GetServices(array('SellOnline'=>true));
 		//$this->loadModel('Package');
 		//$data=$this->Package->find('all');
 		//debug($data);
 		$this->Product->recursive = 0;
 		$this->set('products', $this->Paginator->paginate());
-		$this->render('index','frontend');
+		//Use a ZERO for SellOnline false
+		//$data=$mb->GetProducts(array('XMLDetail'=>'Full','SellOnline'=>0,'SearchDomain'=>'Name','SearchText'=>'frosting','PageSize'=>30));
+		$data=$mb->GetProducts(array('SellOnline'=>0,'PageSize'=>30));
+		debug($data);
+		$this->set('request',$mb->getXMLRequest());
+		$this->set('response',$mb->getXMLResponse());
 
 		
 	}
