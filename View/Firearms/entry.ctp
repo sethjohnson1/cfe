@@ -28,7 +28,7 @@ $carousel=array(
 ?>
 <div class="row">
 <div class="col-xs-12 col-md-8 no-pad">
-<?$main_img=$this->Html->image('cfe_new_homepage.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
+<?$main_img=$this->Html->image('cfe_winter_homepage.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
 </div>
 
 <div class="col-xs-12 col-md-4 no-pad">
