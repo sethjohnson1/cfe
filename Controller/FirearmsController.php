@@ -301,6 +301,7 @@ class FirearmsController extends AppController {
 			$this->Session->setFlash('Updated quantities', 'flash_success');
 			if(isset($this->request->data['Cart']['checkout_button'])){
 				//write Checkout cookie to match cookie, checkout page will match them
+				//debug($checkout_items);
 				$this->Cookie->write('CheckoutItems',$cart_items);
 				return $this->redirect(array('action' => 'checkout'));
 			}

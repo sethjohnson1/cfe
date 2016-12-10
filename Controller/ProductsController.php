@@ -93,6 +93,11 @@ class ProductsController extends AppController {
 		//first big loop through all Categories, this is the only way as the API won't return the Category ID
 		foreach ($this->CFE_Categories as $cat_id=>$cat_name){
 			//SellOnline must be specified or the call fails, using 0 (not false!) gets non-online products too, experimenting with that now
+			//for some damn reason this screws up the checkout when its zero?
+			//ah - because it overwhelms the size of the cookie, shouldn't be a problem in production, NO it could be, try to shorten that cookie somehow when it's time (if ever_)
+			//just for testing
+			//$data=$mb->GetProducts(array('PageSize'=>15,'SellOnline'=>0,'CategoryIDs'=>array($cat_id)));
+			
 			$data=$mb->GetProducts(array('SellOnline'=>true,'CategoryIDs'=>array($cat_id)));
 		//	debug($data);
 			if ($data['GetProductsResult']['ErrorCode']==200){
