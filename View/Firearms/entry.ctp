@@ -33,7 +33,7 @@ $carousel=array(
 
 <div class="col-xs-12 col-md-4 no-pad">
 <div class="video-container">
-         <iframe src="https://www.youtube.com/embed/<?=$youtube['Firearm']['setting_value']?>" frameborder="0" width="560" height="315"></iframe>
+         <iframe src="https://www.youtube.com/embed/<?=$youtube['Firearm']['setting_value']?>?rel=0&modestbranding=1" frameborder="0" width="560" height="315"></iframe>
 </div>
 </div>
 <div class="col-xs-12 col-md-4 no-pad" style="">
