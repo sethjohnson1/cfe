@@ -552,7 +552,7 @@ class FirearmsController extends AppController {
 					//this applies the discount to ALL items and is therefore worthless in our situation
 					//'PromotionCode'=>'MILITARY'
 				));
-				debug($CartItems);
+				//debug($CartItems);
 				//debug($checkout);
 				
 				//NOTICE: It only returns the last appointment booked, but I confirmed it DOES book them all in MINDBODY
@@ -590,7 +590,7 @@ class FirearmsController extends AppController {
 					//send the email before redirecting, this can be done from MINDBODY someday
 					$Email = new CakeEmail();
 					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
-					$Email->to(Configure::read('adminEmail'));
+					$Email->cc(Configure::read('adminEmail'));
 					$Email->to($client['Email']);
 					$Email->subject('Booking confirmation');
 					$Email->send($email_body);
@@ -598,7 +598,7 @@ class FirearmsController extends AppController {
 					
 					$this->Session->setFlash('Booking successful. See you soon!', 'flash_success');
 					
-					//return $this->redirect(array('action' => 'thankyou'));
+					return $this->redirect(array('action' => 'thankyou'));
 					
 				
 				}
@@ -609,8 +609,7 @@ class FirearmsController extends AppController {
 					//	debug("\n\n".$mb->getXMLRequest());
 					//	debug("\n\n".$mb->getXMLResponse());
 					}
-					else
-					$error_msg='';
+					else $error_msg=' Internal Server Error.';
 					$this->Session->setFlash('The request to checkout failed please try again or contact us. <br /><strong>ERROR:</strong><br/>"'.$error_msg.'"<br />
 					If the error persists call us at 307-586-4287 for help.', 'flash_danger');
 					//errorCode 900 is Card Auth, so you can dump the message to user.
@@ -619,14 +618,23 @@ class FirearmsController extends AppController {
 					debug($checkout);
 					
 					//send email
-					$email_body="Something went wrong.";
-					
-					//send the email before redirecting, this can be done from MINDBODY someday
+					$email_body="There was an error during an online booking.\n\n";
+					$email_body.=$checkout['CheckoutShoppingCartResult']['Message']."\n\n";
+					$email_body.="CLIENT DATA:\n\n";
+					foreach ($client as $k=>$v) $email_body.=$k.": ".$v."\n";
+					$email_body.="\n\nBOOKING DATA:\n\n";
+					foreach ($checkout_items['Services'] as $mbdate=>$id){
+						$date_time=explode('T',$mbdate);
+						$email_body.="PACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
+						if (isset($id['Double'])) $email_body.= " Add a friend (2x ammo)+".money_format('$%i',$id['DoubleInfo']['OnlinePrice']);
+					}
+					$email_body.="\n\nSeth has also been notified but feel free to TXT him and let him know. This email does not include any extras they might have ordered.";
+		
 					$Email = new CakeEmail();
 					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
 					$Email->to(Configure::read('adminEmail'));
-					//$Email->to($client['Email']);
-					$Email->subject('Online booking error');
+					$Email->cc('sethj@centerofthewest.org');
+					$Email->subject('Online booking error!!');
 					$Email->send($email_body);
 					
 				}

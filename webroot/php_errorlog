@@ -17,3 +17,13 @@
  in /home/codyfire/public_html/app/webroot/MB_API.php on line 61
 [18-Nov-2016 13:17:34 America/Denver] PHP Fatal error:  SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://api.mindbodyonline.com/0_5/AppointmentService.asmx?WSDL' : Premature end of data in tag HTML line 2
  in /home/codyfire/public_html/app/webroot/MB_API.php on line 61
+[13-Jan-2017 23:17:06 America/Denver] PHP Fatal error:  SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://api.mindbodyonline.com/0_5/AppointmentService.asmx?WSDL' : Start tag expected, '<' not found
+ in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/webroot/MB_API.php on line 61
+[13-Jan-2017 23:17:38 America/Denver] PHP Fatal error:  SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://api.mindbodyonline.com/0_5/AppointmentService.asmx?WSDL' : Start tag expected, '<' not found
+ in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/webroot/MB_API.php on line 61
+[13-Jan-2017 23:21:32 America/Denver] PHP Fatal error:  SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://api.mindbodyonline.com/0_5/AppointmentService.asmx?WSDL' : Start tag expected, '<' not found
+ in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/webroot/MB_API.php on line 61
+[13-Jan-2017 23:25:09 America/Denver] PHP Fatal error:  SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://api.mindbodyonline.com/0_5/AppointmentService.asmx?WSDL' : Start tag expected, '<' not found
+ in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/webroot/MB_API.php on line 65
+[13-Jan-2017 23:27:05 America/Denver] PHP Fatal error:  SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://api.mindbodyonline.com/0_5/AppointmentService.asmx?WSDL' : Start tag expected, '<' not found
+ in /home/codyfire/public_html/TEST_ENVIRO/wfe/app/webroot/MB_API.php on line 65
