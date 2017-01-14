@@ -2,14 +2,14 @@
 <div class="col-xs-12">
 <h3>Confirm your dates and times. <small><em>Once booked, a slot cannot be canceled or refunded.</em></small></h3>
 <table class="table table-hover"> 
-<thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 
+<thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th>2x ammo</th> </tr> </thead><tbody> 
 <?
 
 foreach ($checkout_items['Services'] as $mbdate=>$id):
 $date_time=explode('T',$mbdate);
 ?>
 <tr> <th scope="row"><?=$id['Name']?></th> <td><?=date('D M d, Y',strtotime($date_time[0]))?></td> <td><?=date('h:i a',strtotime($date_time[1]))?></td> <td><?=money_format('$%i',$id['OnlinePrice'])?></td>
-<td><?if (isset($id['Double'])) echo '<strong>Add a friend (2x ammo)</strong> +'.money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td> </tr>
+<td><?if (isset($id['Double'])) echo money_format('$%i',$id['DoubleInfo']['OnlinePrice']); else echo '';?></td> </tr>
 <?
 endforeach?>
 <?if(!empty($checkout_items['Discount'])):

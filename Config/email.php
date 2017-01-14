@@ -44,11 +44,11 @@ class EmailConfig {
 
 	public $default = array(
 		'transport' => 'Mail',
-		'from' => 'forms@centerofthewest.org',
+		'from' => 'you@localhost',
 		//'charset' => 'utf-8',
 		//'headerCharset' => 'utf-8',
 	);
-
+	
 	public $fast = array(
 		'from' => 'you@localhost',
 		'sender' => null,

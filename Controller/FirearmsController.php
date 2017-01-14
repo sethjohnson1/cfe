@@ -27,9 +27,11 @@ class FirearmsController extends AppController {
 		$svcs=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Service')));
 		$new_svc=array();
 		foreach ($svcs as $svc){
+			//debug($svc);
 			$new_svc[$svc['Product']['barcodeID']]=$svc['Product'];
-			$new_svc[$svc['Product']['barcodeID']]['DoubleInfo']=$new_dbl[$svc['Product']['DoubleTypeID']];
+			if (isset($svc['Product']['DoubleTypeID'])) $new_svc[$svc['Product']['barcodeID']]['DoubleInfo']=$new_dbl[$svc['Product']['DoubleTypeID']];
 		}
+		
 		//debug($new_svc);
 		$this->CFE_services=$new_svc;
 		
@@ -298,7 +300,7 @@ class FirearmsController extends AppController {
 			
 			
 			$this->Cookie->write('CartItems',$cart_items);
-			$this->Session->setFlash('Updated quantities', 'flash_success');
+			//$this->Session->setFlash('Updated quantities', 'flash_success');
 			if(isset($this->request->data['Cart']['checkout_button'])){
 				//write Checkout cookie to match cookie, checkout page will match them
 				//debug($checkout_items);
@@ -357,7 +359,7 @@ class FirearmsController extends AppController {
 			$this->Session->setFlash('No current package selected. Selected package may have expired.', 'flash_custom');
 			return $this->redirect(array('action' => 'cart'));
 		}
-		
+		//debug($checkout_items);
 		//write the total to Cookie so we can compare it.
 		$checkout_total=0;
 		$tax_total=0;
@@ -372,16 +374,15 @@ class FirearmsController extends AppController {
 		if (isset($checkout_items['Services'])){
 			foreach ($checkout_items['Services'] as $mbdate=>$pid){
 				$checkout_total=($checkout_total+$pid['OnlinePrice'])-$discount_array[0];
-				//the extended price for package no longer works with discounts, doing a sloppy copy/paste for now
-				//I think if there is ANY value in thousands place it rounds up, otherwise leaves it alone
-				
+				//the extended price for package DOES NOT WORK with discounts (or so I thought), there aren't any so we're doing it the old way
+				/*
 				$rawtax=$checkout_total*$pid['TaxRate'];
 				$tax=number_format(floor(($checkout_total*$pid['TaxRate'])*100)/100,3)*100;
 				$digit3=explode('.',$rawtax);
 				if (isset($digit3[1])&&strlen($digit3[1])>2) $tax++;
 				//debug($tax);
 				$pid['ExtendedPrice']=$checkout_total+($tax/100);
-				
+				*/
 				$final_total=$final_total+$pid['ExtendedPrice'];
 				if (isset($pid['Double'])){
 					$checkout_total=$checkout_total+$pid['DoubleInfo']['OnlinePrice'];
@@ -539,7 +540,7 @@ class FirearmsController extends AppController {
 				
 				else $Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
 				
-				if (Configure::read('testMode')=='yes') $ClientID='57378ab1-2a34-41cd-8a3a-8724c0a80194';
+				if (Configure::read('testMode')=='yes') $ClientID='5719d975-e30c-420d-b313-3135c0a80194';
 				else $ClientID=$add['AddOrUpdateClientsResult']['Clients']['Client']['ID'];
 				
 				$checkout=$mb->CheckoutShoppingCart(array('Test'=>false,
@@ -551,7 +552,7 @@ class FirearmsController extends AppController {
 					//this applies the discount to ALL items and is therefore worthless in our situation
 					//'PromotionCode'=>'MILITARY'
 				));
-				//debug($CartItems);
+				debug($CartItems);
 				//debug($checkout);
 				
 				//NOTICE: It only returns the last appointment booked, but I confirmed it DOES book them all in MINDBODY
@@ -596,7 +597,8 @@ class FirearmsController extends AppController {
 
 					
 					$this->Session->setFlash('Booking successful. See you soon!', 'flash_success');
-					return $this->redirect(array('action' => 'thankyou'));
+					
+					//return $this->redirect(array('action' => 'thankyou'));
 					
 				
 				}
@@ -615,6 +617,18 @@ class FirearmsController extends AppController {
 					//hmm errorCode 900 is also input payment total, dump that to user as well
 					//send me an email here
 					debug($checkout);
+					
+					//send email
+					$email_body="Something went wrong.";
+					
+					//send the email before redirecting, this can be done from MINDBODY someday
+					$Email = new CakeEmail();
+					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
+					$Email->to(Configure::read('adminEmail'));
+					//$Email->to($client['Email']);
+					$Email->subject('Online booking error');
+					$Email->send($email_body);
+					
 				}
 				
 				//$this->set('request',$mb->getXMLRequest());

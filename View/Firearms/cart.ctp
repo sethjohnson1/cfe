@@ -12,14 +12,15 @@ $disabled=false;
 
 if (isset($cart_items['Services'])){?>
 
-<?//temporary error for multiple packages
-$svc_cnt=count($cart_items['Services'])-1;
+<?//temporary error for multiple packages, this should be fixed now
+/*$svc_cnt=count($cart_items['Services'])-1;
 $temp_err='';
  if( count($cart_items['Services'])>1){
 	$temp_err= '<h3 style="color:red;">Only one package can be booked online at a time right now, we\'re working on fixing it. Either remove '.$svc_cnt.' item(s) or give us a ring at (307) 586-4287 for help.</h3>';
 	$disabled=true;
 	echo $temp_err;
  }
+ */
 ?>
 <table class="table table-hover"> 
 <thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th></th> </tr> </thead><tbody> 
@@ -36,6 +37,7 @@ $xicon='<span class="glyphicon glyphicon-remove"></span>';
 echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($mbdate)),array('escape'=>false));
 ?>
 </td> </tr>
+<?if (isset($id['DoubleInfo'])):?>
 <tr><th class="row"><em>&nbsp;&nbsp;Double Ammo</em></th><td>Get 2x ammo and double your fun!</td>
 <td></td>
 <td><?=money_format('$%i',$id['DoubleInfo']['OnlinePrice'])?></td>
@@ -45,12 +47,12 @@ echo $this->Html->link($xicon,array('action'=>'cart_remove_package',urlencode($m
 
 </td></tr>
 <?
-
+endif;
 endforeach?>
 </tbody>
 </table>
 <!-- THIS IS DISABLED FOR NOW until I get some answers from MINDBODY API team, however it can still be done by use of Back button (and then fails at checkout) Also change Lane Reservation to plural when fixed -->
-<!-- h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?></h4 -->
+<h4><?=$this->Html->link('<< Book another!',array('action'=>'pickpkg'))?></h4>
 <?} 
 //no valid packages
 else{
@@ -100,7 +102,7 @@ if (isset($cart_items['Extras'][$extra['barcodeID']])){
 <?
 //old way with a number
 
-echo $this->Form->input($extra['barcodeID'],array('onchange'=>'$("#update_button").click()','type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'max'=>2,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'));
+echo $this->Form->input($extra['barcodeID'],array('onchange'=>'$("#update_button").click()','type'=>'number','class'=>'','label'=>false,'div'=>false,'style'=>'width:45px','value'=>$qty_val,'min'=>0,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'));
 
 //now a checkbox, can't get it to work, will do later
 //echo $this->Form->input($extra['barcodeID'],array('onclick'=>'$("#update_button").click()','type'=>'checkbox','label'=>false,'div'=>false,'name'=>'data[Cart][Extras]['.$extra['barcodeID'].']'));
@@ -181,7 +183,7 @@ if (isset($this->request->data['Firearm']['Discount'])){
 <h2 align="">Cart Total: <?=money_format('$%i',$cart_total)?><br /><small> Tax will be added at checkout</small></h2>
 <?
 //this is a temporary thing, hopefully
-echo $temp_err;
+//echo $temp_err;
 ?>
 </div>
 <div class="col-xs-12 col-md-6 col-pad">

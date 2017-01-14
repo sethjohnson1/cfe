@@ -43,7 +43,10 @@ class ProductsController extends AppController {
 			$this->CFE_DoubleTypeIDs[$this->CFE_ComboTypeIDs[$k]]=$v;
 		}
 		$cat[$settings['taxableCategoryID']]=array('name'=>'TaxedRetail','prodtype'=>'Product');
-		$cat[$settings['nontaxableCategoryID']]=array('name'=>'Retail','prodtype'=>'Product');
+		
+		//this is gone for now
+		//$cat[$settings['nontaxableCategoryID']]=array('name'=>'Retail','prodtype'=>'Product');
+		
 		$cat[$settings['doubleCategoryID']]=array('name'=>'Double','prodtype'=>'Double');
 		$this->CFE_Categories=$cat;
 
@@ -124,13 +127,17 @@ class ProductsController extends AppController {
 					*/
 					
 					//I think if there is ANY value in thousands place it rounds up, otherwise leaves it alone
-					$rawtax=$product['OnlinePrice']*$product['TaxRate'];
+					//this DOES NOT seem to be the case anymore, disabled with simpler method now
+					/*$rawtax=$product['OnlinePrice']*$product['TaxRate'];
 					$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,3)*100;
 					$digit3=explode('.',$rawtax);
 					if (isset($digit3[1])&&strlen($digit3[1])>2) $tax++;
 					//debug($tax);
 					$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
-					
+					*/
+					//simpler tax calculation which MINDBODY now seems to use, must keep an eye on this if they add more products, somewhat of a mystery
+					$tax=round($product['OnlinePrice']*$product['TaxRate'],2);
+					$product['ExtendedPrice']=$product['OnlinePrice']+$tax;
 					$this->Product->create();
 					if ($this->Product->save($product)) {
 						$this->Session->setFlash('Products have been updated','flash_success');

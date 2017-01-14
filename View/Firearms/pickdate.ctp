@@ -36,7 +36,7 @@ echo $this->Form->input('session_id',array('type'=>'hidden','value'=>$session_id
                 </div>
             </div>
 			<p><a href="#" onclick="location.reload();">Reset</a></p>
-			<?=$this->Form->submit('Continue', array('div' => false,'class'=>'btn btn-success btn-lg date-btns','onclick'=>$this->element('blockui',array('msg'=>'Finding time slots...'))))?>
+			<?=$this->Form->submit('Continue', array('div' => false,'id'=>'pickdateButton','class'=>'btn btn-success btn-lg date-btns','onclick'=>$this->element('blockui',array('msg'=>'Finding time slots...'))))?>
         </div>
 
         <script type="text/javascript">
@@ -59,8 +59,10 @@ echo $this->Form->input('session_id',array('type'=>'hidden','value'=>$session_id
 			$( document ).ready(function() {
 				$('#pickdate').data("DateTimePicker").show();
 				$("#cal-btn").prop ("onclick", null);
-
-			});
+				$( '[data-action="selectDay"]' ).click(function() {
+					//brief delay otherwise it can't update the form fast enough
+					setTimeout(function(){$( "#pickdateButton" ).click();},300);});
+				});
 			
 			$('#cal-btn').click(function(){
 				console.log('h');
