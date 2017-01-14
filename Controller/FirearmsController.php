@@ -562,10 +562,10 @@ class FirearmsController extends AppController {
 					$this->Cookie->write(array('SuccessfulCheckout'=>'miracle'));
 
 					//make an email
-					$email_body="CODY FIREARMS EXPERIENCE ORDER CONFIRMATION \n\n";
+					$email_body="CODY FIREARMS EXPERIENCE ORDER CONFIRMATION \n";
 					foreach ($checkout_items['Services'] as $mbdate=>$id){
 						$date_time=explode('T',$mbdate);
-						$email_body.="PACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
+						$email_body.="\n\nPACKAGE:\t".$id['Name']."\nDATE:\t\t".date('D M d, Y',strtotime($date_time[0]))."\nTIME:\t\t".date('h:i a',strtotime($date_time[1]))."\nPRICE:\t\t".money_format('$%i',$id['OnlinePrice']);
 						if (isset($id['Double'])) $email_body.= " Add a friend (2x ammo)+".money_format('$%i',$id['DoubleInfo']['OnlinePrice']);
 					}
 					if(!empty($checkout_items['Discount'])){

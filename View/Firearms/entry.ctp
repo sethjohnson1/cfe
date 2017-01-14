@@ -47,6 +47,12 @@ $carousel=array(
 		interval: 0
 	});
 	</script>
+	<div class="row top-pad">
+<div class="col-xs-12">
+<h3 align="center" style="border: 2px dashed red; width:90%; margin:0 auto">Don't miss our Mixed Winter League kick-off on January 20th!<br/ ><em>Couples Date Night & Wine Tasting</em><br/>
+<a href="<?=$this->base?>/files/CFE_mixed_league.pdf" class="">Click Here for More Information</a></h3>
+</div>
+</div>
 <div class="row top-pad">
 <div class="col-xs-12">
 <?=$this->Html->link('Book Online Now!',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
@@ -54,23 +60,34 @@ $carousel=array(
 </div>
 <div class="row top-pad">
 <div class="col-xs-12">
-<h1>Western-Themed Arcade <small>Fun for the entire family</small></h1>
+<a href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="btn btn-lg date-btns">Membership Flyer</a>
+</div>
+</div>
+<div class="row top-pad">
+<div class="col-xs-12">
+<a href="<?=$this->base?>/files/CFE_Package_Prices.pdf" class="btn btn-lg date-btns">Package Prices</a>
 </div>
 </div>
 
-
-<div class="row">
-<div class="col-xs-12 no-pad">
-<?=$this->Html->image('examples/arcade.jpg',array('class'=>'img-responsive'))?>
-</div>
-<div class="col-xs-12 top-pad">
+<div class="row top-pad">
+<div class="col-xs-12">
 <h1>State-of-the-Art Range <small>Modern Facility with Western feel</small></h1>
 </div>
 </div>
 
+
 <div class="row">
 <div class="col-xs-12 no-pad">
 <?=$this->Html->image('examples/range.jpg',array('class'=>'img-responsive'))?>
+</div>
+<div class="col-xs-12 top-pad">
+<h1>Western-Themed Arcade <small>Fun for the entire family</small></h1>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-12 no-pad">
+<?=$this->Html->image('examples/arcade.jpg',array('class'=>'img-responsive'))?>
 </div>
 
 <div class="col-xs-12 top-pad">

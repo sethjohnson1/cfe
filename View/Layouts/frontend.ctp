@@ -206,7 +206,8 @@ $(document).on('click',function(){
 		<ul>
 		<li>142 W. Yellowstone Ave Cody, Wyoming, USA 82414</li>
 		<li>(307) 586-4287</li>
-		<li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Email</a></li>	
+		<!-- li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Email</a></li -->	
+		<li><a href="mailto:codyfirearms@gmail.com">codyfirearms@gmail.com</a></li>	
 		</ul>
 		</div>
 
