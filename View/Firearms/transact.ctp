@@ -109,7 +109,8 @@ endforeach;
 <?endif?>
 Tax: <?=money_format('$%i',$tax_total)?></h4>
 <h3 align="center">Total: <?=money_format('$%i',$final_total)?></h3>
-<?=$this->Form->submit('Submit Payment', array('div' => false,'class'=>'btn btn-lg date-btns'))?>
+<h4 align="center">Please press the button only once</h4>
+<?=$this->Form->submit('Submit Payment', array('div' => false,'class'=>'btn btn-lg date-btns','onclick'=>$this->element('blockui',array('msg'=>'Processing Payment...'))))?>
 <?=$this->Form->end();?>
 </div>
 </div><!-- /transaction row -->

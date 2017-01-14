@@ -398,7 +398,8 @@ class FirearmsController extends AppController {
 				}		
 			}
 		}
-		
+		//round the FINAL total here and I think it will work
+		$final_total=round($final_total,2);
 		$tax_total=$final_total-$checkout_total;
 		//debug("\n\n".$checkout_total);
 		$final_total=round($final_total,2);

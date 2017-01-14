@@ -135,8 +135,8 @@ class ProductsController extends AppController {
 					//debug($tax);
 					$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
 					*/
-					//simpler tax calculation which MINDBODY now seems to use, must keep an eye on this if they add more products, somewhat of a mystery
-					$tax=round($product['OnlinePrice']*$product['TaxRate'],2);
+					//simpler tax calculation which MINDBODY now seems to use, DO NOT ROUND HERE! If there are multiple items ordered it rounds as a whole (e.g. 3+ targets rounds an extra penny)
+					$tax=$product['OnlinePrice']*$product['TaxRate'];
 					$product['ExtendedPrice']=$product['OnlinePrice']+$tax;
 					$this->Product->create();
 					if ($this->Product->save($product)) {
