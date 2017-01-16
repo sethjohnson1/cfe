@@ -148,24 +148,9 @@
 			<?foreach ($social_media as $name=>$s):?>
 			<li><?=$this->Html->link($this->Html->image('social_media/'.$s['img'],array('alt'=>$name,'class'=>'img-responsive')),$s['link'],array('escape'=>false,))?></li>
 			<?endforeach?>
-			
+			<div style="float:right; padding: 4px" class="fb-like" data-href="https://www.facebook.com/Codyfirearmexperience/" data-layout="box_count" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div>
             </ul>
-			<!-- small social media -->
-			<ul class="hidden-lg hidden-xl hidden-md nav navbar-nav navbar-right cfe-social-icons">
-			 <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-				<?=$this->Html->image('social_media/rss_45x45.png')?>
-				<span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-				<?foreach ($social_media as $name=>$s):?>
-                  <li>
-				  <?=$this->Html->link($this->Html->image('social_media/'.$s['img'],array('alt'=>$name,'class'=>'img-responsive','style'=>'float:left; padding-right:3px')).' '.$name,$s['link'],array('escape'=>false))?>
-				  </li>
-				 <?endforeach?>
 
-                </ul>
-              </li>
-			</ul>
           </div><!--/.nav-collapse -->
         </div><!--/container menu -->
       </nav> 
