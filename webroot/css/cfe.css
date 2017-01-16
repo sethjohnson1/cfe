@@ -2,6 +2,10 @@
 #eac05e is yellow
 #a22b29 is read
 */
+/* This is the small TripAdvisor widget visible on sm and xs only */
+.socialWidgetContainer{
+	display: block !important;
+}
 .session-flash{
 	font-size:1.5em;
 	margin: 75px 0 0 0;

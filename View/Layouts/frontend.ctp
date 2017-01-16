@@ -18,12 +18,14 @@
 
 	echo $this->Html->script('jquery.min');
 	echo $this->Html->script('jquery.blockUI');
+	echo $this->Html->script('jquery.colorbox-min');
 	//used by datepicker
 	echo $this->Html->script('moment.min');
 	echo $this->Html->script('bootstrap.min');
 	echo $this->Html->css('bootstrap.min');
 	echo $this->Html->script('bootstrap-datepicker.min');
 	echo $this->Html->css('bootstrap-datepicker.min');
+	echo $this->Html->css('colorbox');
 	
 
 //	echo $this->Html->css('proctor_overrides.css');
@@ -191,7 +193,7 @@ $(document).on('click',function(){
 				  <?=$this->Html->link($this->Html->image('social_media/'.$s['img'],array('alt'=>$name,'class'=>'img-responsive','style'=>'float: left; padding-right:4px;')).' ',$s['link'],array('escape'=>false))?>
 		<?endforeach?>
 		</div>
-		<div style="padding-top:20px">More coming soon!</div>
+		
 
 		</div>
 
@@ -207,7 +209,7 @@ $(document).on('click',function(){
 		<li>142 W. Yellowstone Ave Cody, Wyoming, USA 82414</li>
 		<li>(307) 586-4287</li>
 		<!-- li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Email</a></li -->	
-		<li><a href="mailto:codyfirearms@gmail.com">codyfirearms@gmail.com</a></li>	
+		<li><a href="mailto:info@codyfirearmsexperience.com">info@codyfirearmsexperience.com</a></li>	
 		</ul>
 		</div>
 
