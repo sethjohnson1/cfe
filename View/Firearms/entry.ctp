@@ -91,8 +91,8 @@ $carousel=array(
 <!-- /TripAdvisor widget -->
 </div>
 <div class="col-md-9 col-sm-12">
-<h3 align="center" style="border: 2px dashed red; width:90%; margin:0 auto">Don't miss our Mixed Winter League kick-off on January 20th!<br/ ><em>Couples Date Night & Wine Tasting</em><br/>
-<a href="<?=$this->base?>/files/CFE_mixed_league.pdf" class="">Click Here for More Information</a></h3>
+<!-- h3 align="center" style="border: 2px dashed red; width:90%; margin:0 auto">Don't miss our Mixed Winter League kick-off on January 20th!<br/ ><em>Couples Date Night & Wine Tasting</em><br/>
+<a href="<?=$this->base?>/files/CFE_mixed_league.pdf" class="">Click Here for More Information</a></h3 -->
 
 
 <div class="top-pad">
