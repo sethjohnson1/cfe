@@ -25,6 +25,7 @@
  * to use (in this case, /app/View/Pages/home.ctp)...
  */
 	Router::connect('/', array('controller' => 'firearms', 'action' => 'entry'));
+	Router::connect('/guns', array('controller' => 'firearms', 'action' => 'selection'));
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */
