@@ -18,7 +18,7 @@ class AppController extends Controller {
 		}
 		$desc=$this->Description->find('all',array('conditions'=>array('Description.pagetype'=>'firearm','Description.visible'=>true)));
 		$firearm_menu=array();
-		foreach ($desc as $d){
+	/*	foreach ($desc as $d){
 			$firearm_menu[$d['Description']['name']]=array('controller'=>'firearms','action'=>'learn','firearm',$d['Description']['slug']);
 		}
 		/*
@@ -37,7 +37,8 @@ class AppController extends Controller {
 			//'Features'=>array('dropdown'=>$f_menu),
 			//'Features'=>array('controller'=>'firearms','action'=>'features'),
 			'Packages'=>array('controller'=>'firearms','action'=>'packages'),
-			'Our Firearms'=>array('dropdown'=>$firearm_menu),
+			'Our Firearms'=>array('controller'=>'firearms','action'=>'selection'),
+			//'Our Firearms'=>array('dropdown'=>$firearm_menu),
 			'Firearms History'=>array('dropdown'=>$history_menu)
 			
 			

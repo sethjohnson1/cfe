@@ -72,7 +72,14 @@ class FirearmsController extends AppController {
 		$this->set('TheTitle','Welcome');
 		$this->render('entry','frontend');
 	}
-
+	public function selection(){
+		$pickpkg=$this->CFE_services;
+		$youtube=$this->Firearm->find('first',array('conditions'=>array('Firearm.name'=>'YouTube')));
+		$this->set(compact('pickpkg','youtube'));
+		$this->set('TheTitle','Gun selection');
+		$this->render('selection','frontend');
+	}
+	
 	public function features(){
 		$pickpkg=$this->CFE_services;
 		$this->set(compact('pickpkg'));

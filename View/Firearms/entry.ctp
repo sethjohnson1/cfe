@@ -98,9 +98,9 @@ $carousel=array(
 <a target="_blank" href="<?=$this->base?>/files/CFE_Package_Prices.pdf" class="btn btn-lg date-btns">Package Prices</a>
 </div>
 
-<!-- div class="top-pad">
-<a target="_blank" href="<?=$this->base?>..." class="btn btn-lg date-btns">Our Firearms</a>
-</div -->
+<div class="top-pad">
+<?=$this->Html->link('Our Firearms',['action'=>'selection','controller'=>'firearms'],['class'=>'btn btn-lg date-btns'])?>
+</div>
 
 <div class="top-pad">
 <?=$this->Html->link('Book Online Now!',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
@@ -198,7 +198,7 @@ $carousel=array(
 </div>
 
 <div class="col-xs-12 no-pad">
-<?=$this->Html->image('examples/arcade.jpg',array('class'=>'img-responsive','style'=>'width:100%'))?>
+<?=$this->Html->image('cody_firearms_experience_arcade.jpg',array('class'=>'img-responsive','style'=>'width:100%'))?>
 </div>
 </div>
 
