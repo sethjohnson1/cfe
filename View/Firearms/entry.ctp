@@ -45,7 +45,7 @@ $carousel=array(
 ?>
 <div class="row">
 <div class="col-xs-12 col-md-8 no-pad">
-<?$main_img=$this->Html->image('cfe_winter_homepage2.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
+<?$main_img=$this->Html->image('cody_firearms_experience_2017_spring.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
 </div>
 
 <div class="col-xs-12 col-md-4 no-pad">
@@ -94,19 +94,21 @@ $carousel=array(
 <!-- h3 align="center" style="border: 2px dashed red; width:90%; margin:0 auto">Don't miss our Mixed Winter League kick-off on January 20th!<br/ ><em>Couples Date Night & Wine Tasting</em><br/>
 <a href="<?=$this->base?>/files/CFE_mixed_league.pdf" class="">Click Here for More Information</a></h3 -->
 
+<div class="top-pad">
+<a target="_blank" href="<?=$this->base?>/files/CFE_Package_Prices.pdf" class="btn btn-lg date-btns">Package Prices</a>
+</div>
+
+<!-- div class="top-pad">
+<a target="_blank" href="<?=$this->base?>..." class="btn btn-lg date-btns">Our Firearms</a>
+</div -->
 
 <div class="top-pad">
 <?=$this->Html->link('Book Online Now!',array('controller'=>'firearms','action'=>'packages'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 
-<div class="top-pad">
-<a target="_blank" href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="btn btn-lg date-btns">Membership Flyer</a>
-</div>
 
 
-<div class="top-pad">
-<a target="_blank" href="<?=$this->base?>/files/CFE_Package_Prices.pdf" class="btn btn-lg date-btns">Package Prices</a>
-</div>
+
 
 
 </div>
@@ -124,7 +126,7 @@ $carousel=array(
 <div class="col-md-8 col-sm-12">
 <div class="row">
 <div class="col-xs-12 no-pad">
-<?=$this->Html->image('examples/range.jpg',array('class'=>'img-responsive'))?>
+<?=$this->Html->image('cody_firearms_experience_range.jpg',array('class'=>'img-responsive'))?>
 </div>
 <div class="col-xs-6"  style="padding-left:5px">
 <section>

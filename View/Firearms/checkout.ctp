@@ -1,6 +1,6 @@
 <div class="row">
 <div class="col-xs-12">
-<h3>Confirm your dates and times. <small><em>Once booked, a slot cannot be canceled or refunded.</em></small></h3>
+<h3>Confirm your dates and times. <small><em>Two hours notice is required to cancel your slot</em></small></h3>
 <table class="table table-hover"> 
 <thead> <tr> <th>Package</th> <th>Date</th> <th>Time</th> <th>Price</th><th>2x ammo</th> </tr> </thead><tbody> 
 <?
@@ -53,6 +53,9 @@ endforeach;
 <h3><?=$this->Html->link('<< Back to Cart',array('action'=>'cart'))?></h3>
 
 <h3 align="center">Sub-Total: <small><em>only</em></small> <?=money_format('$%i',$checkout_total)?><br />
+<?if($percentOff[0]['Firearm']['setting_value']>0):?>
+<small style="color:red"><?=$percentOff[0]['Firearm']['setting_value']?>% discount: <?=money_format('$%i',$discount_total)?></small><br />
+<?endif?>
 <small>Tax: <?=money_format('$%i',$tax_total)?></small><br />
 Total: <?=money_format('$%i',$final_total)?>
 

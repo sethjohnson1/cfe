@@ -38,6 +38,7 @@ class ProductsController extends AppController {
 		$this->CFE_ComboTypeIDs=explode(',',$settings['appointmentSessionIDs']);
 		$dbl=explode(',',$settings['doubleSessionIDs']);
 		$this->CFE_DoubleTypeIDs=array();
+		$this->allSettings=$settings;
 		//as long as they listed them in the same order this works
 		foreach ($dbl as $k=>$v){
 			$this->CFE_DoubleTypeIDs[$this->CFE_ComboTypeIDs[$k]]=$v;
@@ -75,9 +76,10 @@ class ProductsController extends AppController {
 		//Use a ZERO for SellOnline false
 		//$data=$mb->GetProducts(array('XMLDetail'=>'Full','SellOnline'=>0,'SearchDomain'=>'Name','SearchText'=>'frosting','PageSize'=>30));
 		$data=$mb->GetProducts(array('SellOnline'=>0,'PageSize'=>30));
-		debug($data);
+		//debug($data);
 		$this->set('request',$mb->getXMLRequest());
 		$this->set('response',$mb->getXMLResponse());
+		debug($this->allSettings);
 
 		
 	}
@@ -136,8 +138,13 @@ class ProductsController extends AppController {
 					$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
 					*/
 					//simpler tax calculation which MINDBODY now seems to use, DO NOT ROUND HERE! If there are multiple items ordered it rounds as a whole (e.g. 3+ targets rounds an extra penny)
-					$tax=$product['OnlinePrice']*$product['TaxRate'];
-					$product['ExtendedPrice']=$product['OnlinePrice']+$tax;
+					$percent=$this->allSettings['percentageDiscount']/100;
+					//this is where MINDBODY rounds
+					$price=$product['OnlinePrice']-round(($product['OnlinePrice']*$percent),2);
+					$product['DiscountedPrice']=$price;
+					//confirmed tax is calculated based on discounted price
+					$tax=$product['DiscountedPrice']*$product['TaxRate'];
+					$product['ExtendedPrice']=$price+$tax;
 					$this->Product->create();
 					if ($this->Product->save($product)) {
 						$this->Session->setFlash('Products have been updated','flash_success');
@@ -171,11 +178,13 @@ class ProductsController extends AppController {
 				$product['SessionTypeID']=$ses_id;	
 				$product['SessionTypeName']='Service';
 				$product['DoubleTypeID']=$this->CFE_DoubleTypeIDs[$ses_id];
-				$tax=number_format(floor(($product['OnlinePrice']*$product['TaxRate'])*100)/100,2)*100;
-				//debug($tax);
-				//unless it finished even, in which case no rounding!
-				if ( $tax & 1 )$tax++;
-				$product['ExtendedPrice']=$product['OnlinePrice']+($tax/100);
+				//simpler tax calculation which MINDBODY now seems to use, DO NOT ROUND HERE! If there are multiple items ordered it rounds as a whole (e.g. 3+ targets rounds an extra penny)
+				$percent=$this->allSettings['percentageDiscount']/100;
+				$price=$product['OnlinePrice']-round(($product['OnlinePrice']*$percent),2);
+				$product['DiscountedPrice']=$price;
+				//I have confirmed tax is based on discounted price
+				$tax=$product['DiscountedPrice']*$product['TaxRate'];
+				$product['ExtendedPrice']=$price+$tax;
 				$this->Product->create();
 				if ($this->Product->save($product)) {
 					$this->Session->setFlash('Products have been updated','flash_success');
@@ -207,7 +216,7 @@ class ProductsController extends AppController {
 			unset($settings['discountDesc']);
 			unset($settings['amount']);
 			//debug($settings);
-			//just for testing, may not want to do this - the loop does it individually
+			//yes deleting is the best way otherwise old settings could stay
 			$this->Firearm->deleteAll(array(1=>1));
 			//build the appoint/double into a single setting as it was originally
 			foreach ($settings['appointmentSessionIDs'] as $k=>$s){

@@ -11,7 +11,10 @@ class FirearmsController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Product');
 		$this->Auth->allow();
-		$this->CFE_discounts=$this->Firearm->find('all',array('conditions'=>array('Firearm.name'=>'discount')));$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
+		$this->percent_discount=$this->Firearm->find('all',array('conditions'=>array('Firearm.name'=>'percentageDiscount')));
+		$this->CFE_discounts=$this->Firearm->find('all',array('conditions'=>array('Firearm.name'=>'discount')));
+		
+		$extras=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Product')));
 		$new_ex=array();
 		foreach ($extras as $extra){
 			$new_ex[$extra['Product']['barcodeID']]=$extra['Product'];
@@ -19,8 +22,9 @@ class FirearmsController extends AppController {
 		$this->CFE_extras=$new_ex;
 		//first find doubles, we will add them to product for ease of checkout
 		//TESTING TO SEE IF GROUP ID CHECKS OUT
-		$dbl=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Double'),'fields'=>array('barcodeID','GroupID','Price','OnlinePrice','TaxRate','ExtendedPrice')));
+		$dbl=$this->Product->find('all',array('conditions'=>array('Product.prodtype'=>'Double'),'fields'=>array('barcodeID','GroupID','Price','OnlinePrice','TaxRate','ExtendedPrice','DiscountedPrice')));
 		$new_dbl=array();
+		//debug($dbl);
 		foreach ($dbl as $d){
 			$new_dbl[$d['Product']['GroupID']]=$d['Product'];
 		}
@@ -58,6 +62,7 @@ class FirearmsController extends AppController {
 		foreach ($days as $day) if (!$opts[$day]) $days_off[$day]=$day;
 		$opts['weekdaysOff']=$days_off;
 		$this->CFE_settings=$opts;
+		$this->set('percentOff',$this->percent_discount);
 	}
 	
 	public function entry(){
@@ -355,6 +360,7 @@ class FirearmsController extends AppController {
 
 
 		$checkout_items=$this->Cookie->read('CheckoutItems');
+	//	debug($checkout_items);
 		if (!isset($checkout_items['Services'])){
 			$this->Session->setFlash('No current package selected. Selected package may have expired.', 'flash_custom');
 			return $this->redirect(array('action' => 'cart'));
@@ -364,6 +370,7 @@ class FirearmsController extends AppController {
 		$checkout_total=0;
 		$tax_total=0;
 		$final_total=0;
+		$discount_total=0;
 		if (!empty($checkout_items['Discount'])){
 			$discount_array=explode('_',$checkout_items['Discount']);
 			//debug($discount_array);
@@ -373,6 +380,7 @@ class FirearmsController extends AppController {
 		}
 		if (isset($checkout_items['Services'])){
 			foreach ($checkout_items['Services'] as $mbdate=>$pid){
+			//this is legacy old shit here
 				$checkout_total=($checkout_total+$pid['OnlinePrice'])-$discount_array[0];
 				//the extended price for package DOES NOT WORK with discounts (or so I thought), there aren't any so we're doing it the old way
 				/*
@@ -384,9 +392,11 @@ class FirearmsController extends AppController {
 				$pid['ExtendedPrice']=$checkout_total+($tax/100);
 				*/
 				$final_total=$final_total+$pid['ExtendedPrice'];
+				$discount_total=$discount_total+$pid['DiscountedPrice'];
 				if (isset($pid['Double'])){
 					$checkout_total=$checkout_total+$pid['DoubleInfo']['OnlinePrice'];
 					$final_total=$final_total+$pid['DoubleInfo']['ExtendedPrice'];
+					$discount_total=$discount_total+$pid['DoubleInfo']['DiscountedPrice'];
 				}
 			}
 		}
@@ -394,19 +404,22 @@ class FirearmsController extends AppController {
 			foreach ($checkout_items['Extras'] as $pid=>$qty){
 				if ($qty>0){
 				$checkout_total=$checkout_total+($extras[$pid]['OnlinePrice']*$qty);	
+				$discount_total=$discount_total+($extras[$pid]['DiscountedPrice']*$qty);	
 				$final_total=$final_total+($extras[$pid]['ExtendedPrice']*$qty);	
 				}		
 			}
 		}
 		//round the FINAL total here and I think it will work
 		$final_total=round($final_total,2);
-		$tax_total=$final_total-$checkout_total;
+		$discount_total=$discount_total-$checkout_total;
+		$discount_total=round($discount_total,2);
+		$tax_total=$final_total-$checkout_total-$discount_total;
 		//debug("\n\n".$checkout_total);
 		$final_total=round($final_total,2);
 		$this->Cookie->write('CheckoutTotal',$final_total);
 		$this->Cookie->write('DiscountTotal',$discount_array);
 		$this->Cookie->write('SubTotals',array('tax'=>$tax_total,'sub'=>$checkout_total));
-		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total'));
+		$this->set(compact('checkout_items','services','extras','final_total','checkout_total','tax_total','discount_total'));
 		//for building the email	
 		$this->Cookie->write('checkoutExtras',$checkout_items['Extras']);
 		$this->Cookie->write('checkoutSubtotal',$checkout_total);
@@ -536,7 +549,7 @@ class FirearmsController extends AppController {
 					$PaymentInfo['BillingPostalCode']=$this->request->data['Firearm']['PostalCode'];
 				}
 								
-				//for testing with comp
+				//for testing with comp, easy to leave at zero to test cart totals
 				if (Configure::read('testMode')=='yes') $Payments['PaymentInfo']=new SoapVar(array('Amount'=>0), SOAP_ENC_ARRAY, 'CompInfo', 'http://clients.mindbodyonline.com/api/0_5');
 				
 				else $Payments['PaymentInfo']=new SoapVar($PaymentInfo, SOAP_ENC_ARRAY, 'CreditCardInfo', 'http://clients.mindbodyonline.com/api/0_5');
@@ -548,10 +561,10 @@ class FirearmsController extends AppController {
 					'ClientID'=>$ClientID,
 					'CartItems'=>$CartItems,
 					'Payments'=>$Payments,
-					//products WILL NOT SELL unless you say InStore...
+					//products WILL NOT SELL unless you say InStore. AND - as it would seem - the OnlinePrice is no longer used as a result (new as of January 2017 sometime)
 					'InStore'=>true,
-					//this applies the discount to ALL items and is therefore worthless in our situation
-					//'PromotionCode'=>'MILITARY'
+					//this applies the discount to all items, must match the admin section
+					'PromotionCode'=>'online'
 				));
 				//debug($CartItems);
 				//debug($checkout);
@@ -588,10 +601,10 @@ class FirearmsController extends AppController {
 					$email_body.="\nTOTAL:\t\t".money_format('$%i',$Amount);
 					$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.";
 					
-					//send the email before redirecting, this can be done from MINDBODY someday
+					//send the email before redirecting, this canNOT be done from MINDBODY
 					$Email = new CakeEmail();
 					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
-					$Email->cc(Configure::read('adminEmail'));
+					$Email->cc(array(Configure::read('adminEmail'),Configure::read('paulEmail')));
 					$Email->to($client['Email']);
 					$Email->subject('Booking confirmation');
 					$Email->send($email_body);
@@ -633,8 +646,8 @@ class FirearmsController extends AppController {
 		
 					$Email = new CakeEmail();
 					$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
-					$Email->to(Configure::read('adminEmail'));
-					$Email->cc('sethj@centerofthewest.org');
+					$Email->to(array(Configure::read('adminEmail'),Configure::read('paulEmail')));
+					//$Email->cc();
 					$Email->subject('Online booking error!!');
 					$Email->send($email_body);
 					

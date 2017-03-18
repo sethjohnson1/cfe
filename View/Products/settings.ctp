@@ -56,7 +56,7 @@ echo $this->Form->input('doubleSessionIDs',array('class'=>'form-control','label'
 </div>
 <?endfor;?>
 </div>
-<h4>Discount ID &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Description &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Amount</h4>
+<!-- h4>Discount ID &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Description &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Amount</h4>
 <?//debug($discount_fill)?>
 <div class="row">
 <?for ($i=0;$i<3;$i++):?>
@@ -82,15 +82,15 @@ echo $this->Form->input('amount',array('class'=>'form-control','label'=>false,'n
 ?>
 </div>
 <?endfor;?>
-</div>
+</div -->
 
 <?
-//echo $this->Form->input('everythingSessionID',array('class'=>'form-control','label'=>'All That & a Gat Session IDs - You must have one package assigned just to gatling and another to all lanes, comma list in order you want them booked')).'<br />';
 
 //this is disabled, just two now - one for targets the other for double
 //echo $this->Form->input('nontaxableCategoryID',array('class'=>'form-control','label'=>'No Tax category ID')).'<br />';
 echo $this->Form->input('taxableCategoryID',array('class'=>'form-control','label'=>'Tax category ID (Range retail)')).'<br />';
 echo $this->Form->input('doubleCategoryID',array('class'=>'form-control','label'=>'Double ammo (Package Sales)')).'<br />';
+echo $this->Form->input('percentageDiscount',array('class'=>'form-control','label'=>'% discount. Must match "online" promo code in MINDBODY!')).'<br />';
 echo $this->Form->input('YouTube',array('class'=>'form-control','label'=>'YouTube video ID')).'<br />';
 
 echo $this->Form->submit('Save', array('div' => false,'class'=>'pad btn btn-success btn-lg date-btns'));
