@@ -124,6 +124,9 @@ $(".googlemap").colorbox({ html:'<iframe src="https://www.google.com/maps/embed?
 </table>
 <p>*Packages coming soon!</p>
 </div><!-- column 2 -->
+<div class="col-xs-12"><h4><a target="_blank" href="<?=$this->base?>/files/CFE_Liability_Release.pdf" class="">Liability Release</a> Print it and bring it with you to save time at the checkout!</h4>
+<? //debug(WWW_ROOT.'files/CFE_Liability_Release.pdf')?>
+</div>
 </div><!-- list row -->
 
 

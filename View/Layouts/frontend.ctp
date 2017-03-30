@@ -195,6 +195,7 @@ $(document).on('click',function(){
 		<li>(307) 586-4287</li>
 		<!-- li><a href="#" class="" data-toggle="modal" data-target="#contactModal">Email</a></li -->	
 		<li><a href="mailto:info@codyfirearmsexperience.com">info@codyfirearmsexperience.com</a></li>	
+		<li><a target="_blank" href="<?=$this->base?>/files/CFE_Liability_Release.pdf" class="">Liability Release</a> Fill it out and bring it with you to speed up the checkout process!</li>
 		</ul>
 		</div>
 
