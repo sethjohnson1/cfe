@@ -606,7 +606,7 @@ class FirearmsController extends AppController {
 					$email_body.="\nSUBTOTAL:\t".money_format('$%i',$Subtotal);
 					$email_body.="\nTAX:\t\t".money_format('$%i',$Tax);
 					$email_body.="\nTOTAL:\t\t".money_format('$%i',$Amount);
-					$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.";
+					$email_body.="\n\nThank you for your order, we look forward to seeing you soon. Please do not be more than 10 minutes late or we may have to cancel your reservation. If you have any questions simply reply to this e-mail or call 307-586-4287.\n\n We have attached a copy of our liability release, please print it and complete it if you can - we will get you on the range even faster!";
 					
 					//send the email before redirecting, this canNOT be done from MINDBODY
 					$Email = new CakeEmail();
@@ -614,6 +614,7 @@ class FirearmsController extends AppController {
 					$Email->cc(array(Configure::read('adminEmail'),Configure::read('paulEmail')));
 					$Email->to($client['Email']);
 					$Email->subject('Booking confirmation');
+					$Email->attachments(WWW_ROOT.'files/CFE_Liability_Release.pdf');
 					$Email->send($email_body);
 
 					
@@ -681,7 +682,7 @@ class FirearmsController extends AppController {
 	public function thankyou() {
 	//need to add tracking pixel here!!
 	$legit=$this->Cookie->read('SuccessfulCheckout');
-	if ($legit=='miracle'){
+	if ($legit=='miracle' || Configure::read('debug')>0){
 			$cart=$this->Cookie->read('CartItems');
 			//debug($cart);
 			//erase all trace!

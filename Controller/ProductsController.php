@@ -19,6 +19,7 @@ Production IDs (put these into the settings page now)
 20160111185337924
 */
 App::uses('AppController', 'Controller');
+App::uses('CakeEmail','Network/Email');
 
 class ProductsController extends AppController {
 
@@ -79,6 +80,13 @@ class ProductsController extends AppController {
 		//debug($data);
 		$this->set('request',$mb->getXMLRequest());
 		$this->set('response',$mb->getXMLResponse());
+		$Email = new CakeEmail();
+		$Email->from(array('info@codyfirearmsexperience.com' => 'Cody Firearms Experience'));
+		$Email->cc(array(Configure::read('adminEmail'),Configure::read('paulEmail')));
+		$Email->to($client['Email']);
+		$Email->subject('Booking confirmation');
+		$Email->attachments(WWW_ROOT.'files/CFE_Liability_Release.pdf');
+		$Email->send('test email');
 		debug($this->allSettings);
 
 		

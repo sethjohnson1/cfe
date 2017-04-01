@@ -18,6 +18,7 @@ endforeach;
 ?>
 </ul>
 <h2 style="color:red">Please arrive on time, if you're more than 10 minutes late we may have to cancel your reservation.</h2>
+<h3><a target="_blank" href="<?=$this->base?>/files/CFE_Liability_Release.pdf" class="">Click here for the Liability Release.</a> Please print and complete it if you can, this will get you on the range even faster!</h3>
 <p>
 <?=$this->Html->link('Return Home','/',array('class'=>'btn btn-success btn-lg','role'=>'button'))?></p>
 </div>
