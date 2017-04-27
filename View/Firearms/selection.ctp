@@ -87,8 +87,8 @@ $(".googlemap").colorbox({ html:'<iframe src="https://www.google.com/maps/embed?
 <tr><td>1860 Henry 22 Cal rifle </td>	<td>22</td>	<td>12</td></tr>
 <tr class="header"><th>Single Shot Rifle</th><th>Caliber</th><th>Rounds</th></tr>
 
-<tr><td>1874 Sharps</td>	<td>45/70</td>	<td>10</td></tr>
-<tr><td>1873 Springfield Trapdoor</td>	<td>45/70</td>	<td>10</td></tr>
+<tr><td>1874 Sharps</td>	<td>45/70</td>	<td>5</td></tr>
+<tr><td>1873 Springfield Trapdoor</td>	<td>45/70</td>	<td>5</td></tr>
 <tr class="header"><th>Coach Gun (Shotgun)</th><th>Caliber</th><th>Rounds</th></tr>
 
 <tr><td>1878 Coach Gun</td>	<td>12 ga.</td>	<td>5</td></tr>
@@ -100,29 +100,31 @@ $(".googlemap").colorbox({ html:'<iframe src="https://www.google.com/maps/embed?
 <tbody>
 <tr class="header"><th>Revolvers</th><th>Caliber</th><th>Rounds</th></tr>
 <tr><td>Ruger Vaquero</td><td>45LC</td><td>10</td></tr>
-<tr><td>Smith & Wesson Model 29</td><td>44M</td><td>10</td></tr>
+<tr><td>Smith & Wesson Model 29</td><td>44Mag</td><td>10</td></tr>
+
 <tr class="header"><th>Semi-Auto Pistols</th><th>Caliber</th><th>Rounds</th></tr>
+<tr><td>1911 A1 45 Auto</td><td>45 acp</td><td>10</td></tr>
 <tr><td>Glock 17</td><td>9mm</td><td>10</td></tr>
 <tr><td>Glock 19</td><td>9mm</td><td>10</td></tr>
 <tr><td>Glock 20</td><td>10mm</td><td>8</td></tr>
 <tr><td>Glock 21</td><td>45 acp</td><td>10</td></tr>
-<tr><td>Ruger SR1911 </td><td>45 acp</td><td>10</td></tr>
+
 
 <tr class="header"><th>Semiautomatic Rifles</th><th>Caliber</th><th>Rounds</th></tr>
-<tr><td>H&amp;R ARMS M-1 GARAND </td><td>30-06</td><td>8</td></tr>
-<tr><td>M-1 Carbine</td><td>30 car</td><td>10</td></tr>
+<tr><td>WWII M-1 GARAND </td><td>30-06</td><td>8</td></tr>
+<tr><td>WWII M-1 Carbine</td><td>30 car</td><td>10</td></tr>
 <tr><td>Anderson Arms AR-15 </td><td>223</td><td>10</td></tr>
 <tr><td>Mossberg AR-15 </td><td>22</td><td>12</td></tr>
 <tr><td>FN AR</td><td>308</td><td>10</td></tr>
 <tr class="header"><th></th></tr>
 <tr class="header"><th>Gatling Gun</th><th>Caliber</th><th>Rounds</th></tr>
 <tr><td>Model 1862 Gatling Gun</td><td>45LC</td><td>20 or 40</td></tr>
-<tr class="header"><th>Machine Guns*</th><th>Caliber</th><th>Rounds</th></tr>
-<tr><td>FN SCAR 16</td><td>5.56</td><td>25</td></tr>
-<tr><td>FN P90 Tactical</td><td>5.7</td><td>40</td></tr>
+<tr class="header"><th>Machine Guns</th><th>Caliber</th><th>Rounds</th></tr>
+<tr><td>Coming soon!</td><td></td><td></td></tr>
+<!--tr><td>FN SCAR 16</td><td>5.56</td><td>25</td></tr>
+<tr><td>FN P90 Tactical</td><td>5.7</td><td>40</td></tr -->
 </tbody>
 </table>
-<p>*Packages coming soon!</p>
 </div><!-- column 2 -->
 <div class="col-xs-12"><h4><a target="_blank" href="<?=$this->base?>/files/CFE_Liability_Release.pdf" class="">Liability Release</a> Print it and bring it with you to save time at the checkout!</h4>
 <? //debug(WWW_ROOT.'files/CFE_Liability_Release.pdf')?>
