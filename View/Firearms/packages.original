@@ -7,12 +7,23 @@ ALL PACKAGE FIREARMS ARE MODERN DAY REPRODUCTIONS</small></h3>
 <h3>Call us for lane rental information. Memberships available! (307) 586-4287</h3>
 
 </div>
-
-<div class="col-xs-12">
-<!-- Start Square Appointments Embed Code --><script src='https://squareup.com/appointments/buyer/widget/8cffcc35-5f18-41a0-b1a4-5ae0c7f67f5a/BQFGWD6C7SMVJ.js'></script><!-- End Square Appointments EmbedCode -->
-</div>
 </div>
 
+<?//debug($packages);?>
+<?foreach ($packages as $id=>$pkg):?>
+<a name=<?=$pkg['Description']['slug']?>></a>
+<div class="row package">
+<?=$this->element('Guns/package_description',array('pkg'=>$pkg))?>
+
+<?
+/* THIS IS DISABLED, JUST USING DESCRIPTION FOR NOW, OLD WAY OF ECHO ELEMENT
+echo $this->element('Guns/'.$pkg['Description']['description'],array('pkg'=>$pkg))
+
+******/
+?>
+
+</div>
+<?endforeach?>
 <br />
 
 

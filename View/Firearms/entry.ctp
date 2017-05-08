@@ -183,12 +183,9 @@ $carousel=array(
 <div class="col-xs-12">
 
 <h1 align=center>Book Online<small> Hassle-free</small></h1>
-<?foreach ($pickpkg as $id=>$pkg):?>
-<div class="col-xs-12" style="padding:10px;">
-<?=$this->Html->link($pkg['Name'],array('action'=>'pickdate',$id,$pkg['SessionTypeID']),array('class'=>'btn btn-lg btn-success date-btns','style'=>'','onclick'=>$this->element('blockui',array('msg'=>'Checking dates...'))))?>
+<!-- Start Square Appointments Embed Code --><script src='https://squareup.com/appointments/buyer/widget/8cffcc35-5f18-41a0-b1a4-5ae0c7f67f5a/BQFGWD6C7SMVJ.js'></script><!-- End Square Appointments EmbedCode -->
 
-</div>
-<?endforeach?><h3 align=center>Call us for lane rental information. <a target="_blank" href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="">Memberships available!</a> (307) 586-4287</h3>
+<h3 align=center>Call us for lane rental information. <a target="_blank" href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="">Memberships available!</a> (307) 586-4287</h3>
 </div>
 </div>
 

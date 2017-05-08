@@ -36,7 +36,7 @@ class AppController extends Controller {
 		$menu_array=array(
 			//'Features'=>array('dropdown'=>$f_menu),
 			//'Features'=>array('controller'=>'firearms','action'=>'features'),
-			'Packages'=>array('controller'=>'firearms','action'=>'packages'),
+			'Book Now'=>array('controller'=>'firearms','action'=>'packages'),
 			'Our Firearms'=>array('controller'=>'firearms','action'=>'selection'),
 			//'Our Firearms'=>array('dropdown'=>$firearm_menu),
 			'Firearms History'=>array('dropdown'=>$history_menu)

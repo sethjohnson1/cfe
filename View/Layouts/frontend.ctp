@@ -200,7 +200,7 @@ $(document).on('click',function(){
 		</div>
 
       </footer>
-			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC. Credit card processing and online booking are Powered by <a href="http://www.mindbody.com">MINDBODY</a>.'?></p>
+			<p align="center"><?='&copy; '.date('Y').' Cody Firearms Experience, LLC'?></p>
 </div><!-- /container -->
 
 <?
