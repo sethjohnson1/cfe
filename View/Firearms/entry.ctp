@@ -224,15 +224,3 @@ $carousel=array(
 <?=$this->Html->link('Our Firearms',array('action'=>'learn','firearm','indian_trade_musket'),array('class'=>'btn btn-lg date-btns'))?>
 </div>
 </div>
-<div class="row jumbotron firearm" style="margin-top:17px;">
-<div class="col-xs-12">
-
-<h1 align=center>Book Online<small> Hassle-free</small></h1>
-<?foreach ($pickpkg as $id=>$pkg):?>
-<div class="col-xs-12" style="padding:10px;">
-<?=$this->Html->link($pkg['Name'],array('action'=>'pickdate',$id,$pkg['SessionTypeID']),array('class'=>'btn btn-lg btn-success date-btns','style'=>'','onclick'=>$this->element('blockui',array('msg'=>'Checking dates...'))))?>
-
-</div>
-<?endforeach?><h3 align=center>Call us for lane rental information. <a target="_blank" href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="">Memberships available!</a> (307) 586-4287</h3>
-</div>
-</div>

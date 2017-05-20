@@ -9,7 +9,9 @@ ALL PACKAGE FIREARMS ARE MODERN DAY REPRODUCTIONS</small></h3>
 </div>
 
 <div class="col-xs-12">
+<div class="square-booking-container">
 <!-- Start Square Appointments Embed Code --><script src='https://squareup.com/appointments/buyer/widget/8cffcc35-5f18-41a0-b1a4-5ae0c7f67f5a/BQFGWD6C7SMVJ.js'></script><!-- End Square Appointments EmbedCode -->
+</div>
 </div>
 </div>
 
