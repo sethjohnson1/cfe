@@ -45,7 +45,7 @@ $carousel=array(
 ?>
 <div class="row">
 <div class="col-xs-12 col-md-8 no-pad">
-<?$main_img=$this->Html->image('cody_firearms_experience_2017_spring.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
+<?$main_img=$this->Html->image('Home_page_Spring_2017_May.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
 </div>
 
 <div class="col-xs-12 col-md-4 no-pad">
@@ -183,8 +183,9 @@ $carousel=array(
 <div class="col-xs-12">
 
 <h1 align=center>Book Online<small> Hassle-free</small></h1>
+<div class="square-booking-container">
 <!-- Start Square Appointments Embed Code --><script src='https://squareup.com/appointments/buyer/widget/8cffcc35-5f18-41a0-b1a4-5ae0c7f67f5a/BQFGWD6C7SMVJ.js'></script><!-- End Square Appointments EmbedCode -->
-
+</div>
 <h3 align=center>Call us for lane rental information. <a target="_blank" href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="">Memberships available!</a> (307) 586-4287</h3>
 </div>
 </div>
