@@ -134,7 +134,7 @@ $carousel=array(
 <ul class="">
 <li><strong>No experience required!</strong> Our packages includes everything you need to shoot live ammunition</li>
 <li><strong>Huge selection of guns</strong> including modern tactical and historic replicas</li>
-<li>...including the 1865 Gatling Gun, P90 Tactical, and SCAR 16 CQC machine guns</li>
+<li>...including the 1865 Gatling Gun, M-16, and Thompson sub-machine gun</li>
 <li>All packages include <strong>one-on-one expert instruction</strong> for uncompromising safety and fascinating facts</li>
 <li><strong>Unique retail items</strong>, <strong>Cowboy-Western Arcade</strong>, and <strong>North American Wildlife Display</strong> ensure fun for the whole family</li>
 </ul>

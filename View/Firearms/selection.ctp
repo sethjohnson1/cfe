@@ -119,8 +119,10 @@ $(".googlemap").colorbox({ html:'<iframe src="https://www.google.com/maps/embed?
 <tr class="header"><th></th></tr>
 <tr class="header"><th>Gatling Gun</th><th>Caliber</th><th>Rounds</th></tr>
 <tr><td>Model 1862 Gatling Gun</td><td>45LC</td><td>20 or 40</td></tr>
-<tr class="header"><th>Machine Guns</th><th>Caliber</th><th>Rounds</th></tr>
-<tr><td>Coming soon!</td><td></td><td></td></tr>
+<tr class="header"><th>Machine Guns*</th><th>Caliber</th><th>Rounds</th></tr>
+<tr><td>Thompson sub-machine gun</td><td></td><td>25</td></tr>
+<tr><td>Full Auto M-16</td><td></td><td>25</td></tr>
+<tr><td><em><strong>*Must be 18 or above</strong></em></td><td></td><td></td></tr>
 <!--tr><td>FN SCAR 16</td><td>5.56</td><td>25</td></tr>
 <tr><td>FN P90 Tactical</td><td>5.7</td><td>40</td></tr -->
 </tbody>
