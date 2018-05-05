@@ -45,13 +45,15 @@ $carousel=array(
 ?>
 <div class="row">
 <div class="col-xs-12 col-md-8 no-pad">
-<?$main_img=$this->Html->image('Home_page_Spring_2017_May.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
+<?php $main_img=$this->Html->image('Home_page_Spring_2017_May.jpg',array('class'=>'img-responsive','alt'=>'Cody Firearms Experience'));echo $this->Html->link($main_img,array('action'=>'packages'),array('escape'=>false));?>
+
 </div>
 
 <div class="col-xs-12 col-md-4 no-pad">
 <div class="video-container">
-         <iframe src="https://www.youtube.com/embed/<?=$youtube['Firearm']['setting_value']?>?rel=0&modestbranding=1" frameborder="0" width="560" height="315"></iframe>
+         <iframe src="https://www.youtube.com/embed/lhQGjaTmFP0?rel=0&modestbranding=1&controls=1&showinfo=0" frameborder="0" width="560" height="315"></iframe>
 </div>
+
 </div>
 <div class="col-xs-12 col-md-4 hidden-sm hidden-xs no-pad" style="">
 <?=$this->Html->image('shooters2.jpg',array('class'=>'img-responsive'))?>
@@ -183,9 +185,8 @@ $carousel=array(
 <div class="col-xs-12">
 
 <h1 align=center>Book Online<small> Hassle-free</small></h1>
-<div class="square-booking-container">
-<!-- Start Square Appointments Embed Code --><script src='https://squareup.com/appointments/buyer/widget/8cffcc35-5f18-41a0-b1a4-5ae0c7f67f5a/BQFGWD6C7SMVJ.js'></script><!-- End Square Appointments EmbedCode -->
-</div>
+<script id="setmore_script" type="text/javascript" src="https://my.setmore.com/webapp/js/src/others/setmore_iframe.js"></script>
+<p align="center"><a id="Setmore_button_iframe" style="float:none" href="https://my.setmore.com/bookingpage/46fcf027-a223-4e1a-9851-0570ad9ec7ea"><img border="none" src="https://my.setmore.com/webapp/images/bookappt/SetMore-book-button.png" alt="Book an appointment with Cody Firearms Experience, LLC using SetMore" /></a></p>
 <h3 align=center>Call us for lane rental information. <a target="_blank" href="<?=$this->base?>/files/CFE_2017_winter_spring_membership_flyer.pdf" class="">Memberships available!</a> (307) 586-4287</h3>
 </div>
 </div>
